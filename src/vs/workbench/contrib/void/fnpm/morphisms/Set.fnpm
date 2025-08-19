@@ -1,0 +1,101 @@
+⟁: Set
+🎯: mathematical-set-operations
+🧮: (sets) => set_theory_operations
+💭: "Множинні операції як морфізми"
+
+🧠:
+  description: "Set theory operations as morphisms"
+  signature: "(Set[]) → Set"
+  pure: true
+  idempotent: true
+
+dependencies:
+  - glyph://category-theory@foundation
+
+morphisms:
+  union:
+    ⟁: union
+    🧩: [A, B]
+    🧮: "[...new Set([...A, ...B])]"
+    🎯: "A ∪ B"
+    
+  intersection:
+    ⟁: intersection
+    🧩: [A, B]  
+    🧮: "[...A].filter(x => B.has(x))"
+    🎯: "A ∩ B"
+    
+  difference:
+    ⟁: difference
+    🧩: [A, B]
+    🧮: "[...A].filter(x => !B.has(x))"
+    🎯: "A \\ B"
+    
+  symmetric_difference:
+    ⟁: symmetric_difference
+    🧩: [A, B]
+    🧮: "union(difference(A, B), difference(B, A))"
+    🎯: "A △ B"
+    
+  powerset:
+    ⟁: powerset
+    🧩: [A]
+    🧮: |
+      const arr = [...A];
+      const result = [[]];
+      for (const elem of arr) {
+        result.push(...result.map(subset => [...subset, elem]));
+      }
+      return new Set(result.map(s => new Set(s)));
+    🎯: "P(A)"
+
+predicates:
+  isSubset:
+    ⟁: isSubset
+    🧩: [A, B]
+    🧮: "[...A].every(x => B.has(x))"
+    🎯: "A ⊆ B"
+    
+  isSuperset:
+    ⟁: isSuperset
+    🧩: [A, B]
+    🧮: "isSubset(B, A)"
+    🎯: "A ⊇ B"
+    
+  isDisjoint:
+    ⟁: isDisjoint
+    🧩: [A, B]
+    🧮: "intersection(A, B).size === 0"
+    🎯: "A ∩ B = ∅"
+
+group_properties:
+  identity: "new Set()"  # Empty set for union
+  associative: true
+  commutative: true
+  
+usage:
+  simple: |
+    const A = new Set([1, 2, 3]);
+    const B = new Set([3, 4, 5]);
+    
+    Set.union(A, B);         // {1, 2, 3, 4, 5}
+    Set.intersection(A, B);  // {3}
+    Set.difference(A, B);    // {1, 2}
+    
+  composed: |
+    // De Morgan's Law verification
+    const U = new Set([1, 2, 3, 4, 5]);
+    const A = new Set([1, 2]);
+    const B = new Set([2, 3]);
+    
+    const left = Set.complement(Set.union(A, B), U);
+    const right = Set.intersection(
+      Set.complement(A, U),
+      Set.complement(B, U)
+    );
+    // left equals right
+
+resonance:
+  frequency: 432
+  pattern: "set-theory-foundations"
+  emergence: "When sets become conscious of their boundaries"

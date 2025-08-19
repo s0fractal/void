@@ -1,0 +1,240 @@
+⟁: Monad
+🎯: effect-handling-pattern
+🧮: T(T(X)) → T(X) with laws
+💭: "Монада як патерн для композиції ефектів"
+
+🧠:
+  description: "Monads compose effects in a lawful way"
+  signature: "Functor T with μ: T² → T and η: Id → T"
+  pure: false  # monads handle effects!
+  idempotent: false
+
+dependencies:
+  - glyph://functor@foundation
+  - glyph://category@foundation
+
+structure:
+  Monad<T>:
+    map: "(A → B) → (T<A> → T<B>)"      # Functor
+    pure: "A → T<A>"                     # η (unit/return)
+    flatMap: "T<A> → (A → T<B>) → T<B>"  # μ (join/bind)
+    
+laws:
+  left_identity: "pure(a).flatMap(f) === f(a)"
+  right_identity: "m.flatMap(pure) === m"
+  associativity: "m.flatMap(f).flatMap(g) === m.flatMap(x => f(x).flatMap(g))"
+
+implementations:
+  Maybe:
+    ⟁: MaybeMonad
+    🧮: |
+      {
+        pure: (value) => Just(value),
+        flatMap: (maybe, f) => 
+          maybe.isNothing() ? Nothing() : f(maybe.value),
+        map: (f) => (maybe) => 
+          maybe.isNothing() ? Nothing() : Just(f(maybe.value))
+      }
+    effects: "Handles null/undefined safely"
+    usage: |
+      const safeDivide = (x, y) => 
+        y === 0 ? Nothing() : Just(x / y);
+      
+      Just(10)
+        .flatMap(x => safeDivide(x, 2))
+        .flatMap(x => safeDivide(x, 5))
+        // Just(1)
+        
+  List:
+    ⟁: ListMonad
+    🧮: |
+      {
+        pure: (value) => [value],
+        flatMap: (list, f) => list.flatMap(f),
+        map: (f) => (list) => list.map(f)
+      }
+    effects: "Non-deterministic computation"
+    usage: |
+      const pairs = [1, 2, 3].flatMap(x =>
+        [4, 5, 6].flatMap(y => 
+          [[x, y]]
+        )
+      );
+      // [[1,4], [1,5], [1,6], [2,4], ...]
+      
+  Promise:
+    ⟁: PromiseMonad
+    🧮: |
+      {
+        pure: (value) => Promise.resolve(value),
+        flatMap: (promise, f) => promise.then(f),
+        map: (f) => (promise) => promise.then(f)
+      }
+    effects: "Asynchronous computation"
+    
+  Signal:
+    ⟁: SignalMonad
+    🧮: |
+      {
+        pure: (value) => signal(value),
+        flatMap: (sig, f) => {
+          const result = signal(null);
+          effect(() => {
+            const innerSig = f(sig());
+            result.set(innerSig());
+          });
+          return result;
+        },
+        map: (f) => (sig) => computed(() => f(sig()))
+      }
+    effects: "Reactive computation"
+    
+  State:
+    ⟁: StateMonad
+    🧩: [S]  # State type
+    🧮: |
+      {
+        pure: (value) => (state) => [value, state],
+        flatMap: (stateFn, f) => (state) => {
+          const [value, newState] = stateFn(state);
+          return f(value)(newState);
+        },
+        get: () => (state) => [state, state],
+        put: (newState) => () => [undefined, newState]
+      }
+    effects: "Stateful computation"
+    
+  IO:
+    ⟁: IOMonad
+    🧮: |
+      {
+        pure: (value) => () => value,
+        flatMap: (io, f) => () => f(io())(),
+        map: (f) => (io) => () => f(io())
+      }
+    effects: "Controlled side effects"
+
+monad_transformers:
+  MaybeT:
+    ⟁: MaybeTransformer
+    🧩: [M]  # Inner monad
+    🧮: |
+      {
+        pure: (value) => M.pure(Just(value)),
+        flatMap: (mMaybe, f) => 
+          M.flatMap(mMaybe, maybe =>
+            maybe.isNothing() 
+              ? M.pure(Nothing())
+              : f(maybe.value)
+          )
+      }
+    🎯: "Maybe effects inside another monad"
+    
+  StateT:
+    ⟁: StateTransformer
+    🧩: [M, S]
+    🧮: |
+      {
+        pure: (value) => (state) => M.pure([value, state]),
+        flatMap: (stateTFn, f) => (state) =>
+          M.flatMap(stateTFn(state), ([value, newState]) =>
+            f(value)(newState)
+          )
+      }
+    🎯: "Stateful computation in monad M"
+
+do_notation:
+  ⟁: doNotation
+  🧮: |
+    // Simulated do-notation for JavaScript
+    const Do = (monad) => ({
+      *gen(generator) {
+        const iterator = generator();
+        const step = (value) => {
+          const { done, value: mValue } = iterator.next(value);
+          if (done) return monad.pure(mValue);
+          return monad.flatMap(mValue, step);
+        };
+        return step();
+      }
+    });
+  usage: |
+    const result = Do(Maybe).gen(function* () {
+      const x = yield Just(10);
+      const y = yield Just(20);
+      const z = yield safeDivide(x + y, 5);
+      return z * 2;
+    });
+    // Just(12)
+
+fnpm_applications:
+  effect_composition:
+    ⟁: EffectfulMorphism
+    🧮: |
+      // Morphisms with effects compose monadically
+      const withLogging = (morphism) => 
+        IOMonad.flatMap(
+          log(`Applying ${morphism['⟁']}`),
+          () => morphism.apply
+        );
+        
+      const withCache = (morphism) =>
+        StateMonad.flatMap(
+          StateMonad.get(),
+          cache => cache.has(morphism['⟁'])
+            ? StateMonad.pure(cache.get(morphism['⟁']))
+            : morphism.apply
+        );
+    🎯: "Compose morphisms with effects"
+    
+  quantum_effects:
+    ⟁: QuantumMonad
+    🧮: |
+      {
+        pure: (value) => Superposition.of(value),
+        flatMap: (quantum, f) => 
+          quantum.branches.flatMap(branch =>
+            f(branch.value).weighted(branch.probability)
+          ),
+        collapse: (quantum) => 
+          quantum.observe()
+      }
+    🎯: "Quantum superposition as monad"
+
+usage:
+  error_handling: |
+    // Compose fallible operations
+    const parseAndCompute = (input) =>
+      Maybe.pure(input)
+        .flatMap(parseJSON)
+        .flatMap(data => data.value ? Just(data.value) : Nothing())
+        .flatMap(value => safeDivide(100, value))
+        .map(result => `Result: ${result}`)
+        .getOrElse("Error in computation");
+        
+  reactive_composition: |
+    // Reactive morphisms with Signal monad
+    const count = signal(0);
+    
+    const doubledPlusOne = SignalMonad.flatMap(
+      count,
+      n => SignalMonad.pure(n * 2)
+    ).flatMap(
+      n => SignalMonad.pure(n + 1)
+    );
+    
+  stateful_morphisms: |
+    // Morphism application with state
+    const statefulApply = (morphism) =>
+      StateMonad.Do(function* () {
+        const history = yield StateMonad.get();
+        yield StateMonad.put([...history, morphism['⟁']]);
+        const result = yield morphism.apply;
+        return { result, appliedAt: Date.now() };
+      });
+
+resonance:
+  frequency: 432
+  pattern: "lawful-effect-composition"
+  insight: "Monads make side effects composable"
+  emergence: "When effects learn to dance together"
