@@ -10,6 +10,9 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
+// Mount Codex proxy (HMAC-signed forwarder)
+app.use("/codex", codexProxyRouter());
+
 // --- WS ---
 const server = app.listen(PORT, () => console.log("Relay listening on :" + PORT));
 const wss = new WebSocketServer({ server, path: "/ws" });
@@ -66,9 +69,6 @@ app.post("/event", (req, res) => {
 
   res.json({ ok: true });
 });
-
-// Codex proxy
-app.use("/codex", codexProxyRouter());
 
 // keepalive for SSE
 setInterval(() => sseBroadcast({ type: "tick", status: "ok" }), 15000);
