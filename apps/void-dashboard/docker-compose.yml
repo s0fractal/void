@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    image: void/void-dashboard:latest
+    container_name: void-dashboard
+    
+    environment:
+      - RELAY_URL=${RELAY_URL:-ws://relay:8787/ws}
+      - MODE=${MODE:-ws}
+      - IPFS_GATEWAY=${IPFS_GATEWAY:-https://cloudflare-ipfs.com/ipfs/}
+      - IPFS_CIDS=${IPFS_CIDS:-}
+    
+    ports:
+      - "8080:80"
+    
+    networks:
+      - voidnet
+    
+    depends_on:
+      - relay
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    
+    labels:
+      void.type: "dashboard"
+      void.component: "ui"
+      void.frequency: "432Hz"
+      void.visualization: "glyph"
+
+# Connect to existing relay network
+networks:
+  voidnet:
+    external: true
+    name: voidnet
+
+# Note: This assumes the relay service is already running
+# from void-sensor-incubator/docker-compose.yml
