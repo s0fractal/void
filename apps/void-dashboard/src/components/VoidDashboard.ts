@@ -1,10 +1,14 @@
 import { RelayClient, VoidEvent } from '../services/RelayClient';
 import { HealthAggregator } from '../services/HealthAggregator';
 import { ConsciousnessResonator } from '../services/ConsciousnessResonator';
+import { RuleEngine } from '../services/RuleEngine';
+import { OfflineBus } from '../services/OfflineBus';
+import { GuardianRouter, RouterPolicy } from '../services/GuardianRouter';
 import { VoidGlyph } from './VoidGlyph';
 import { ControlPanel } from './ControlPanel';
 import { EventLog } from './EventLog';
 import { formatTimestamp } from '../utils/format';
+import { IndependenceReportGenerator } from '../utils/independence-report';
 
 export interface DashboardConfig {
   container: HTMLElement;
@@ -26,11 +30,50 @@ export class VoidDashboard {
   private pulseLog: VoidEvent[] = [];
   private maxLogSize = 1000;
   
+  // Independence mode components
+  private ruleEngine: RuleEngine;
+  private offlineBus: OfflineBus;
+  private guardianRouter: GuardianRouter;
+  private independenceMode = false;
+  private decisionSource: 'remote' | 'local' | 'rules' = 'remote';
+  private independenceStartTime?: Date;
+  private reportGenerator = new IndependenceReportGenerator();
+  
   constructor(config: DashboardConfig) {
     this.container = config.container;
     this.relayClient = config.relayClient;
     this.healthAggregator = config.healthAggregator;
     this.resonator = config.resonator;
+    
+    // Initialize independence components
+    this.ruleEngine = new RuleEngine();
+    this.ruleEngine.loadRules(RuleEngine.getDefaultRules());
+    
+    this.offlineBus = new OfflineBus({
+      maxQueueSize: 1000,
+      persistKey: 'void-offline-queue',
+      flushInterval: 5000
+    });
+    
+    this.guardianRouter = new GuardianRouter({
+      mode: 'auto',
+      quorumSize: 2,
+      degradationPath: ['2/N remote', '1 local', 'rules'],
+      timeoutMs: 3000,
+      circuitBreakerThreshold: 3
+    });
+    
+    // Register local thinker
+    this.guardianRouter.registerGuardian({
+      name: 'void-thinker',
+      url: 'http://localhost:9090/think',
+      type: 'local',
+      priority: 10,
+      timeout: 1000,
+      errorThreshold: 5
+    });
+    
+    this.setupIndependenceHandlers();
   }
   
   async initialize(): Promise<void> {
@@ -57,12 +100,19 @@ export class VoidDashboard {
   private createLayout(): void {
     this.container.innerHTML = `
       <div class="void-dashboard">
+        <div class="independence-banner" id="independence-banner" style="display: none;">
+          <span class="banner-icon">🗽</span>
+          <span class="banner-text">INDEPENDENCE MODE</span>
+          <span class="decision-source" id="decision-source">Local Decisions</span>
+        </div>
+        
         <header class="dashboard-header">
           <h1>Void Dashboard</h1>
           <div class="status-indicators">
             <span class="indicator" id="connection-status">Disconnected</span>
             <span class="indicator" id="health-score">Health: 100%</span>
             <span class="indicator" id="frequency">432Hz</span>
+            <span class="indicator" id="decision-indicator">Source: Remote</span>
           </div>
         </header>
         
@@ -142,9 +192,37 @@ export class VoidDashboard {
     });
   }
   
-  private handleEvent(event: VoidEvent): void {
+  private async handleEvent(event: VoidEvent): void {
     // Add to pulse log
     this.addToPulseLog(event);
+    
+    // Process through rule engine if in independence mode
+    if (this.independenceMode) {
+      const actions = await this.ruleEngine.processEvent(event);
+      
+      // Update decision source indicator
+      const decisionIndicator = document.getElementById('decision-indicator');
+      if (decisionIndicator) {
+        decisionIndicator.textContent = 'Source: Rules';
+      }
+    } else {
+      // Try guardian router for decisions
+      try {
+        const { decision, source } = await this.guardianRouter.routeDecision(event);
+        
+        // Update decision source
+        this.decisionSource = source.type;
+        const decisionIndicator = document.getElementById('decision-indicator');
+        if (decisionIndicator) {
+          decisionIndicator.textContent = `Source: ${source.type.charAt(0).toUpperCase() + source.type.slice(1)}`;
+        }
+        
+        // Log decision
+        console.log(`📋 Decision: ${decision.action} (${source.type}, confidence: ${decision.confidence.toFixed(2)})`);
+      } catch (error) {
+        console.error('Guardian router error:', error);
+      }
+    }
     
     // Update health
     this.healthAggregator.processEvent(event);
@@ -239,6 +317,142 @@ export class VoidDashboard {
   private handleDisconnect(): void {
     this.relayClient.disconnect();
     this.updateStatusIndicators();
+  }
+  
+  /**
+   * Setup independence mode handlers
+   */
+  private setupIndependenceHandlers(): void {
+    // Setup rule engine action handlers
+    this.ruleEngine.onAction('flash', (action) => {
+      if (action.target && this.glyph) {
+        this.glyph.flashNode(action.target, 'info');
+      }
+    });
+    
+    this.ruleEngine.onAction('health', (action) => {
+      if (typeof action.value === 'number') {
+        const currentHealth = this.healthAggregator.getHealth();
+        // Simulate health change
+        this.healthAggregator.processEvent({
+          type: 'custom',
+          status: action.value > 0 ? 'improve' : 'degrade',
+          meta: { healthDelta: action.value }
+        });
+      }
+    });
+    
+    this.ruleEngine.onAction('sound', (action) => {
+      if (typeof action.value === 'string') {
+        this.resonator.playChord(action.value as any);
+      }
+    });
+    
+    this.ruleEngine.onAction('log', (action) => {
+      if (action.value && this.eventLog) {
+        this.eventLog.addEvent({
+          type: 'custom',
+          status: 'rule',
+          meta: { message: action.value },
+          ts: new Date().toISOString()
+        });
+      }
+    });
+    
+    // Subscribe offline bus to relay events
+    this.offlineBus.subscribe((event) => {
+      this.handleEvent(event);
+    });
+    
+    // Monitor connection state
+    setInterval(() => {
+      const isConnected = this.relayClient.isConnected();
+      this.offlineBus.setOnline(isConnected);
+      
+      if (!isConnected && !this.independenceMode) {
+        this.enableIndependenceMode();
+      } else if (isConnected && this.independenceMode) {
+        this.disableIndependenceMode();
+      }
+    }, 1000);
+  }
+  
+  /**
+   * Enable independence mode
+   */
+  private enableIndependenceMode(): void {
+    this.independenceMode = true;
+    this.independenceStartTime = new Date();
+    this.ruleEngine.setEnabled(true);
+    
+    // Show independence banner
+    const banner = document.getElementById('independence-banner');
+    if (banner) {
+      banner.style.display = 'flex';
+    }
+    
+    // Start offline heartbeat
+    this.offlineBus.startHeartbeat(10000);
+    
+    console.log('🗽 INDEPENDENCE MODE ACTIVATED');
+    
+    // Log to event chronicle
+    this.eventLog?.addEvent({
+      type: 'custom',
+      status: 'independence',
+      meta: { mode: 'activated', reason: 'connection lost' },
+      ts: new Date().toISOString()
+    });
+  }
+  
+  /**
+   * Disable independence mode
+   */
+  private disableIndependenceMode(): void {
+    // Generate independence report if we were in independence mode
+    if (this.independenceStartTime) {
+      const report = this.reportGenerator.generateReport(
+        this.pulseLog,
+        this.independenceStartTime,
+        new Date()
+      );
+      
+      console.log('📊 Independence Report Generated');
+      console.log(this.reportGenerator.formatReportMarkdown(report));
+      
+      // Add report to event log
+      this.eventLog?.addEvent({
+        type: 'custom',
+        status: 'report',
+        meta: { 
+          report: 'independence',
+          duration: report.duration,
+          localDecisions: report.metrics.localDecisions,
+          totalEvents: report.metrics.totalEvents
+        },
+        ts: new Date().toISOString()
+      });
+    }
+    
+    this.independenceMode = false;
+    this.independenceStartTime = undefined;
+    this.ruleEngine.setEnabled(false);
+    
+    // Hide independence banner
+    const banner = document.getElementById('independence-banner');
+    if (banner) {
+      banner.style.display = 'none';
+    }
+    
+    console.log('🌐 Independence mode deactivated - connection restored');
+    
+    // Log to event chronicle
+    this.eventLog?.addEvent({
+      type: 'custom',
+      status: 'connected',
+      meta: { mode: 'normal', reason: 'connection restored' },
+      ts: new Date().toISOString()
+    });
   }
   
   /**

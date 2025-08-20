@@ -69,6 +69,42 @@ body {
   background: var(--bg-primary);
 }
 
+/* Independence banner */
+.independence-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(90deg, var(--status-warning), var(--accent-secondary));
+  color: white;
+  font-weight: 600;
+  animation: independence-pulse 2s ease-in-out infinite;
+}
+
+@keyframes independence-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.banner-icon {
+  font-size: 1.5rem;
+}
+
+.banner-text {
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+}
+
+.decision-source {
+  margin-left: auto;
+  margin-right: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
 .dashboard-header {
   display: flex;
   justify-content: space-between;

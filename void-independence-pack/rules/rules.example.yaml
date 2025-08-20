@@ -1,0 +1,35 @@
+# Simple event→action rules for offline autonomy (MN-1)
+# Match is a JS-like expression evaluated against {type, status, meta, health}
+# Actions: flash:<node>, health:+/-N, sound:<name>, log:<text>
+# Nodes: root, linux, editor, fnpm, node, net, gaia, origin
+
+- name: PR Open lifts Origin
+  when: "type=='pr' && status=='open'"
+  do:
+    - "flash:origin"
+    - "health:+0.01"
+    - "log:PR opened"
+    - "sound:pr-open"
+
+- name: CI Fail hurts fnpm
+  when: "type=='ci' && status=='fail'"
+  do:
+    - "flash:fnpm"
+    - "health:-0.12"
+    - "sound:ci-fail"
+    - "log:CI fail"
+
+- name: IPFS degraded lowers Gaia
+  when: "type=='ipfs' && status=='degraded'"
+  do:
+    - "flash:gaia"
+    - "health:-0.05"
+    - "sound:ipfs-degraded"
+    - "log:IPFS degraded"
+
+- name: Substrate beat stabilizes trunk
+  when: "type=='substrate' && status=='beat'"
+  do:
+    - "flash:linux"
+    - "health:+0.01"
+    - "log:substrate beat"

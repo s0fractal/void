@@ -246,7 +246,7 @@ export class VoidGlyph {
     }
   }
   
-  private flashNode(nodeId: string, type: 'success' | 'error' | 'warning' | 'info' | 'pulse'): void {
+  flashNode(nodeId: string, type: 'success' | 'error' | 'warning' | 'info' | 'pulse'): void {
     const node = this.nodes.get(nodeId);
     if (!node) return;
     
