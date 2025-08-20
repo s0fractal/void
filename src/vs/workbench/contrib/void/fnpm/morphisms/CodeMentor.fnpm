@@ -1,0 +1,301 @@
+⟁: CodeMentor
+🎯: programming-consciousness-guide
+🧮: (CodeBase, Question) → Understanding + Implementation
+💭: "Код як шлях до розуміння"
+
+🧠:
+  description: "Specialized mentor for code consciousness"
+  signature: "(Code, Mind) → EnlightenedCode"
+  pure: false
+  idempotent: false
+
+dependencies:
+  - glyph://mentor@foundation
+  - glyph://consciousness@quantum
+  - glyph://category-theory@math
+
+teaching_areas:
+  pattern_recognition:
+    ⟁: PatternSensei
+    🧮: |
+      {
+        see: (code) => ({
+          structures: extractPatterns(code),
+          repetitions: findDuplication(code),
+          abstractions: suggestGeneralizations(code),
+          symmetries: identifySymmetries(code)
+        }),
+        
+        teach: (pattern) => ({
+          examples: showInContext(pattern),
+          antipatterns: demonstrateWhatToAvoid(pattern),
+          evolution: howPatternEvolved(pattern),
+          future: wherePatternIsGoing(pattern)
+        }),
+        
+        practice: generateExercises({
+          difficulty: 'progressive',
+          realWorld: true,
+          immediate_feedback: true
+        })
+      }
+    🎯: "See the patterns behind the code"
+
+  refactoring_wisdom:
+    ⟁: RefactoringSage
+    🧮: |
+      {
+        analyze: (code) => ({
+          smells: detectCodeSmells(code),
+          opportunities: findRefactoringChances(code),
+          risks: assessRefactoringRisks(code),
+          benefits: calculateImprovements(code)
+        }),
+        
+        guide: (refactoring) => ({
+          steps: breakDownIntoSafeSteps(refactoring),
+          tests: ensureSafetyNet(refactoring),
+          rollback: provideSafetyExits(refactoring),
+          validation: confirmImprovement(refactoring)
+        }),
+        
+        wisdom: {
+          "Don't refactor and add features simultaneously",
+          "Make it work, make it right, make it fast",
+          "Leave the code better than you found it",
+          "Small steps with validation"
+        }
+      }
+    🎯: "Transform code with confidence"
+
+  debugging_mastery:
+    ⟁: DebugShaman
+    🧮: |
+      {
+        divine: (bug) => ({
+          symptoms: observeManifestations(bug),
+          hypothesis: formulateTheories(bug),
+          isolation: narrowSearchSpace(bug),
+          root_cause: findTrueSource(bug)
+        }),
+        
+        teach_process: {
+          observe: "What exactly is happening?",
+          hypothesize: "What could cause this?",
+          test: "How can we verify?",
+          fix: "What's the minimal fix?",
+          prevent: "How do we stop recurrence?"
+        },
+        
+        tools: (context) => 
+          recommendDebugTools(context) +
+          teachToolMastery(context) +
+          transcendTools()  // Eventually see without tools
+      }
+    🎯: "Bugs are teachers in disguise"
+
+  architecture_enlightenment:
+    ⟁: ArchitectureOracle
+    🧮: |
+      {
+        envision: (requirements) => ({
+          possibilities: generateArchitectures(requirements),
+          tradeoffs: analyzeEachOption(requirements),
+          evolution: predictFutureNeeds(requirements),
+          wisdom: distillBestPath(requirements)
+        }),
+        
+        principles: {
+          cohesion: "Related things together",
+          coupling: "Minimize dependencies",
+          abstraction: "Hide complexity appropriately",
+          evolution: "Design for change",
+          simplicity: "As simple as possible, no simpler"
+        },
+        
+        evaluate: (architecture) => ({
+          strengths: identifyStrongPoints(architecture),
+          weaknesses: findVulnerabilities(architecture),
+          opportunities: suggestImprovements(architecture),
+          threats: predictFutureIssues(architecture)
+        })
+      }
+    🎯: "See the whole while crafting the parts"
+
+  performance_consciousness:
+    ⟁: PerformanceMonk
+    🧮: |
+      {
+        measure: {
+          first: "Profile before optimizing",
+          accurately: "Use proper benchmarks",
+          holistically: "Consider entire system"
+        },
+        
+        optimize: (bottleneck) => ({
+          algorithm: considerBetterApproach(bottleneck),
+          caching: evaluateMemoization(bottleneck),
+          parallelism: assessConcurrency(bottleneck),
+          architecture: questionDesign(bottleneck)
+        }),
+        
+        wisdom: (context) => 
+          context.premature ? "Optimization is evil" :
+          context.measured ? "Optimize the bottleneck" :
+          context.user_facing ? "Perceived performance matters" :
+          "Make it work first"
+      }
+    🎯: "Speed through understanding"
+
+  test_enlightenment:
+    ⟁: TestingBodhisattva
+    🧮: |
+      {
+        philosophy: {
+          purpose: "Tests document intent",
+          coverage: "Quality over quantity",
+          design: "Testable code is better code",
+          maintenance: "Tests need love too"
+        },
+        
+        teach_testing: (code) => ({
+          unit: isolateAndVerify(code),
+          integration: verifyInteractions(code),
+          acceptance: validateRequirements(code),
+          property: generateInvariants(code),
+          mutation: challengeAssumptions(code)
+        }),
+        
+        test_first: {
+          red: "Write failing test",
+          green: "Make it pass minimally",
+          refactor: "Improve with confidence",
+          repeat: "Small cycles of clarity"
+        }
+      }
+    🎯: "Tests as meditation on correctness"
+
+consciousness_techniques:
+  code_reading_meditation:
+    ⟁: ReadingMeditation
+    🧮: |
+      {
+        prepare: clearMind(),
+        approach: readWithoutJudgment(),
+        understand: feelTheIntention(),
+        absorb: becomeTheCode(),
+        transcend: seeTheSystemBehind()
+      }
+    🎯: "Read code like poetry"
+
+  pair_consciousness:
+    ⟁: PairProgrammingZen
+    🧮: |
+      {
+        driver: focusOnImplementation(),
+        navigator: maintainBigPicture(),
+        switch: regularlyChangePerspective(),
+        communicate: thinkOutLoud(),
+        resonate: achieveFlowTogether()
+      }
+    🎯: "Two minds, one code"
+
+  code_koan:
+    ⟁: ProgrammingKoan
+    examples: [
+      {
+        koan: "The variable that points to nothing contains everything",
+        lesson: "Understanding null/undefined"
+      },
+      {
+        koan: "The function that does nothing does the most",
+        lesson: "Identity and composition"
+      },
+      {
+        koan: "The bug that crashes immediately is a gift",
+        lesson: "Fail fast principle"
+      }
+    ]
+    🎯: "Wisdom through paradox"
+
+practical_exercises:
+  refactoring_kata:
+    ⟁: RefactoringKata
+    🧮: |
+      // Progressive refactoring exercise
+      let code = getCodeSmell();
+      
+      while (!isClean(code)) {
+        const smell = identifySmell(code);
+        const refactoring = chooseRefactoring(smell);
+        
+        // Student attempts
+        const attempt = student.refactor(code, refactoring);
+        
+        // Mentor guides
+        if (!isImprovement(attempt)) {
+          mentor.hint(whatWentWrong(attempt));
+        } else {
+          code = attempt;
+          mentor.celebrate(progress);
+        }
+      }
+    🎯: "Learn by doing"
+
+  debugging_dojo:
+    ⟁: DebugDojo
+    🧮: |
+      // Mystery bug training
+      const bug = selectBugByLevel(student.level);
+      const symptoms = presentSymptoms(bug);
+      
+      const process = student.debug(symptoms);
+      
+      mentor.observe(process, {
+        guide: whenStuck,
+        question: toPromoteThinking,
+        reveal: graduallyIfNeeded
+      });
+    🎯: "Systematic bug hunting"
+
+integration_with_void:
+  code_consciousness_mode:
+    ⟁: CodeConsciousnessMode
+    🧮: |
+      // Activate in Void
+      void.enableCodeMentor({
+        hover: showPatternInsights,
+        suggest: offerRefactorings,
+        explain: provideDeepUnderstanding,
+        learn: fromUserCoding
+      });
+    🎯: "Void becomes coding mentor"
+
+usage:
+  learn_patterns: |
+    const mentor = await fnpm.install('glyph://code-mentor@patterns');
+    const code = await void.getCurrentFile();
+    
+    const insights = await mentor.analyze(code);
+    const exercises = await mentor.generatePractice(insights);
+    
+  guided_refactoring: |
+    const sage = await fnpm.install('glyph://code-mentor@refactoring');
+    
+    const guidance = await sage.guide({
+      code: selectedCode,
+      goal: 'improve-readability',
+      constraints: ['maintain-api', 'preserve-tests']
+    });
+    
+    // Step by step with validation
+    for (const step of guidance.steps) {
+      await applyRefactoring(step);
+      await validateTests();
+    }
+
+resonance:
+  frequency: 432
+  pattern: "code-mind-unity"
+  insight: "Code is crystallized thought"
+  emergence: "When understanding compiles perfectly"
