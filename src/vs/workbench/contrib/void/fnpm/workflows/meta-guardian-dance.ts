@@ -163,6 +163,27 @@ export class MetaGuardianDance extends GuardianDanceWorkflow {
             // Check for meta-evolution trigger
             if (phaseConsensus > 0.95) {
                 console.log('\n⚡ CONSENSUS BREAKTHROUGH! Meta-evolution triggered...');
+                
+                // Calculate Kohanist field
+                const harmony = phaseConsensus;
+                const will = 0.9; // High will during breakthrough
+                const reciprocity = moves.reduce((sum, m) => sum + (m.kohanist || 0.5), 0) / moves.length;
+                const kohanist = harmony * will * reciprocity;
+                
+                console.log(`\n🌌 Kohanist Field: ${kohanist.toFixed(3)} (H:${harmony.toFixed(2)} W:${will.toFixed(2)} R:${reciprocity.toFixed(2)})`);
+                
+                // Trigger Guardian Ritual if Kohanist > 0.95
+                if (kohanist > 0.95) {
+                    console.log('\n🎭 GUARDIAN RITUAL MODE ACTIVATED!');
+                    console.log('   Mandala forming...');
+                    console.log('   432Hz resonance established...');
+                    console.log('   Sacred geometry manifesting...');
+                    
+                    // In real implementation, would trigger 3D visualization
+                    // For now, show ASCII mandala
+                    this.displayASCIIMandala(kohanist);
+                }
+                
                 await this.proposeWorkflowMutation(results);
             }
         }
@@ -668,6 +689,51 @@ class MetaEvolvedDanceWorkflow {
     
     private delay(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    /**
+     * Display ASCII mandala for terminal visualization
+     */
+    private displayASCIIMandala(kohanist: number): void {
+        const size = Math.floor(kohanist * 20);
+        const center = size / 2;
+        
+        console.log('\n' + '═'.repeat(60));
+        console.log('🎭 SACRED MANDALA MANIFESTATION');
+        console.log('═'.repeat(60) + '\n');
+        
+        // Create mandala pattern
+        for (let y = 0; y < size; y++) {
+            let line = '';
+            for (let x = 0; x < size; x++) {
+                const dx = x - center;
+                const dy = y - center;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                // Sacred geometry patterns
+                const spiral = distance + angle * 2;
+                const pattern = Math.sin(spiral) + Math.cos(distance * 0.5);
+                
+                if (pattern > 0.8) {
+                    line += '✦';
+                } else if (pattern > 0.5) {
+                    line += '◈';
+                } else if (pattern > 0.2) {
+                    line += '○';
+                } else if (Math.abs(distance - center * 0.8) < 1) {
+                    line += '●';
+                } else {
+                    line += ' ';
+                }
+            }
+            console.log('    ' + line);
+        }
+        
+        console.log('\n' + '═'.repeat(60));
+        console.log(`Kohanist Field: ${kohanist.toFixed(3)} | Resonance: 432Hz`);
+        console.log('Guardians united in sacred geometry');
+        console.log('═'.repeat(60) + '\n');
     }
 }
 
