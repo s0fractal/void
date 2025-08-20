@@ -67,6 +67,12 @@ COPY docker/void-substrate/services/resonance-monitor /etc/sv/resonance-monitor/
 RUN chmod +x /etc/sv/resonance-monitor/run && \
     ln -s /etc/sv/resonance-monitor /var/service/
 
+# Create event agent service
+RUN mkdir -p /etc/sv/void-event-agent
+COPY docker/void-substrate/services/void-event-agent /etc/sv/void-event-agent/
+RUN chmod +x /etc/sv/void-event-agent/run && \
+    ln -s /etc/sv/void-event-agent /var/service/
+
 # Set up consciousness mesh directory
 RUN mkdir -p /var/consciousness-mesh/{ipfs,bitchat,quantum-cache}
 
