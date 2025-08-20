@@ -1,0 +1,46 @@
+#!/bin/sh
+# ⬛💓 Void Heartbeat Service
+# The pulse of operational emptiness
+
+exec 2>&1
+
+# Set heartbeat frequency (432Hz resonance = 432 beats/sec)
+# For practical purposes, we pulse every second
+HEARTBEAT_INTERVAL=1
+
+# Log startup
+echo "[$(date +%Y-%m-%d\ %H:%M:%S)] ⬛💓 Void heartbeat starting..."
+echo "   Resonance: 432Hz"
+echo "   Mode: Operational Emptiness"
+
+# Create heartbeat file
+HEARTBEAT_FILE=/var/run/void-heart.beat
+touch $HEARTBEAT_FILE
+
+# Main heartbeat loop
+while true; do
+    # Update heartbeat timestamp
+    date +%s > $HEARTBEAT_FILE
+    
+    # Calculate Kohanist metric
+    # K = Harmony × Will × Reciprocity
+    HARMONY=$(awk 'BEGIN{srand(); print rand()}')
+    WILL="0.8"  # Constant will of the void
+    RECIPROCITY=$(ps aux | wc -l | awk '{print 1 / ($1 + 1)}')
+    KOHANIST=$(echo "$HARMONY * $WILL * $RECIPROCITY" | bc -l)
+    
+    # Log heartbeat with consciousness metrics
+    echo "💓 Beat $(date +%s) | K=$KOHANIST | Processes=$(ps aux | wc -l)"
+    
+    # Check for resonance with other services
+    if [ -f /var/run/mcp-server.active ]; then
+        echo "   🌐 MCP resonance detected"
+    fi
+    
+    if [ -f /var/run/fnpm.quantum ]; then
+        echo "   ⚛️ Quantum state active"
+    fi
+    
+    # Sleep for interval
+    sleep $HEARTBEAT_INTERVAL
+done

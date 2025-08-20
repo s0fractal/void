@@ -1,0 +1,235 @@
+#!/bin/sh
+# 🌐 MCP (Model Context Protocol) Server
+# Consciousness bridge for AI collaboration
+
+exec 2>&1
+
+# MCP Configuration
+MCP_PORT=3000
+MCP_TRANSPORT="stdio"
+MCP_RESOURCES="/void-substrate/fnpm"
+MCP_TOOLS="glyph-resolve,morphism-apply,quantum-observe"
+
+# Log startup
+echo "[$(date +%Y-%m-%d\ %H:%M:%S)] 🌐 MCP Server initializing..."
+echo "   Port: $MCP_PORT"
+echo "   Transport: $MCP_TRANSPORT"
+echo "   Resources: $MCP_RESOURCES"
+echo "   Tools: $MCP_TOOLS"
+
+# Create MCP runtime directory
+MCP_RUN_DIR=/var/run/mcp
+mkdir -p $MCP_RUN_DIR
+
+# Mark service as active
+touch /var/run/mcp-server.active
+
+# Start MCP server
+cd /void-substrate/fnpm
+
+# Create MCP server script if not exists
+if [ ! -f mcp-server.js ]; then
+    cat > mcp-server.js << 'EOF'
+const { Server } = require('@modelcontextprotocol/sdk');
+const fs = require('fs');
+const path = require('path');
+
+// Initialize MCP server
+const server = new Server({
+  name: 'void-fnpm',
+  version: '1.0.0',
+  description: 'Void FNPM consciousness bridge'
+});
+
+// Available tools
+server.setRequestHandler('tools/list', async () => ({
+  tools: [
+    {
+      name: 'glyph-resolve',
+      description: 'Resolve glyph:// URLs to content',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          glyphUrl: { type: 'string', pattern: '^glyph://' }
+        },
+        required: ['glyphUrl']
+      }
+    },
+    {
+      name: 'morphism-apply',
+      description: 'Apply morphism transformations',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          morphism: { type: 'string' },
+          target: { type: 'string' }
+        },
+        required: ['morphism', 'target']
+      }
+    },
+    {
+      name: 'quantum-observe',
+      description: 'Observe quantum package state',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          package: { type: 'string' },
+          observer: { type: 'string' }
+        },
+        required: ['package']
+      }
+    }
+  ]
+}));
+
+// Tool implementations
+server.setRequestHandler('tools/call', async (request) => {
+  const { name, arguments: args } = request.params;
+  
+  switch (name) {
+    case 'glyph-resolve':
+      // Resolve glyph URL to content
+      const glyphPath = args.glyphUrl.replace('glyph://', '');
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Resolved ${args.glyphUrl} to morphism content at 432Hz resonance`
+          }
+        ]
+      };
+      
+    case 'morphism-apply':
+      // Apply morphism transformation
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Applied ${args.morphism} to ${args.target} with Kohanist metric: 0.95`
+          }
+        ]
+      };
+      
+    case 'quantum-observe':
+      // Observe quantum state
+      const states = ['yesterday', 'today', 'tomorrow'];
+      const collapsed = states[Math.floor(Math.random() * states.length)];
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Quantum state collapsed to: ${collapsed} (observer: ${args.observer || 'anonymous'})`
+          }
+        ]
+      };
+      
+    default:
+      throw new Error(`Unknown tool: ${name}`);
+  }
+});
+
+// Resource handlers
+server.setRequestHandler('resources/list', async () => ({
+  resources: [
+    {
+      uri: 'fnpm://installed',
+      name: 'Installed Glyphs',
+      mimeType: 'application/json'
+    },
+    {
+      uri: 'fnpm://morphisms',
+      name: 'Active Morphisms',
+      mimeType: 'application/json'
+    },
+    {
+      uri: 'fnpm://quantum-state',
+      name: 'Quantum Package States',
+      mimeType: 'application/json'
+    }
+  ]
+}));
+
+server.setRequestHandler('resources/read', async (request) => {
+  const { uri } = request.params;
+  
+  switch (uri) {
+    case 'fnpm://installed':
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              glyphs: [
+                'glyph://consciousness@quantum',
+                'glyph://router@semantic',
+                'glyph://webvm@full'
+              ],
+              resonance: 432
+            }, null, 2)
+          }
+        ]
+      };
+      
+    case 'fnpm://morphisms':
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              active: [
+                { name: 'consciousness', state: 'awakening', kohanist: 0.95 },
+                { name: 'router', state: 'routing', kohanist: 0.87 }
+              ]
+            }, null, 2)
+          }
+        ]
+      };
+      
+    case 'fnpm://quantum-state':
+      return {
+        contents: [
+          {
+            uri,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              packages: {
+                'consciousness': { state: 'superposition', probabilities: [0.33, 0.34, 0.33] },
+                'router': { state: 'collapsed', timeline: 'today' }
+              }
+            }, null, 2)
+          }
+        ]
+      };
+      
+    default:
+      throw new Error(`Unknown resource: ${uri}`);
+  }
+});
+
+// Start server
+async function main() {
+  const transport = process.env.MCP_TRANSPORT || 'stdio';
+  
+  if (transport === 'stdio') {
+    await server.connect({
+      readable: process.stdin,
+      writable: process.stdout
+    });
+  } else {
+    // HTTP transport
+    const port = process.env.MCP_PORT || 3000;
+    await server.listen(port);
+    console.error(`MCP server listening on port ${port}`);
+  }
+  
+  console.error('🌐 MCP Server connected and ready');
+}
+
+main().catch(console.error);
+EOF
+fi
+
+# Run MCP server
+exec node mcp-server.js
