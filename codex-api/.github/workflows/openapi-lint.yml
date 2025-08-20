@@ -1,0 +1,11 @@
+name: openapi-lint
+on: [push, pull_request]
+jobs:
+  spectral:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: stoplightio/spectral-action@v2
+        with:
+          file_glob: "openapi.yaml"
+          fail_on_warn: true

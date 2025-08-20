@@ -7,6 +7,7 @@ import { GuardianRouter, RouterPolicy } from '../services/GuardianRouter';
 import { VoidGlyph } from './VoidGlyph';
 import { ControlPanel } from './ControlPanel';
 import { EventLog } from './EventLog';
+import { CodexPanel } from './CodexPanel';
 import { formatTimestamp } from '../utils/format';
 import { IndependenceReportGenerator } from '../utils/independence-report';
 
@@ -26,6 +27,7 @@ export class VoidDashboard {
   private glyph?: VoidGlyph;
   private controlPanel?: ControlPanel;
   private eventLog?: EventLog;
+  private codexPanel?: CodexPanel;
   
   private pulseLog: VoidEvent[] = [];
   private maxLogSize = 1000;
@@ -129,6 +131,10 @@ export class VoidDashboard {
             <div class="event-log" id="event-log">
               <!-- Event Log -->
             </div>
+            
+            <div class="codex-panel" id="codex-panel">
+              <!-- Codex AI Panel -->
+            </div>
           </aside>
         </main>
         
@@ -173,6 +179,20 @@ export class VoidDashboard {
       });
       this.eventLog.render();
     }
+    
+    // Initialize Codex Panel
+    const codexContainer = document.getElementById('codex-panel');
+    if (codexContainer) {
+      this.codexPanel = new CodexPanel({
+        container: codexContainer,
+        relayUrl: this.relayClient.getUrl().replace('/ws', '').replace('/sse', ''),
+        onEvent: (event) => this.handleEvent(event)
+      });
+      this.codexPanel.render();
+    }
+    
+    // Store pulse log in window for Codex access
+    (window as any).__voidPulseLog = this.pulseLog;
   }
   
   private setupEventHandlers(): void {

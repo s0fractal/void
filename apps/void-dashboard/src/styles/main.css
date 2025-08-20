@@ -415,6 +415,60 @@ button:disabled {
   background: var(--border-color);
 }
 
+/* Codex Panel */
+.codex-panel {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.codex-panel h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-secondary);
+}
+
+.codex-panel .hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.output-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.output-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.output-section pre {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.output-section pre.loading {
+  color: var(--accent-primary);
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.output-section pre.success {
+  color: var(--text-primary);
+}
+
+.output-section pre.error {
+  color: var(--status-error);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-main {

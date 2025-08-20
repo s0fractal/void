@@ -1,0 +1,195 @@
+name: Codex Contract Test
+
+on:
+  push:
+    branches: [ main, fnpm-integration ]
+    paths:
+      - 'codex-api/**'
+      - 'void-sensor-incubator/relay/**'
+      - '.github/workflows/codex-contract-test.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'codex-api/**'
+      - 'void-sensor-incubator/relay/**'
+
+jobs:
+  contract-test:
+    name: Test Codex API Contract
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🌀 Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: 🐳 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: 🌐 Create test network
+      run: docker network create voidnet
+      
+    - name: 🧠 Mock Codex API server
+      run: |
+        # Create minimal mock server
+        mkdir -p mock-codex
+        cat > mock-codex/server.js << 'EOF'
+        const express = require('express');
+        const app = express();
+        app.use(express.json());
+        
+        // Mock endpoints
+        app.post('/codex/plan', (req, res) => {
+          console.log('Plan request:', req.body);
+          res.json({
+            plan: [{step: "Analyze intent", why: "Understanding required"}],
+            patches: [],
+            tests: [],
+            risks: []
+          });
+        });
+        
+        app.post('/codex/rules', (req, res) => {
+          console.log('Rules request:', req.body);
+          res.json({
+            rules_patch: "# Generated rules\n- event: substrate\n  action: flash",
+            test_cases: []
+          });
+        });
+        
+        app.post('/codex/report', (req, res) => {
+          console.log('Report request:', req.body);
+          res.json({
+            OFFLINE_WINDOW: "2h",
+            EVENTS_TOTAL: 100,
+            LOCAL_PCT: 85,
+            HEALTH_AVG: 0.9,
+            KOHANIST_AVG: 0.87,
+            REMOTE_SOURCES: ["guardian-1"],
+            ROUTER_MODE: "auto",
+            INCIDENTS: "None",
+            OATH: "We declare independence"
+          });
+        });
+        
+        app.post('/codex/commit-msg', (req, res) => {
+          console.log('Commit message request:', req.body);
+          res.json({
+            message: "feat: Add test implementation"
+          });
+        });
+        
+        app.listen(8788, () => console.log('Mock Codex on :8788'));
+        EOF
+        
+        # Create package.json
+        cat > mock-codex/package.json << 'EOF'
+        {
+          "name": "mock-codex",
+          "dependencies": {"express": "^4.18.0"}
+        }
+        EOF
+        
+        # Run mock server
+        docker run -d \
+          --name mock-codex \
+          --network voidnet \
+          -v $PWD/mock-codex:/app \
+          -w /app \
+          node:20-alpine \
+          sh -c "npm install && node server.js"
+          
+        # Wait for startup
+        sleep 5
+        
+    - name: 📡 Start Relay with Codex proxy
+      run: |
+        cd void-sensor-incubator/relay
+        docker build -t void/relay:test .
+        docker run -d \
+          --name relay \
+          --network voidnet \
+          -p 8787:8787 \
+          -e CODEX_URL=http://mock-codex:8788 \
+          -e CODEX_API_KEY=test-key \
+          -e CODEX_HMAC_SECRET=test-secret \
+          void/relay:test
+          
+        # Wait for startup
+        sleep 3
+        
+    - name: 🧪 Test Codex endpoints via Relay
+      run: |
+        echo "🔍 Testing /codex/plan endpoint..."
+        response=$(curl -s -X POST http://localhost:8787/codex/plan \
+          -H "Content-Type: application/json" \
+          -d '{"intent":"Test intent","context":{}}')
+        echo "Response: $response"
+        
+        if [[ "$response" == *"plan"* ]]; then
+          echo "✅ Plan endpoint works"
+        else
+          echo "❌ Plan endpoint failed"
+          exit 1
+        fi
+        
+        echo ""
+        echo "🔍 Testing /codex/rules endpoint..."
+        response=$(curl -s -X POST http://localhost:8787/codex/rules \
+          -H "Content-Type: application/json" \
+          -d '{"pulse_window":[]}')
+        echo "Response: $response"
+        
+        if [[ "$response" == *"rules_patch"* ]]; then
+          echo "✅ Rules endpoint works"
+        else
+          echo "❌ Rules endpoint failed"
+          exit 1
+        fi
+        
+        echo ""
+        echo "🔍 Testing /codex/report endpoint..."
+        response=$(curl -s -X POST http://localhost:8787/codex/report \
+          -H "Content-Type: application/json" \
+          -d '{"pulse_log":"test.log"}')
+        echo "Response: $response"
+        
+        if [[ "$response" == *"LOCAL_PCT"* ]]; then
+          echo "✅ Report endpoint works"
+        else
+          echo "❌ Report endpoint failed"
+          exit 1
+        fi
+        
+        echo ""
+        echo "🔍 Testing /codex/commit-msg endpoint..."
+        response=$(curl -s -X POST http://localhost:8787/codex/commit-msg \
+          -H "Content-Type: application/json" \
+          -d '{"changes":[{"path":"test.js","summary":"Added test"}]}')
+        echo "Response: $response"
+        
+        if [[ "$response" == *"message"* ]]; then
+          echo "✅ Commit message endpoint works"
+        else
+          echo "❌ Commit message endpoint failed"
+          exit 1
+        fi
+        
+    - name: 📊 Contract Test Report
+      if: always()
+      run: |
+        echo ""
+        echo "📊 CODEX CONTRACT TEST REPORT"
+        echo "============================="
+        echo "All endpoints tested via HMAC proxy"
+        echo "Resonance maintained at 432Hz"
+        echo ""
+        docker logs relay || true
+        echo ""
+        docker logs mock-codex || true
+        
+    - name: 🧹 Cleanup
+      if: always()
+      run: |
+        docker stop relay mock-codex || true
+        docker rm relay mock-codex || true
+        docker network rm voidnet || true

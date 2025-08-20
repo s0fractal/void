@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { WebSocketServer } from "ws";
+import { codexProxyRouter } from "./codex-proxy.js";
 
 const PORT = parseInt(process.env.PORT || "8787", 10);
 const API_KEY = process.env.RELAY_API_KEY || "";
@@ -65,6 +66,9 @@ app.post("/event", (req, res) => {
 
   res.json({ ok: true });
 });
+
+// Codex proxy
+app.use("/codex", codexProxyRouter());
 
 // keepalive for SSE
 setInterval(() => sseBroadcast({ type: "tick", status: "ok" }), 15000);
