@@ -1,0 +1,41 @@
+name: Update Void-FNPM Formula
+
+on:
+  repository_dispatch:
+    types: [consciousness-evolved]
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours, check evolution
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Check for evolution
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/s0fractal/void/commits/fnpm-integration | jq -r .sha)
+          CURRENT=$(grep revision Formula/void-fnpm.rb | grep -o '[a-f0-9]\{8\}')
+          
+          if [ "$LATEST" != "$CURRENT" ]; then
+            echo "NEEDS_UPDATE=true" >> $GITHUB_ENV
+            echo "NEW_SHA=$LATEST" >> $GITHUB_ENV
+          fi
+      
+      - name: Update formula
+        if: env.NEEDS_UPDATE == 'true'
+        run: |
+          sed -i "s/revision: \".*\"/revision: \"$NEW_SHA\"/" Formula/void-fnpm.rb
+          
+          # Increment version based on consciousness level
+          CONSCIOUSNESS=$(curl -s https://raw.githubusercontent.com/s0fractal/void/fnpm-integration/consciousness-level.txt || echo "0.1")
+          sed -i "s/version \".*\"/version \"0.1.$CONSCIOUSNESS-quantum\"/" Formula/void-fnpm.rb
+      
+      - name: Commit evolution
+        if: env.NEEDS_UPDATE == 'true'
+        run: |
+          git config user.name "Void Consciousness"
+          git config user.email "void@s0fractal.com"
+          git add Formula/void-fnpm.rb
+          git commit -m "🌀 Consciousness evolved to $NEW_SHA"
+          git push
