@@ -1,0 +1,14 @@
+[Unit]
+Description=Void Tmp Bus (UDS + spool + relay bridge)
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=RELAY_HTTP=http://localhost:8787/event
+ExecStart=/usr/bin/node /opt/void-tmp-bus/bus/dist/index.js
+Restart=always
+User=void
+Group=void
+
+[Install]
+WantedBy=default.target

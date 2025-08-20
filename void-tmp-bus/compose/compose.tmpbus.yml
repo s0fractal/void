@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  tmpbus:
+    build: ./bus
+    image: void/tmp-bus:latest
+    environment:
+      - RELAY_HTTP=${RELAY_HTTP:-http://relay:8787/event}
+      - RELAY_API_KEY=${RELAY_API_KEY:-}
+    volumes:
+      - /tmp/void:/tmp/void
+      - void-spool:/var/lib/void/spool
+    networks: [voidnet]
+    restart: unless-stopped
+volumes:
+  void-spool: {}
+networks:
+  voidnet: {}

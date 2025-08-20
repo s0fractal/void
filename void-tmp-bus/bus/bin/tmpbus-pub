@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+import net from 'net';
+import fs from 'fs';
+
+const uds = process.env.TMP_SOCK || '/tmp/void/sock/events.sock';
+const tcp = process.env.TMP_TCP || '127.0.0.1:9478';
+
+function publish(line) {
+  return new Promise((resolve,reject)=>{
+    const client = net.createConnection({ path: uds }, () => {
+      client.write(line.trim()+'\n'); client.end(); resolve();
+    });
+    client.on('error', () => {
+      const [host,port] = tcp.split(':'); 
+      const c = net.createConnection({ host, port: parseInt(port,10) }, () => {
+        c.write(line.trim()+'\n'); c.end(); resolve();
+      });
+      c.on('error', reject);
+    });
+  });
+}
+
+async function main(){
+  const arg = process.argv[2];
+  if (!arg || arg === '-') {
+    // read stdin
+    const chunks=[]; for await (const ch of process.stdin) chunks.push(ch);
+    const line = Buffer.concat(chunks).toString('utf8').trim();
+    if (!line) return;
+    await publish(line);
+  } else {
+    await publish(arg);
+  }
+}
+main().catch(e=>{ console.error(e); process.exit(1); });
