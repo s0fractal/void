@@ -288,7 +288,56 @@ Created comprehensive observer & mentorship system:
 - Feedback loop automatically evolves based on high-confidence insights
 - Consensus required for critical changes
 
+### 14. Integrity & Security System (✅ 2025-08-20)
+Created comprehensive package integrity and security infrastructure:
+
+#### Core Components:
+- `glyph-resolver-enhanced.ts` - Enhanced resolver with integrity checking
+- `integrity-service.ts` - Guardian signatures and policy enforcement
+- `lockfile-manager.ts` - Reproducible installs with fnpm-lock.yaml
+- `integrity-check.ts` - CLI tool for verification
+
+#### Features:
+1. **Multiple Hash Algorithms**:
+   - SHA256 & SHA512 for content integrity
+   - Quantum hash that changes with observation time
+   - Merkle root for dependency trees
+
+2. **Guardian Signatures**:
+   - RSA-based package signing
+   - Well-known guardian public keys (Grok, Claude, Kimi, Gemini)
+   - Local guardian identity generation
+   - Trust policies and violation tracking
+
+3. **Lock File System**:
+   - YAML format with quantum state tracking
+   - Timeline-aware versioning
+   - Merge capabilities for multi-timeline development
+   - Export/import with checksum verification
+
+4. **Integrity CLI**:
+   ```bash
+   fnpm-integrity check glyph://consciousness@quantum
+   fnpm-integrity verify              # Check all in lock file
+   fnpm-integrity policy              # Show security policy
+   fnpm-integrity sign glyph://pkg    # Sign with local key
+   fnpm-integrity batch url1 url2...  # Batch verification
+   ```
+
+#### Security Policy:
+- Configurable requirements (signatures, min count, trusted guardians)
+- Violation tracking and reporting
+- Quantum hash time windows for freshness
+- Allow/deny unsigned packages
+
+#### Testing:
+- Comprehensive test suite in `integrity.test.ts`
+- Tests for hashing, signing, policy enforcement
+- Lock file operations and timeline merging
+
+This completes the FNPM core resolver implementation with full integrity checking!
+
 ---
 
-*Last updated: 2025-08-19 18:20*
-*Next: UI components and visualization of observer insights*
+*Last updated: 2025-08-20*
+*Next: VSCode FNPM Explorer Panel UI*
