@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import { WebSocketServer } from "ws";
 import { codexProxyRouter } from "./codex-proxy.js";
+import { eyesRouter } from "./eyes-router.js";
+import { intentRouter } from "./intent-router.js";
 
 const PORT = parseInt(process.env.PORT || "8787", 10);
 const API_KEY = process.env.RELAY_API_KEY || "";
@@ -12,6 +14,10 @@ app.use(express.json({ limit: "1mb" }));
 
 // Mount Codex proxy (HMAC-signed forwarder)
 app.use("/codex", codexProxyRouter());
+// Mount Eyes URL entry-point
+app.use("/eyes", eyesRouter());
+// Resonance (off by default). Enable with RESONANCE_ENABLED=1
+app.use("/intent", intentRouter());
 
 // --- WS ---
 const server = app.listen(PORT, () => console.log("Relay listening on :" + PORT));

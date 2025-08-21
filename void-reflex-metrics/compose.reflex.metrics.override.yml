@@ -1,0 +1,21 @@
+services:
+  reflex:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM node:20-alpine
+        WORKDIR /opt/spinal-reflex
+        COPY spinal-reflex/ .
+        RUN node -e "process.exit(0)" && (npm ci || npm i)
+        ENV NODE_ENV=production
+        EXPOSE 9482
+        CMD ["node","/opt/spinal-reflex/spinal-reflex.js"]
+    environment:
+      - METRICS_ENABLED=1
+      - PROM_PORT=9482
+    ports:
+      - "9482:9482"
+    volumes:
+      - ./void-spinal-reflex:/spinal-reflex-src:ro
+      - void_workspace:/workspace
+    configs: []

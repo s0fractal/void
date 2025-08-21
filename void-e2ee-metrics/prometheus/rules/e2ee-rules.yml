@@ -1,0 +1,42 @@
+groups:
+- name: e2ee.rules
+  rules:
+  - record: job:e2ee_ingest_error_ratio:5m
+    expr: |
+      sum(rate(void_e2ee_ingest_requests_total{status="err"}[5m]))
+      / clamp_min(sum(rate(void_e2ee_ingest_requests_total[5m])), 1)
+  - alert: E2EEIngestErrorRateHigh
+    expr: job:e2ee_ingest_error_ratio:5m > 0.01
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "E2EE ingest error rate >1%"
+      action: "Check relay logs and provider status"
+  - record: job:e2ee_ingest_p95_ms:5m
+    expr: histogram_quantile(0.95, sum(rate(void_e2ee_ingest_duration_ms_bucket[5m])) by (le))
+  - alert: E2EEIngestLatencyP95High
+    expr: job:e2ee_ingest_p95_ms:5m > 800
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "E2EE ingest p95 latency > 800ms"
+      action: "Investigate relay CPU/network, provider latency"
+  - alert: E2EEDecryptFailures
+    expr: increase(void_e2ee_decrypt_failures_total[15m]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Decrypt failures detected"
+      action: "Check keys/handshake (libsignal/OpenMLS)"
+  - alert: E2EEForwardDrop
+    expr: |
+      sum(rate(void_e2ee_forward_intent_total[5m])) < (sum(rate(void_e2ee_ingest_requests_total{status="ok"}[5m])) * 0.5)
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low forward to /intent/wave vs ingest OK"
+      action: "Investigate filtering/type_hint and relay forwardIntent"

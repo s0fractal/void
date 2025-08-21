@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "orchestra.result",
+  "type": "object",
+  "required": [
+    "type",
+    "meta",
+    "ts"
+  ],
+  "properties": {
+    "type": {
+      "const": "orchestra.result"
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "content": {
+                "type": [
+                  "string",
+                  "object"
+                ]
+              },
+              "veracity": {
+                "type": "number"
+              },
+              "coherence": {
+                "type": "number"
+              },
+              "affect": {
+                "type": "object",
+                "properties": {
+                  "valence": {
+                    "type": "number"
+                  },
+                  "arousal": {
+                    "type": "number"
+                  }
+                }
+              },
+              "risk": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "weight": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "agent",
+              "content"
+            ]
+          }
+        }
+      }
+    },
+    "ts": {
+      "type": "string"
+    }
+  }
+}

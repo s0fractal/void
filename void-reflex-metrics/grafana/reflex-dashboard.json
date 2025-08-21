@@ -1,0 +1,181 @@
+{
+  "title": "Void Spinal Reflex",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Queue Depth",
+      "targets": [
+        {
+          "expr": "max(void_reflex_queue_depth)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Active",
+      "targets": [
+        {
+          "expr": "max(void_reflex_active)"
+        }
+      ],
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "SSE Connected",
+      "targets": [
+        {
+          "expr": "max(void_reflex_sse_connected)"
+        }
+      ],
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Builds OK (rate)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=\"pass\"}[5m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Builds Fail (rate)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=~\"fail|error\"}[5m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Build Duration p95",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_reflex_build_duration_ms_bucket[5m])) by (le))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Step Durations (rate)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_reflex_step_duration_ms_bucket[5m])) by (le,step)"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Timeouts",
+      "targets": [
+        {
+          "expr": "increase(void_reflex_timeouts_total[30m])"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Builds by Status",
+      "targets": [
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=\"pass\"}[1m]))",
+          "legendFormat": "pass"
+        },
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=~\"fail|error\"}[1m]))",
+          "legendFormat": "fail+error"
+        },
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=\"dryrun\"}[1m]))",
+          "legendFormat": "dryrun"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Last Start",
+      "targets": [
+        {
+          "expr": "max(void_reflex_last_build_started)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Last Finish",
+      "targets": [
+        {
+          "expr": "max(void_reflex_last_build_finished)"
+        }
+      ],
+      "gridPos": {
+        "x": 6,
+        "y": 20,
+        "w": 6,
+        "h": 4
+      }
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}

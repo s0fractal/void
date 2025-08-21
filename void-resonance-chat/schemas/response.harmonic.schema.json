@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "response.harmonic",
+  "type": "object",
+  "required": [
+    "type",
+    "meta",
+    "ts"
+  ],
+  "properties": {
+    "type": {
+      "enum": [
+        "response.harmonic",
+        "response.dissonant"
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "resonance": {
+          "type": "number"
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "explain": {
+          "type": "string"
+        },
+        "glyph_event": {
+          "type": "string"
+        }
+      }
+    },
+    "ts": {
+      "type": "string"
+    }
+  }
+}

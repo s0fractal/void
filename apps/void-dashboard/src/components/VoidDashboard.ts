@@ -8,6 +8,8 @@ import { VoidGlyph } from './VoidGlyph';
 import { ControlPanel } from './ControlPanel';
 import { EventLog } from './EventLog';
 import { CodexPanel } from './CodexPanel';
+import { TmpBusPanel } from './TmpBusPanel';
+import ResonancePanel from './ResonancePanel';
 import { formatTimestamp } from '../utils/format';
 import { IndependenceReportGenerator } from '../utils/independence-report';
 
@@ -28,6 +30,7 @@ export class VoidDashboard {
   private controlPanel?: ControlPanel;
   private eventLog?: EventLog;
   private codexPanel?: CodexPanel;
+  private tmpBusPanel?: TmpBusPanel;
   
   private pulseLog: VoidEvent[] = [];
   private maxLogSize = 1000;
@@ -135,6 +138,14 @@ export class VoidDashboard {
             <div class="codex-panel" id="codex-panel">
               <!-- Codex AI Panel -->
             </div>
+            
+            <div class="tmpbus-panel" id="tmpbus-panel">
+              <!-- TmpBus Status Panel -->
+            </div>
+            
+            <div class="resonance-panel" id="resonance-panel">
+              <!-- Resonance Panel -->
+            </div>
           </aside>
         </main>
         
@@ -189,6 +200,16 @@ export class VoidDashboard {
         onEvent: (event) => this.handleEvent(event)
       });
       this.codexPanel.render();
+    }
+    
+    // Initialize TmpBus Panel
+    const tmpBusContainer = document.getElementById('tmpbus-panel');
+    if (tmpBusContainer) {
+      this.tmpBusPanel = new TmpBusPanel(
+        tmpBusContainer,
+        this.relayClient.getUrl().replace('/sse', '/ws'),
+        5000
+      );
     }
     
     // Store pulse log in window for Codex access

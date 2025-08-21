@@ -1,0 +1,58 @@
+groups:
+- name: tmpbus-recordings
+  interval: 15s
+  rules:
+  - record: tmpbus:cmd_latency:p95
+    expr: histogram_quantile(0.95, sum(rate(tmpbus_command_latency_seconds_bucket[5m])) by (le))
+  - record: tmpbus:cmd_latency:p99
+    expr: histogram_quantile(0.99, sum(rate(tmpbus_command_latency_seconds_bucket[5m])) by (le))
+  - record: tmpbus:spool_growth_2m
+    expr: max_over_time(tmpbus_spool_depth[2m]) - min_over_time(tmpbus_spool_depth[2m])
+
+- name: tmpbus-alerts
+  interval: 15s
+  rules:
+  - alert: TmpBusRelayDown
+    expr: tmpbus_relay_connected == 0
+    for: 60s
+    labels: 
+      severity: warning
+    annotations:
+      summary: "Relay недоступний"
+      description: "relay_connected=0 > 60s. Перевірити мережу/relay-сервіс."
+
+  - alert: TmpBusWsDisconnected
+    expr: tmpbus_ws_connected == 0
+    for: 60s
+    labels: 
+      severity: info
+    annotations:
+      summary: "WS відʼєднаний"
+      description: "ws_connected=0 > 60s. UI/гліф не на прямому каналі."
+
+  - alert: TmpBusSpoolRapidGrowth
+    expr: tmpbus:spool_growth_2m > 50
+    for: 2m
+    labels: 
+      severity: critical
+    annotations:
+      summary: "Швидке зростання спулу"
+      description: "Spool росте >50/2m. Імовірний збій relay або backpressure."
+
+  - alert: TmpBusLowEventFlow
+    expr: rate(tmpbus_events_ingested_total[5m]) * 60 < 1
+    for: 5m
+    labels: 
+      severity: warning
+    annotations:
+      summary: "Низький потік подій"
+      description: "events_per_min < 1 протягом 5 хв. Перевірити джерела подій."
+
+  - alert: TmpBusCmdLatencyHighP95
+    expr: tmpbus:cmd_latency:p95 > 0.3
+    for: 2m
+    labels: 
+      severity: warning
+    annotations:
+      summary: "Висока затримка RPC (p95)"
+      description: "p95 команд > 300ms. Перевірити навантаження/блокування сокета."

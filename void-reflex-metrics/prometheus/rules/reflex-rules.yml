@@ -1,0 +1,44 @@
+groups:
+- name: reflex.rules
+  rules:
+  - record: job:void_reflex_build_fail_ratio:10m
+    expr: |
+      sum(rate(void_reflex_builds_total{status=~"fail|error"}[10m])) 
+        / clamp_min(sum(rate(void_reflex_builds_total[10m])), 1)
+  - alert: ReflexBuildFailureRateHigh
+    expr: job:void_reflex_build_fail_ratio:10m > 0.2
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Reflex build failure rate > 20%"
+      action: "Inspect repo, tests, and environment"
+  - record: job:void_reflex_build_p95_ms:10m
+    expr: histogram_quantile(0.95, sum(rate(void_reflex_build_duration_ms_bucket[10m])) by (le))
+  - alert: ReflexBuildLatencyP95High
+    expr: job:void_reflex_build_p95_ms:10m > 600000
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Reflex p95 build duration > 10m"
+      action: "Investigate dependency cache, test slowness"
+  - alert: ReflexStepTimeouts
+    expr: increase(void_reflex_timeouts_total[15m]) > 0
+    for: 5m
+    labels: { severity: critical }
+    annotations:
+      summary: "Step timeouts detected (git/deps/tests)"
+      action: "Check connectivity and TIMEOUT_MS setting"
+  - alert: ReflexQueueDepthHigh
+    expr: max_over_time(void_reflex_queue_depth[10m]) > 3
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Queue depth > 3 for 10m"
+      action: "Increase capacity or investigate stuck jobs"
+  - alert: ReflexSSEDisconnected
+    expr: max_over_time(void_reflex_sse_connected[5m]) < 1
+    for: 5m
+    labels: { severity: warning }
+    annotations:
+      summary: "SSE disconnected for >5m"
+      action: "Check relay availability"

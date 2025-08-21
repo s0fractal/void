@@ -1,0 +1,204 @@
+name: TmpBus Metrics CI
+
+on:
+  push:
+    paths:
+      - 'void-tmp-bus/**'
+      - '.github/workflows/tmpbus-metrics.yml'
+  pull_request:
+    paths:
+      - 'void-tmp-bus/**'
+      - '.github/workflows/tmpbus-metrics.yml'
+
+jobs:
+  test-exporter:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        cd void-tmp-bus/bus
+        npm ci
+        cd ../exporter
+        npm ci
+    
+    - name: Build tmpbus
+      run: |
+        cd void-tmp-bus/bus
+        npm run build
+    
+    - name: Build exporter
+      run: |
+        cd void-tmp-bus/exporter
+        npm run build
+    
+    - name: Run tests
+      run: |
+        cd void-tmp-bus/bus
+        npm test
+    
+    - name: Start tmpbus and exporter
+      run: |
+        cd void-tmp-bus
+        
+        # Create tmp directories
+        sudo mkdir -p /tmp/void/sock /tmp/void/logs
+        sudo chmod 777 /tmp/void /tmp/void/sock /tmp/void/logs
+        
+        # Start tmpbus in background
+        cd bus
+        node dist/index.js &
+        TMPBUS_PID=$!
+        cd ..
+        
+        # Wait for tmpbus to start
+        sleep 5
+        
+        # Start exporter in background
+        cd exporter
+        node dist/index.js &
+        EXPORTER_PID=$!
+        cd ..
+        
+        # Wait for exporter to start
+        sleep 5
+        
+        # Check if services are running
+        kill -0 $TMPBUS_PID || exit 1
+        kill -0 $EXPORTER_PID || exit 1
+        
+        # Test metrics endpoint
+        curl -f http://localhost:9479/metrics | grep -q "tmpbus_session_id" || exit 1
+        
+        # Send test event
+        echo '{"type":"test","value":432}' | nc -U /tmp/void/sock/events.sock || true
+        
+        # Check metrics again
+        sleep 2
+        curl -f http://localhost:9479/metrics | grep -q "tmpbus_events_ingested_total" || exit 1
+        
+        # Cleanup
+        kill $TMPBUS_PID $EXPORTER_PID || true
+    
+    - name: Docker build test
+      run: |
+        cd void-tmp-bus
+        docker compose -f compose.metrics.yml build
+    
+  prometheus-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Validate Prometheus config
+      uses: promtool/promtool-action@v1
+      with:
+        config_file: void-tmp-bus/prometheus.yml
+        rules_files: |
+          void-tmp-bus/alerts/*.yml
+    
+    - name: Validate Grafana dashboard
+      run: |
+        # Install jq for JSON validation
+        sudo apt-get update && sudo apt-get install -y jq
+        
+        # Validate dashboard JSON
+        jq . void-tmp-bus/grafana/dashboards/tmpbus-overview.json > /dev/null || exit 1
+        
+        # Check required fields
+        jq -e '.panels | length > 0' void-tmp-bus/grafana/dashboards/tmpbus-overview.json || exit 1
+        jq -e '.title' void-tmp-bus/grafana/dashboards/tmpbus-overview.json || exit 1
+    
+  integration-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      prometheus:
+        image: prom/prometheus:latest
+        ports:
+          - 9090:9090
+        options: >-
+          --health-cmd "wget --spider -q http://localhost:9090/-/healthy"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup test environment
+      run: |
+        # Create temp prometheus config
+        cat > /tmp/prometheus-test.yml << EOF
+        global:
+          scrape_interval: 5s
+        scrape_configs:
+          - job_name: 'tmpbus'
+            static_configs:
+              - targets: ['host.docker.internal:9479']
+        EOF
+        
+        # Copy to prometheus container
+        docker cp /tmp/prometheus-test.yml $(docker ps -q -f ancestor=prom/prometheus):/etc/prometheus/prometheus.yml
+        
+        # Reload prometheus
+        curl -X POST http://localhost:9090/-/reload || true
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Run full stack test
+      run: |
+        cd void-tmp-bus
+        
+        # Build everything
+        cd bus && npm ci && npm run build && cd ..
+        cd exporter && npm ci && npm run build && cd ..
+        
+        # Start services
+        sudo mkdir -p /tmp/void/sock /tmp/void/logs
+        sudo chmod 777 /tmp/void /tmp/void/sock /tmp/void/logs
+        
+        cd bus && node dist/index.js &
+        TMPBUS_PID=$!
+        cd ..
+        
+        sleep 3
+        
+        cd exporter && METRICS_PORT=9479 node dist/index.js &
+        EXPORTER_PID=$!
+        cd ..
+        
+        sleep 5
+        
+        # Query prometheus
+        curl -f http://localhost:9090/api/v1/targets | jq -e '.data.activeTargets | length > 0' || exit 1
+        
+        # Wait for scrape
+        sleep 10
+        
+        # Check metrics in prometheus
+        curl -f "http://localhost:9090/api/v1/query?query=tmpbus_session_id" | jq -e '.data.result | length > 0' || exit 1
+        
+        # Cleanup
+        kill $TMPBUS_PID $EXPORTER_PID || true
+    
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: |
+          /tmp/void/logs/
+          /tmp/prometheus-test.yml

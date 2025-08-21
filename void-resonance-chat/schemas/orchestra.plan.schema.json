@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "orchestra.plan",
+  "type": "object",
+  "required": [
+    "type",
+    "meta",
+    "ts"
+  ],
+  "properties": {
+    "type": {
+      "const": "orchestra.plan"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "steps"
+      ],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "args": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "agent"
+            ]
+          }
+        }
+      }
+    },
+    "ts": {
+      "type": "string"
+    }
+  }
+}
