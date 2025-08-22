@@ -1,0 +1,71 @@
+{
+  "title": "WASM Security",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Cosign verified/5m",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_cosign_total{result=\"verified\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Cosign failed/5m",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_cosign_total{result=\"verify_failed\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "OPA denies/5m",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_opa_total{result=\"deny\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Policy denies vs Runs",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_policy_denied_total[1m]))",
+          "legendFormat": "policy_denied rps"
+        },
+        {
+          "expr": "sum(rate(void_wasm_runs_total{result=\"ok\"}[1m]))",
+          "legendFormat": "runs ok rps"
+        }
+      ]
+    }
+  ]
+}

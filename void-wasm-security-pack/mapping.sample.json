@@ -1,0 +1,4 @@
+[
+  {"from":"void_tmpbus_spool_depth","to":"void_tmpbus_spool_depth_gauge"},
+  {"from":"void_reflex_build_duration_ms_bucket","to":"void_reflex_build_ms_bucket"}
+]

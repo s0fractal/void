@@ -1,0 +1,21 @@
+services:
+  wasm-exec:
+    build:
+      context: ..
+      dockerfile: docker/exec.feature.Dockerfile
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - EVENT_POST=/event
+      - ALLOW_MODULES=wasm/ci/*,wasm/pulse/*,wasm/demo/*
+      - ALLOW_CAPS=emit,kv,http
+      - ALLOW_HTTP_HOSTS=relay,localhost
+      - HTTP_RPS=5
+      - HTTP_BURST=5
+      - HTTP_MAX_KB=64
+      - WASM_DRYRUN=0
+    networks: [ voidnet ]
+    restart: unless-stopped
+    ports: ["9490:9490"]
+networks:
+  voidnet: { external: true }

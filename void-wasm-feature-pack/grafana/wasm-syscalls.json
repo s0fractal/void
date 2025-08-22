@@ -1,0 +1,66 @@
+{
+  "title": "WASM Syscalls",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "HTTP syscalls rps",
+      "targets": [
+        {
+          "expr": "job:wasm_sys_http_rps:1m"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "KV syscalls rps",
+      "targets": [
+        {
+          "expr": "job:wasm_sys_kv_rps:1m"
+        }
+      ],
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Syscall latency (ms)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_syscall_ms_bucket[5m])) by (le,kind)"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "table",
+      "title": "Syscalls by result",
+      "targets": [
+        {
+          "expr": "sum(rate(void_wasm_syscalls_total[1m])) by (kind,result)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      }
+    }
+  ],
+  "schemaVersion": 38
+}

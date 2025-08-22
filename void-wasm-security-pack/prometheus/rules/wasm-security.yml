@@ -1,0 +1,21 @@
+groups:
+- name: wasm.security
+  rules:
+  - record: job:wasm_cosign_fail_rate:5m
+    expr: sum(rate(void_wasm_cosign_total{result="verify_failed"}[5m]))
+  - record: job:wasm_opa_denies:5m
+    expr: sum(rate(void_wasm_opa_total{result="deny"}[5m]))
+  - alert: WasmCosignFailures
+    expr: job:wasm_cosign_fail_rate:5m > 0
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Cosign verification failing"
+      action: "Перевірити sig_url/cert_url або довіру до ключів"
+  - alert: WasmOPADenies
+    expr: job:wasm_opa_denies:5m > 0
+    for: 10m
+    labels: { severity: info }
+    annotations:
+      summary: "OPA deny події"
+      action: "Перевірити policy.rego та input"
