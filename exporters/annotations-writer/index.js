@@ -1,17 +1,19 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import { Counter, Histogram, Gauge, Registry, collectDefaultMetrics } from 'prom-client';
+import fs from 'fs';
 
 const RELAY = (process.env.RELAY_BASE || 'http://relay:8787').replace(/\/$/, '');
 const SSE_PATH = process.env.SSE_PATH || '/sse';
 const GRAFANA = (process.env.GRAFANA_URL || '').replace(/\/$/, '');
 const TOKEN = process.env.GRAFANA_TOKEN || '';
-const DASHBOARD_ID = process.env.GRAFANA_DASHBOARD_ID ? Number(process.env.GRAFANA_DASHBOARD_ID) : null;
+const FALLBACK_DASHBOARD_ID = process.env.GRAFANA_DASHBOARD_ID ? Number(process.env.GRAFANA_DASHBOARD_ID) : null;
+const PANEL_MAP_PATH = process.env.PANEL_MAP_PATH || '';
 const PORT = Number(process.env.PORT || 9488);
 const TYPES = (process.env.ANNOTATE_TYPES || 'duality.patch,duality.rollback,duality.particle.cid,ci.result,ci.fail,ci.pass')
   .split(',').map(s=>s.trim()).filter(Boolean);
-const TAGS = (process.env.TAGS || 'void,duality').split(',').map(s=>s.trim()).filter(Boolean);
-const COLOR = (process.env.COLOR || '00ff88').trim(); // hex RGB
+const DEFAULT_TAGS = (process.env.TAGS || '').split(',').map(s=>s.trim()).filter(Boolean);
+const DEFAULT_COLOR = (process.env.COLOR || '00ff88').trim();
 
 const reg = new Registry();
 collectDefaultMetrics({ register: reg });
@@ -19,9 +21,31 @@ collectDefaultMetrics({ register: reg });
 const sent = new Counter({ name: 'void_annotations_sent_total', help: 'annotations sent', labelNames:['result','type'] });
 const annMs = new Histogram({ name: 'void_annotations_ms', help: 'annotation latency', buckets:[10,20,50,100,200,500,1000,2000,5000] });
 const sseConn = new Gauge({ name: 'void_annotations_sse_connected', help: '0/1' });
-const queueGauge = new Gauge({ name: 'void_annotations_queue', help: 'pending events' });
 
-reg.registerMetric(sent); reg.registerMetric(annMs); reg.registerMetric(sseConn); reg.registerMetric(queueGauge);
+reg.registerMetric(sent); reg.registerMetric(annMs); reg.registerMetric(sseConn);
+
+let panelMap = null;
+if (PANEL_MAP_PATH && fs.existsSync(PANEL_MAP_PATH)){
+  try { panelMap = JSON.parse(fs.readFileSync(PANEL_MAP_PATH, 'utf8')); } catch {}
+}
+
+function mergeTags(base, extra){
+  const set = new Set([...(base||[]), ...(extra||[])]);
+  return Array.from(set).filter(Boolean);
+}
+
+function pickRoute(evType){
+  const def = { tags: DEFAULT_TAGS, color: DEFAULT_COLOR, dashboardId: FALLBACK_DASHBOARD_ID, panelId: undefined };
+  if (!panelMap) return def;
+  const d = panelMap.defaults || {};
+  const m = (panelMap.map || {})[evType] || {};
+  return {
+    dashboardId: m.dashboardId ?? d.dashboardId ?? FALLBACK_DASHBOARD_ID,
+    panelId:     m.panelId,
+    color:       m.color ?? d.color ?? DEFAULT_COLOR,
+    tags:        mergeTags(d.tags, m.tags)
+  };
+}
 
 function textFor(ev){
   const t = ev.type;
@@ -36,12 +60,16 @@ function textFor(ev){
 
 async function annotate(ev){
   if (!GRAFANA || !TOKEN) return false;
+  const route = pickRoute(ev.type);
   const body = {
     time: ev.ts || Date.now(),
     text: textFor(ev),
-    tags: [...TAGS, ev.type, ev.astHash ? `ast:${ev.astHash.slice(0,8)}` : undefined].filter(Boolean)
+    tags: mergeTags(route.tags, [ev.type, ev.astHash ? `ast:${ev.astHash.slice(0,8)}` : null]).filter(Boolean),
+    isRegion: false,
+    color: '#' + (route.color || DEFAULT_COLOR)
   };
-  if (DASHBOARD_ID) body.dashboardId = DASHBOARD_ID;
+  if (route.dashboardId) body.dashboardId = route.dashboardId;
+  if (route.panelId !== undefined) body.panelId = route.panelId;
   const url = GRAFANA + '/api/annotations';
   const t0 = Date.now();
   const res = await fetch(url, { method:'POST', headers: { 'content-type':'application/json', 'authorization': 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
@@ -55,7 +83,6 @@ async function annotate(ev){
 async function runSSE(){
   const url = RELAY + SSE_PATH;
   let backoff = 1000;
-  const q = [];
   for(;;){
     try{
       const res = await fetch(url);
@@ -71,12 +98,7 @@ async function runSSE(){
           if (!payload) continue;
           const ev = JSON.parse(payload);
           if (!TYPES.includes(ev.type)) continue;
-          q.push(ev); queueGauge.set(q.length);
-          // lightweight worker
-          while (q.length){
-            const cur = q.shift(); queueGauge.set(q.length);
-            try { await annotate(cur); } catch {}
-          }
+          try { await annotate(ev); } catch {}
         }
       }
     } catch (e) {
@@ -94,4 +116,4 @@ app.get('/metrics', async (_req,res)=>{
   res.set('Content-Type', reg.contentType);
   res.end(await reg.metrics());
 });
-app.listen(PORT, ()=> console.log('[annotations-writer] :%d', PORT));
+app.listen(PORT, ()=> console.log('[annotations-writer(panelmap)] :%d', PORT));
