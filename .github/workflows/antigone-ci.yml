@@ -1,0 +1,48 @@
+name: Antigone Ethical Firewall CI
+
+on:
+  push:
+    paths:
+      - 'tools/antigone/**'
+      - 'glyphs/core.yaml'
+      - '.github/workflows/antigone-ci.yml'
+  pull_request:
+    paths:
+      - 'tools/antigone/**'
+      - 'glyphs/core.yaml'
+      - '.github/workflows/antigone-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        pip install pytest pyyaml fastapi httpx
+        
+    - name: Run tests
+      run: |
+        python -m pytest tools/antigone/tests -v
+        
+    - name: Verify genome file
+      run: |
+        python -c "import yaml; yaml.safe_load(open('glyphs/core.yaml'))"
+        
+    - name: Build Docker image
+      run: |
+        docker build -f tools/antigone/docker/Dockerfile -t void/antigone:test .
+        
+    - name: Test Docker container
+      run: |
+        docker run -d --name antigone-test -p 9495:9495 void/antigone:test
+        sleep 5
+        curl -f http://localhost:9495/health
+        docker logs antigone-test
+        docker stop antigone-test

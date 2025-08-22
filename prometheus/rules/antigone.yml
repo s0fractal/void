@@ -1,0 +1,26 @@
+groups:
+- name: antigone
+  rules:
+  - alert: AntigoneHighRefusalRate
+    expr: sum(rate(void_antigone_refusals_total[15m])) > 1
+    for: 15m
+    labels: { severity: warning }
+    annotations:
+      summary: "High ethical refusal rate (>1/min avg over 15m)"
+      action: "Review recent commands and genome configuration"
+      
+  - alert: AntigoneSlowDecisions
+    expr: histogram_quantile(0.95, sum(rate(void_antigone_decision_ms_bucket[10m])) by (le)) > 500
+    for: 10m
+    labels: { severity: info }
+    annotations:
+      summary: "Antigone decision latency p95 > 500ms"
+      action: "Check genome complexity and service resources"
+      
+  - alert: AntigoneGenomeChange
+    expr: changes(void_antigone_genome_hash[1h]) > 0
+    for: 1m
+    labels: { severity: info }
+    annotations:
+      summary: "Antigone genome hash changed"
+      action: "Verify intentional genome update"
