@@ -1,0 +1,27 @@
+groups:
+- name: annotations.writer
+  rules:
+  - alert: AnnotationsWriterDisconnected
+    expr: avg_over_time(void_annotations_sse_connected[5m]) < 0.5
+    for: 5m
+    labels: { severity: info }
+    annotations:
+      summary: "Annotations writer втратив SSE"
+      action: "Перевірити relay/Grafana токен"
+  - alert: AnnotationsErrors
+    expr: sum(rate(void_annotations_sent_total{result="err"}[5m])) > 0
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Помилки створення анотацій"
+      action: "Перевірити GRAFANA_URL/TOKEN/DASHBOARD_ID"
+
+- name: cid.verifier
+  rules:
+  - alert: CIDVerifyFailures
+    expr: sum(rate(void_duality_cid_verify_total{result=~"pin_missing|gw_fail|error"}[10m])) > 0
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Збої валідації CID (pin/gateway)"
+      action: "Перевірити IPFS API та gateway, увімкнути AUTO_REPIN якщо доречно"
