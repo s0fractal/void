@@ -1,0 +1,60 @@
+--- a/void-sensor-incubator/relay/intent-router.js
++++ b/void-sensor-incubator/relay/intent-router.js
+@@ -1,5 +1,6 @@
+ import { guardianRouter } from './guardian-router.js';
+ import { postToOfflineBus } from './offline-bus.js';
++import { antigoneGate, antigoneMetrics } from './antigone-gate.js';
+ 
+ const TRACE_ID_HEADER = 'x-trace-id';
+ 
+@@ -14,10 +15,22 @@ export function intentRouter() {
+   const enabled = process.env.RESONANCE_ENABLED === '1';
+   const dryrun  = process.env.RESONANCE_DRYRUN === '1';
+   
++  // Initialize Antigone metrics
++  const antigone = antigoneMetrics();
++  
+   return (req, res, next) => {
+     if (!req.path.startsWith('/intent/')) return next();
+     if (!enabled) return res.status(503).json({ error: 'Resonance disabled' });
+     
++    // Apply Antigone gate to intent requests
++    antigoneGate()(req, res, (err) => {
++      if (err) return next(err);
++      
++      // Track Antigone metrics
++      antigone.middleware(req, res, () => {});
++      
++      // Continue with intent processing
++    });
++    
+     const { text, caps } = req.body || {};
+     const agent = req.get('user-agent') || 'unknown';
+     const trace = req.get(TRACE_ID_HEADER) || null;
+@@ -85,6 +98,25 @@ export function intentRouter() {
+     
+     // For non-dry run, forward to actual implementation
+     if (!dryrun) {
++      // Check Antigone decision
++      if (req.antigone && !req.antigone.allowed) {
++        const event = {
++          type: 'antigone.blocked_intent',
++          text: text.slice(0, 100),
++          decision: req.antigone.decision,
++          reason: req.antigone.reason,
++          trace_id: trace,
++          ts: Date.now()
++        };
++        
++        // Emit blocked event
++        postToOfflineBus(event);
++        
++        return res.status(409).json({
++          error: 'Intent blocked by ethical firewall',
++          antigone: req.antigone
++        });
++      }
++      
+       // TODO: Forward to actual resonance implementation
+       return res.status(501).json({ 
+         error: 'Not implemented',
