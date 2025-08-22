@@ -1,0 +1,15 @@
+services:
+  pulse-metrics:
+    image: node:20-alpine
+    working_dir: /app
+    volumes: [ "./pulse-metrics:/app:ro" ]
+    command: ["node","/app/pulse-metrics.js"]
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - PROM_PORT=9483
+      - BACKUP_FROM_METRICS=1
+    networks: [ voidnet ]
+    ports: ["9483:9483"]
+networks:
+  voidnet: { external: true }
