@@ -4,6 +4,7 @@ import { WebSocketServer } from "ws";
 import { codexProxyRouter } from "./codex-proxy.js";
 import { eyesRouter } from "./eyes-router.js";
 import { intentRouter } from "./intent-router.js";
+import { mountDuality } from "./duality-router.js";
 
 const PORT = parseInt(process.env.PORT || "8787", 10);
 const API_KEY = process.env.RELAY_API_KEY || "";
@@ -18,6 +19,8 @@ app.use("/codex", codexProxyRouter());
 app.use("/eyes", eyesRouter());
 // Resonance (off by default). Enable with RESONANCE_ENABLED=1
 app.use("/intent", intentRouter());
+// Duality (off by default). Enable with DUALITY_ENABLED=1
+app.use(mountDuality(app, { emit: (type, data) => { wsBroadcast(data); sseBroadcast(data); } }));
 
 // --- WS ---
 const server = app.listen(PORT, () => console.log("Relay listening on :" + PORT));

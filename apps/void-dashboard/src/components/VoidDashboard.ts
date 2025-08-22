@@ -10,6 +10,7 @@ import { EventLog } from './EventLog';
 import { CodexPanel } from './CodexPanel';
 import { TmpBusPanel } from './TmpBusPanel';
 import ResonancePanel from './ResonancePanel';
+import DualityPanel from './DualityPanel';
 import { formatTimestamp } from '../utils/format';
 import { IndependenceReportGenerator } from '../utils/independence-report';
 
@@ -146,6 +147,10 @@ export class VoidDashboard {
             <div class="resonance-panel" id="resonance-panel">
               <!-- Resonance Panel -->
             </div>
+            
+            <div class="duality-panel" id="duality-panel">
+              <!-- Duality Panel -->
+            </div>
           </aside>
         </main>
         
@@ -210,6 +215,16 @@ export class VoidDashboard {
         this.relayClient.getUrl().replace('/sse', '/ws'),
         5000
       );
+    }
+    
+    // Initialize Duality Panel
+    const dualityContainer = document.getElementById('duality-panel');
+    if (dualityContainer) {
+      const relayBase = this.relayClient.getUrl().replace('/ws', '').replace('/sse', '');
+      const dualityElement = document.createElement('div');
+      dualityContainer.appendChild(dualityElement);
+      // React component will be mounted by the main app
+      (window as any).__dualityPanelProps = { relayBase };
     }
     
     // Store pulse log in window for Codex access
