@@ -1,0 +1,15 @@
+services:
+  duality-ipfs-pinner:
+    build:
+      context: ../pinner
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - IPFS_API=http://ipfs:5001
+      - PIN=true
+      - PORT=9487
+      - ALLOW_MAX_KB=256
+    networks: [ voidnet ]
+    restart: unless-stopped
+    ports: ["9487:9487"]
+networks:
+  voidnet: { external: true }

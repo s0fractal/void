@@ -1,0 +1,196 @@
+{
+  "title": "Duality \u00b7 Particle/Wave + CID",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Waves/5m",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_waves_total[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Collapses/5m",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_collapses_total[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Particles/5m",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_particles_total[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Interference",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_duality_interference_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(void_duality_interference_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Collapse duration (ms)",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_duality_result_ms_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(void_duality_result_ms_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "CID",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 1
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Pins OK/5m",
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_ipfs_pins_total{result=\"ok\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Pins ERR/5m",
+      "gridPos": {
+        "x": 6,
+        "y": 21,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_ipfs_pins_total{result=\"err\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "IPFS pin latency (ms)",
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_duality_ipfs_pin_ms_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(void_duality_ipfs_pin_ms_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "SSE Connected (pinner)",
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "avg(void_duality_pinner_sse_connected)"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Particles w/Source/5m",
+      "gridPos": {
+        "x": 6,
+        "y": 29,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_particle_with_source_total[5m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "CID Present/5m",
+      "gridPos": {
+        "x": 12,
+        "y": 29,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_duality_cid_present_total[5m]))"
+        }
+      ]
+    }
+  ]
+}

@@ -73,6 +73,10 @@ export function signal<TArgs=any, TResult=any>(p: Particle, opts?: Partial<Wave<
 }
 
 /** Bind wave to relay bus; returns duality operators */
+// Re-export new register functionality
+export { registerParticle, RegisterOpts } from './register';
+export { addNormalizedToIPFS } from './ipfs';
+
 export function bindToRelay<TArgs=any, TResult=any>(w: Wave<TArgs, TResult>, particle: Particle, relayBase = 'http://localhost:8787'): DualityOps {
   const post = async (path: string, body: any) => {
     await fetch(relayBase + path, {
