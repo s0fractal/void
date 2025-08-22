@@ -1,0 +1,17 @@
+groups:
+- name: autopanel
+  rules:
+  - alert: AutoPanelMissRateHigh
+    expr: (sum(rate(void_autopanel_resolve_total{result="miss"}[15m])) / sum(rate(void_autopanel_resolve_total[15m]))) > 0.2
+    for: 15m
+    labels: { severity: warning }
+    annotations:
+      summary: "AutoPanel miss-rate > 20%"
+      action: "Перевірити AUTOPANEL_MAP_PATH або назви панелей/дашбордів"
+  - alert: AutoPanelSlowResolve
+    expr: histogram_quantile(0.95, sum(rate(void_autopanel_resolve_ms_bucket[10m])) by (le)) > 1000
+    for: 10m
+    labels: { severity: info }
+    annotations:
+      summary: "AutoPanel resolve p95 > 1s"
+      action: "Перевірити доступність Grafana API"
