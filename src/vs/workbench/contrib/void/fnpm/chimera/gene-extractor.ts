@@ -21,6 +21,8 @@ export interface ExtractedGene {
 	purity: number; // 0-1 confidence score
 	wasmReady: boolean;
 	ipfsCID?: string;
+	wasmCID?: string; // CID of compiled WASM
+	wasmSize?: number; // Size of WASM binary
 }
 
 export interface GenomeManifest {
@@ -76,8 +78,9 @@ export class ChimeraGeneExtractor {
 					astHash: gene.astHash,
 					code: this.fixExtractedCode(code), // Fix the 'unction' bug
 					purity: this.calculatePurityScore(code),
-					wasmReady: false, // TODO: WASM compilation
-					ipfsCID: undefined // TODO: IPFS integration
+					wasmReady: false, // Will be updated after WASM compilation
+					ipfsCID: undefined, // Will be updated after IPFS storage
+					wasmCID: undefined // Placeholder for WASM CID
 				});
 			}
 
@@ -118,10 +121,16 @@ gene_metadata:
   extraction_time: ${new Date().toISOString()}
   wasm_ready: ${gene.wasmReady}
   ipfs_cid: "${gene.ipfsCID || 'pending'}"
+  wasm_cid: "${gene.wasmCID || 'pending'}"
+  wasm_size: ${gene.wasmSize || 0}
 
 usage:
   direct: |
     import { ${gene.name} } from 'glyph://genes/${gene.astHash}';
+    
+  wasm: |
+    const wasmModule = await fnpm.loadWasm('${gene.wasmCID || gene.astHash}');
+    const result = wasmModule.${gene.name}(1, 2);
     
   composed: |
     const enhanced = fnpm.compose(

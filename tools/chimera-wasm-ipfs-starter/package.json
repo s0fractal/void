@@ -1,0 +1,17 @@
+{
+  "name": "chimera-wasm-ipfs-starter",
+  "version": "0.1.0",
+  "description": "Starter pack to compile extracted genes to WASM and produce CID/Car for IPFS.",
+  "type": "module",
+  "scripts": {
+    "compile:gene": "node scripts/compile-gene.mjs --in samples/add.ts --out out",
+    "cid": "node scripts/calc-cid.mjs out/add.wasm",
+    "car": "node scripts/pack-car.mjs out/add.wasm out/add.car",
+    "build:all": "npm run compile:gene && npm run cid && npm run car"
+  },
+  "dependencies": {
+    "assemblyscript": "^0.27.7",
+    "multiformats": "^12.1.3",
+    "ipfs-car": "^1.0.0"
+  }
+}

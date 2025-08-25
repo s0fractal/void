@@ -1,0 +1,11 @@
+{
+  "genes": [
+    {
+      "name": "add",
+      "wasm": "add.wasm",
+      "size": 55,
+      "sha256": "2764d95d730dd669fa0ebdd86d6a9a385e4e123f44ee9ffd4d78fd928a172f73",
+      "cid": "bafkreibhmtmv24yn2zu7udv53bwwvgrylzhbep2e52p72tly7wjiufzpom"
+    }
+  ]
+}
