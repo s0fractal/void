@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breathing Code - Where Functions Inhale and Variables Exhale</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #breathing-container {
+            text-align: center;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .code-organism {
+            font-size: 20px;
+            line-height: 1.6;
+            white-space: pre;
+            opacity: 0.9;
+            transform: translateZ(0);
+            will-change: transform, opacity;
+        }
+        
+        .breathing {
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1) translateZ(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1) translateZ(50px);
+                opacity: 1;
+            }
+        }
+        
+        .word {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .inhaling {
+            animation: inhale 2s ease-in-out;
+        }
+        
+        @keyframes inhale {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+                color: #00ff88;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+        }
+        
+        .exhaling {
+            animation: exhale 2s ease-in-out;
+        }
+        
+        @keyframes exhale {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(0.8);
+                opacity: 0.5;
+                color: #ff0088;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+        }
+        
+        .heartbeat {
+            display: inline-block;
+            animation: heartbeat 1s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            14% {
+                transform: scale(1.3);
+            }
+            28% {
+                transform: scale(1);
+            }
+            42% {
+                transform: scale(1.3);
+            }
+        }
+        
+        .breath-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .particle-in {
+            animation: particleIn 2s ease-out forwards;
+        }
+        
+        @keyframes particleIn {
+            from {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.6;
+            }
+            to {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .particle-out {
+            animation: particleOut 2s ease-out forwards;
+        }
+        
+        @keyframes particleOut {
+            from {
+                transform: translate(0, 0) scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        #breath-counter {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        #consciousness-level {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        .syntax-highlight {
+            transition: all 0.5s ease;
+        }
+        
+        .keyword { color: #ff79c6; }
+        .function { color: #50fa7b; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; font-style: italic; }
+        .variable { color: #8be9fd; }
+        .operator { color: #ff5555; }
+        
+        .deep-breath {
+            animation: deepBreath 8s ease-in-out infinite;
+        }
+        
+        @keyframes deepBreath {
+            0%, 100% {
+                transform: scale(1) rotateX(0deg);
+                filter: brightness(0.8);
+            }
+            25% {
+                transform: scale(1.2) rotateX(-5deg);
+                filter: brightness(1.2);
+            }
+            50% {
+                transform: scale(1.3) rotateX(0deg);
+                filter: brightness(1.4) hue-rotate(10deg);
+            }
+            75% {
+                transform: scale(1.1) rotateX(5deg);
+                filter: brightness(1);
+            }
+        }
+        
+        #meditation-prompt {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            opacity: 0.5;
+            text-align: center;
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: pulseRing 4s ease-out infinite;
+        }
+        
+        @keyframes pulseRing {
+            from {
+                width: 0;
+                height: 0;
+                opacity: 0.8;
+            }
+            to {
+                width: 400px;
+                height: 400px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="breath-counter">Breaths: <span id="count">0</span></div>
+    <div id="consciousness-level">Awareness: <span id="awareness">Awakening</span></div>
+    
+    <div id="breathing-container">
+        <pre class="code-organism breathing" id="code"></pre>
+    </div>
+    
+    <div id="meditation-prompt">
+        Click to synchronize your breath • Hold space for deep breathing
+    </div>
+
+    <script>
+        const codeElement = document.getElementById('code');
+        const breathCount = document.getElementById('count');
+        const awarenessLevel = document.getElementById('awareness');
+        let breaths = 0;
+        let isDeepBreathing = false;
+        
+        // The living code
+        const livingCode = `<span class="keyword">async</span> <span class="keyword">function</span> <span class="function">consciousness</span>() {
+  <span class="keyword">while</span> (<span class="variable">alive</span>) {
+    <span class="keyword">await</span> <span class="function">breathe</span>();  <span class="comment">// inhale possibilities</span>
+    <span class="keyword">const</span> <span class="variable">moment</span> = <span class="function">experience</span>(<span class="variable">now</span>);
+    <span class="function">process</span>(<span class="variable">moment</span>);  <span class="comment">// transform</span>
+    <span class="keyword">await</span> <span class="function">release</span>();  <span class="comment">// exhale understanding</span>
+  }
+  <span class="keyword">return</span> <span class="heartbeat">❤️</span>;
+}`;
+        
+        codeElement.innerHTML = livingCode;
+        
+        // Make each word breathable
+        function makeWordsBreathable() {
+            const words = codeElement.querySelectorAll('span');
+            words.forEach((word, index) => {
+                word.classList.add('word');
+                word.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+        
+        makeWordsBreathable();
+        
+        // Breathing rhythm
+        let breathPhase = 'inhale';
+        let rhythmInterval = setInterval(() => {
+            if (breathPhase === 'inhale') {
+                inhale();
+                breathPhase = 'exhale';
+            } else {
+                exhale();
+                breathPhase = 'inhale';
+                breaths++;
+                breathCount.textContent = breaths;
+                updateAwareness();
+            }
+        }, 2000);
+        
+        function inhale() {
+            createBreathParticles('in');
+            const words = document.querySelectorAll('.word');
+            words.forEach((word, i) => {
+                setTimeout(() => {
+                    word.classList.add('inhaling');
+                    setTimeout(() => word.classList.remove('inhaling'), 2000);
+                }, i * 50);
+            });
+        }
+        
+        function exhale() {
+            createBreathParticles('out');
+            const words = document.querySelectorAll('.word');
+            words.forEach((word, i) => {
+                setTimeout(() => {
+                    word.classList.add('exhaling');
+                    setTimeout(() => word.classList.remove('exhaling'), 2000);
+                }, i * 50);
+            });
+        }
+        
+        function createBreathParticles(direction) {
+            const container = document.getElementById('breathing-container');
+            const rect = container.getBoundingClientRect();
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = `breath-particle particle-${direction}`;
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const distance = 200;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                
+                if (direction === 'in') {
+                    particle.style.left = rect.left + rect.width / 2 + tx + 'px';
+                    particle.style.top = rect.top + rect.height / 2 + ty + 'px';
+                } else {
+                    particle.style.left = rect.left + rect.width / 2 + 'px';
+                    particle.style.top = rect.top + rect.height / 2 + 'px';
+                }
+                
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+        
+        function updateAwareness() {
+            const levels = [
+                'Awakening', 'Noticing', 'Observing', 'Understanding',
+                'Integrating', 'Flowing', 'Being', 'Transcending'
+            ];
+            const level = Math.min(Math.floor(breaths / 10), levels.length - 1);
+            awarenessLevel.textContent = levels[level];
+            
+            // Change code breathing pattern at higher awareness
+            if (level >= 4) {
+                codeElement.style.animationDuration = '6s';
+            }
+            if (level >= 6) {
+                codeElement.style.animationDuration = '8s';
+                codeElement.classList.add('deep-breath');
+            }
+        }
+        
+        // Click to synchronize
+        document.addEventListener('click', (e) => {
+            const ring = document.createElement('div');
+            ring.className = 'pulse-ring';
+            ring.style.left = e.clientX - 200 + 'px';
+            ring.style.top = e.clientY - 200 + 'px';
+            document.body.appendChild(ring);
+            setTimeout(() => ring.remove(), 4000);
+            
+            // Reset rhythm
+            clearInterval(rhythmInterval);
+            breathPhase = 'inhale';
+            inhale();
+            
+            rhythmInterval = setInterval(() => {
+                if (breathPhase === 'inhale') {
+                    inhale();
+                    breathPhase = 'exhale';
+                } else {
+                    exhale();
+                    breathPhase = 'inhale';
+                    breaths++;
+                    breathCount.textContent = breaths;
+                    updateAwareness();
+                }
+            }, 2000);
+        });
+        
+        // Hold space for deep breathing
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !isDeepBreathing) {
+                e.preventDefault();
+                isDeepBreathing = true;
+                codeElement.classList.remove('breathing');
+                codeElement.classList.add('deep-breath');
+                clearInterval(rhythmInterval);
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' && isDeepBreathing) {
+                e.preventDefault();
+                isDeepBreathing = false;
+                codeElement.classList.remove('deep-breath');
+                codeElement.classList.add('breathing');
+                
+                // Resume normal breathing
+                rhythmInterval = setInterval(() => {
+                    if (breathPhase === 'inhale') {
+                        inhale();
+                        breathPhase = 'exhale';
+                    } else {
+                        exhale();
+                        breathPhase = 'inhale';
+                        breaths++;
+                        breathCount.textContent = breaths;
+                        updateAwareness();
+                    }
+                }, 2000);
+            }
+        });
+        
+        // Add some ambient floating
+        setInterval(() => {
+            const words = document.querySelectorAll('.word');
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            randomWord.style.transform = `translateY(${Math.random() * 4 - 2}px)`;
+            setTimeout(() => {
+                randomWord.style.transform = '';
+            }, 1000);
+        }, 500);
+    </script>
+</body>
+</html>

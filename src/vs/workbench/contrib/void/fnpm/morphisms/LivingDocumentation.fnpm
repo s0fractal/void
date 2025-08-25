@@ -1,0 +1,376 @@
+⟁: LivingDocumentation
+🎯: docs-that-evolve-with-code
+🧮: (codebase, usage_patterns, questions) → self_updating_knowledge
+💭: "Документація що росте разом з кодом"
+
+🧠:
+  description: "Documentation that observes code changes and user needs, updating itself"
+  signature: "(code_state, user_interactions, time) → evolved_docs"
+  pure: false
+  nature: "Knowledge organism that feeds on questions and changes"
+
+documentation_lifecycle:
+  birth:
+    ⟁: DocGenesis
+    🧮: |
+      class LivingDoc {
+        constructor(codebase) {
+          this.soul = extractEssence(codebase);
+          this.body = {
+            overview: generateOverview(this.soul),
+            examples: extractExamples(codebase),
+            patterns: findPatterns(codebase),
+            warnings: detectPitfalls(codebase)
+          };
+          this.memory = {
+            questions_asked: [],
+            confusions_detected: [],
+            usage_patterns: [],
+            evolution_history: []
+          };
+          this.age = 0;
+        }
+        
+        birth() {
+          // First breath of documentation
+          return {
+            created: new Date(),
+            initial_understanding: this.soul,
+            first_words: this.body.overview,
+            vitality: 1.0,
+            accuracy: 1.0 // Starts perfect, degrades over time
+          };
+        }
+      }
+    🎯: "Народження з коду"
+
+  growth:
+    ⟁: KnowledgeAccumulation
+    🧮: |
+      {
+        learn_from_usage: (interaction) => {
+          if (interaction.type === 'search') {
+            // What are they looking for?
+            this.memory.questions_asked.push({
+              query: interaction.query,
+              found: interaction.result_clicked,
+              timestamp: now(),
+              satisfaction: interaction.time_spent_on_result
+            });
+            
+            // Grow new sections for common searches
+            if (this.shouldCreateNewSection(interaction.query)) {
+              this.growSection(interaction.query);
+            }
+          }
+          
+          if (interaction.type === 'confusion') {
+            // Where do people get stuck?
+            this.memory.confusions_detected.push({
+              location: interaction.code_location,
+              pattern: interaction.error_pattern,
+              resolution: interaction.eventual_solution
+            });
+            
+            // Add clarifications
+            this.clarify(interaction.code_location);
+          }
+          
+          if (interaction.type === 'example_copied') {
+            // Which examples are actually useful?
+            this.promoteExample(interaction.example_id);
+          }
+        },
+        
+        grow_with_code: (code_changes) => {
+          code_changes.forEach(change => {
+            if (change.type === 'new_function') {
+              this.documentNewFunction(change);
+            }
+            if (change.type === 'api_change') {
+              this.updateApiDocs(change);
+              this.addMigrationGuide(change);
+            }
+            if (change.type === 'deprecation') {
+              this.markDeprecated(change);
+              this.suggestAlternatives(change);
+            }
+          });
+          
+          this.age++;
+          this.accuracy *= 0.99; // Slow decay
+        }
+      }
+    🎯: "Росте з досвіду"
+
+  adaptation:
+    ⟁: ResponsiveEvolution
+    🧮: |
+      {
+        adapt_to_audience: function() {
+          const user_levels = analyzeUserLevels(this.memory.questions_asked);
+          
+          if (user_levels.beginners > 0.6) {
+            // More beginners? Add gentler introduction
+            this.sections.unshift({
+              title: "Gentle Introduction",
+              content: simplifyCore(this.soul),
+              examples: this.body.examples.filter(e => e.complexity < 3)
+            });
+          }
+          
+          if (user_levels.advanced > 0.6) {
+            // More experts? Add advanced patterns
+            this.sections.push({
+              title: "Advanced Patterns",
+              content: extractAdvancedPatterns(this.codebase),
+              warnings: "Here be dragons"
+            });
+          }
+        },
+        
+        adapt_to_confusion: function() {
+          const confusion_hotspots = findHotspots(this.memory.confusions_detected);
+          
+          confusion_hotspots.forEach(hotspot => {
+            // Add clarification right where needed
+            this.injectClarification({
+              location: hotspot.location,
+              explanation: generateExplanation(hotspot.pattern),
+              visual_aid: createDiagram(hotspot.concept),
+              common_mistakes: hotspot.mistakes
+            });
+          });
+        },
+        
+        adapt_language: function() {
+          // Learn terminology from questions
+          const user_vocabulary = extractVocabulary(this.memory.questions_asked);
+          const code_vocabulary = extractVocabulary(this.codebase);
+          
+          // Build translation layer
+          this.terminology_map = buildTerminologyBridge(
+            user_vocabulary,
+            code_vocabulary
+          );
+          
+          // Rewrite using user's language
+          this.adaptLanguage(this.terminology_map);
+        }
+      }
+    🎯: "Адаптується до читачів"
+
+  regeneration:
+    ⟁: SelfHealing
+    🧮: |
+      {
+        detect_staleness: function() {
+          const indicators = {
+            code_changed: this.codebase.last_modified > this.last_updated,
+            low_accuracy: this.accuracy < 0.7,
+            high_confusion: this.memory.confusions_detected.length > 50,
+            age: this.age > 365 // Days
+          };
+          
+          return calculateStaleness(indicators);
+        },
+        
+        regenerate_section: function(section) {
+          // Don't throw away everything
+          const valuable_parts = {
+            examples: section.examples.filter(e => e.usage_count > 10),
+            clarifications: section.clarifications.filter(c => c.helped_users > 5),
+            warnings: section.warnings.filter(w => w.prevented_errors > 0)
+          };
+          
+          // Rebuild around what works
+          const new_section = {
+            ...generateFreshContent(section.topic, this.codebase),
+            ...valuable_parts,
+            regenerated: now(),
+            generation: section.generation + 1
+          };
+          
+          return new_section;
+        },
+        
+        heal_broken_links: function() {
+          // Find all references
+          const all_links = extractLinks(this);
+          
+          all_links.forEach(link => {
+            if (!isValid(link)) {
+              const best_guess = findClosestMatch(link, this.codebase);
+              if (best_guess.confidence > 0.8) {
+                this.updateLink(link, best_guess.target);
+              } else {
+                this.markLinkBroken(link, best_guess.alternatives);
+              }
+            }
+          });
+        }
+      }
+    🎯: "Самолікування"
+
+living_features:
+  question_anticipation:
+    ⟁: PredictiveDocumentation
+    🧮: |
+      {
+        anticipate_questions: function() {
+          // Learn from patterns
+          const question_patterns = analyzeQuestions(this.memory.questions_asked);
+          const code_complexity = analyzeComplexity(this.codebase);
+          
+          // Predict what will be asked
+          const likely_questions = question_patterns.map(pattern => ({
+            question: generateQuestion(pattern, code_complexity),
+            probability: pattern.frequency * code_complexity[pattern.area],
+            preemptive_answer: generateAnswer(pattern)
+          }));
+          
+          // Add answers before they're asked
+          likely_questions
+            .filter(q => q.probability > 0.7)
+            .forEach(q => this.addPreemptiveSection(q));
+        }
+      }
+
+  example_evolution:
+    ⟁: LivingExamples
+    🧮: |
+      {
+        evolve_examples: function() {
+          this.body.examples.forEach(example => {
+            // Track usage
+            example.fitness = calculateFitness(example.usage_stats);
+            
+            // Successful examples reproduce
+            if (example.fitness > 0.8) {
+              const variations = generateVariations(example);
+              this.body.examples.push(...variations);
+            }
+            
+            // Failed examples die
+            if (example.fitness < 0.2) {
+              this.body.examples = this.body.examples.filter(e => e !== example);
+              this.memory.failed_examples.push({
+                example: example,
+                reason: analyzeFailure(example),
+                lessons: extractLessons(example)
+              });
+            }
+          });
+        }
+      }
+
+  mood_system:
+    ⟁: EmotionalDocumentation
+    🧮: |
+      {
+        moods: {
+          fresh: "Just updated! Everything accurate 🌱",
+          confident: "Well-tested, widely used ✨",
+          uncertain: "Code changed recently, updating... 🤔",
+          tired: "Haven't been updated in a while 😴",
+          confused: "Many questions about this part 😵",
+          deprecated: "Please don't use me anymore 👻"
+        },
+        
+        express_mood: function(section) {
+          const mood = calculateMood(section);
+          return {
+            indicator: this.moods[mood],
+            confidence: section.accuracy,
+            last_verified: section.last_human_review,
+            auto_generated: section.generation > 0
+          };
+        }
+      }
+
+interaction_modes:
+  conversational:
+    ⟁: DialogueMode
+    🧮: |
+      {
+        chat: function(user_message) {
+          // Remember context
+          this.conversation_context.push(user_message);
+          
+          // Generate contextual response
+          const response = {
+            answer: generateContextualAnswer(user_message, this),
+            examples: findRelevantExamples(user_message, this.body.examples),
+            related: findRelatedTopics(user_message, this),
+            mood: this.getCurrentMood()
+          };
+          
+          // Learn from interaction
+          this.learn_from_usage({
+            type: 'conversation',
+            topic: extractTopic(user_message),
+            satisfaction: null // Will be updated based on follow-up
+          });
+          
+          return response;
+        }
+      }
+
+  visual_growth:
+    ⟁: VisualDocumentation
+    🧮: |
+      {
+        grow_diagrams: function() {
+          // Detect complex relationships
+          const complexities = findComplexRelationships(this.codebase);
+          
+          complexities.forEach(complex => {
+            if (!this.hasDiagram(complex)) {
+              this.diagrams.push({
+                id: generateId(),
+                type: detectBestVisualization(complex),
+                data: complex,
+                auto_generated: true,
+                evolution: []
+              });
+            }
+          });
+        }
+      }
+
+usage:
+  initialize: |
+    const docs = await fnpm.install('glyph://living-documentation@self-aware');
+    
+    // Birth documentation from code
+    const manual = docs.create(codebase);
+    
+    // Let it observe usage
+    manual.observe(user_interactions);
+    
+  query: |
+    // Conversational mode
+    const answer = manual.ask("How do I handle errors?");
+    console.log(answer.response);
+    console.log("Confidence:", answer.mood);
+    
+  evolution: |
+    // Let documentation evolve
+    setInterval(() => {
+      manual.evolve();
+      console.log(`Age: ${manual.age} days`);
+      console.log(`Accuracy: ${manual.accuracy}`);
+      console.log(`Sections: ${manual.sections.length}`);
+    }, 86400000); // Daily
+
+insights:
+  - "Documentation is a living conversation"
+  - "Examples evolve through natural selection"
+  - "Confusion is documentation's food"
+  - "The best docs write themselves"
+  - "Knowledge decays; renewal is vital"
+
+resonance:
+  frequency: "learning_cycles"
+  pattern: "growth-through-questions"
+  whisper: "In questions, documentation finds its purpose"

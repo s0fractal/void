@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Temporal Garden - Where Time Becomes Soil</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        
+        #garden {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%);
+        }
+        
+        .time-layer {
+            position: absolute;
+            width: 100%;
+            height: 33.33%;
+            opacity: 0.7;
+            mix-blend-mode: screen;
+        }
+        
+        #past-layer {
+            bottom: 0;
+            background: linear-gradient(to top, 
+                rgba(101, 67, 33, 0.8) 0%, 
+                rgba(101, 67, 33, 0) 100%);
+        }
+        
+        #present-layer {
+            bottom: 33.33%;
+            background: radial-gradient(circle at center, 
+                rgba(46, 213, 115, 0.3) 0%, 
+                transparent 70%);
+        }
+        
+        #future-layer {
+            top: 0;
+            background: linear-gradient(to bottom, 
+                rgba(108, 92, 231, 0.4) 0%, 
+                transparent 100%);
+        }
+        
+        .thought-seed {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: plant 2s ease-out forwards;
+        }
+        
+        @keyframes plant {
+            0% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 1;
+            }
+            60% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0.4;
+            }
+        }
+        
+        .growing-thought {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to top, 
+                rgba(46, 213, 115, 0.8) 0%, 
+                rgba(108, 92, 231, 0.4) 100%);
+            transform-origin: bottom;
+            animation: grow 8s ease-in-out infinite;
+        }
+        
+        @keyframes grow {
+            0%, 100% {
+                height: 10px;
+                opacity: 0.3;
+            }
+            50% {
+                height: 80px;
+                opacity: 0.8;
+            }
+        }
+        
+        .memory-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #d4a574;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: decompose 10s infinite;
+        }
+        
+        @keyframes decompose {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(100px) scale(0.3);
+                opacity: 0;
+            }
+        }
+        
+        .bloom {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0;
+            animation: bloom 4s ease-in-out forwards;
+        }
+        
+        @keyframes bloom {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotate(180deg);
+                opacity: 0.6;
+            }
+        }
+        
+        .bloom::before {
+            content: '✿';
+            font-size: 60px;
+            position: absolute;
+            color: #e8a0ff;
+            filter: blur(0.5px);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        
+        #attention-cursor {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        #attention-cursor.watering {
+            border-color: rgba(46, 213, 115, 0.6);
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.4);
+        }
+        
+        .season-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        #greenhouse {
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            width: 200px;
+            height: 150px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 100px 100px 10px 10px;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .time-soil {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top,
+                rgba(101, 67, 33, 0.9) 0%,
+                rgba(101, 67, 33, 0.6) 30%,
+                rgba(46, 213, 115, 0.2) 60%,
+                transparent 100%);
+            mix-blend-mode: multiply;
+        }
+    </style>
+</head>
+<body>
+    <div id="garden">
+        <div class="time-layer" id="past-layer"></div>
+        <div class="time-layer" id="present-layer"></div>
+        <div class="time-layer" id="future-layer"></div>
+        <div class="time-soil"></div>
+        
+        <div id="greenhouse">secret growth</div>
+        <div id="attention-cursor"></div>
+        <div class="season-indicator">Season: <span id="season">Spring</span></div>
+    </div>
+
+    <script>
+        const garden = document.getElementById('garden');
+        const cursor = document.getElementById('attention-cursor');
+        const seasonSpan = document.getElementById('season');
+        
+        // Seasons cycle
+        const seasons = ['Winter', 'Spring', 'Summer', 'Autumn'];
+        let currentSeason = 1;
+        
+        setInterval(() => {
+            currentSeason = (currentSeason + 1) % seasons.length;
+            seasonSpan.textContent = seasons[currentSeason];
+            document.body.style.filter = `hue-rotate(${currentSeason * 30}deg)`;
+        }, 15000);
+        
+        // Follow mouse with attention cursor
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        // Plant thoughts on click
+        document.addEventListener('click', (e) => {
+            plantThought(e.clientX, e.clientY);
+        });
+        
+        // Hold to water
+        let watering = false;
+        document.addEventListener('mousedown', () => {
+            watering = true;
+            cursor.classList.add('watering');
+            waterNearbyPlants();
+        });
+        
+        document.addEventListener('mouseup', () => {
+            watering = false;
+            cursor.classList.remove('watering');
+        });
+        
+        function plantThought(x, y) {
+            const seed = document.createElement('div');
+            seed.className = 'thought-seed';
+            seed.style.left = x + 'px';
+            seed.style.top = y + 'px';
+            garden.appendChild(seed);
+            
+            // After planting animation, start growing
+            setTimeout(() => {
+                seed.remove();
+                growThought(x, y);
+            }, 2000);
+            
+            // Add memory particles
+            for(let i = 0; i < 3; i++) {
+                setTimeout(() => createMemoryParticle(x, y), i * 300);
+            }
+        }
+        
+        function growThought(x, y) {
+            const growth = document.createElement('div');
+            growth.className = 'growing-thought';
+            growth.style.left = x + 'px';
+            growth.style.bottom = '100px';
+            garden.appendChild(growth);
+            
+            // Random chance to bloom
+            if (Math.random() > 0.7) {
+                setTimeout(() => createBloom(x, y - 100), 4000);
+            }
+        }
+        
+        function createMemoryParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'memory-particle';
+            particle.style.left = (x + Math.random() * 40 - 20) + 'px';
+            particle.style.bottom = '80px';
+            garden.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 10000);
+        }
+        
+        function createBloom(x, y) {
+            const bloom = document.createElement('div');
+            bloom.className = 'bloom';
+            bloom.style.left = x + 'px';
+            bloom.style.top = y + 'px';
+            garden.appendChild(bloom);
+        }
+        
+        function waterNearbyPlants() {
+            if (!watering) return;
+            
+            const thoughts = document.querySelectorAll('.growing-thought');
+            thoughts.forEach(thought => {
+                const rect = thought.getBoundingClientRect();
+                const distance = Math.hypot(
+                    rect.left - cursor.offsetLeft,
+                    rect.top - cursor.offsetTop
+                );
+                
+                if (distance < 100) {
+                    thought.style.animation = 'grow 4s ease-in-out infinite';
+                }
+            });
+            
+            requestAnimationFrame(waterNearbyPlants);
+        }
+        
+        // Auto-generate some initial activity
+        setInterval(() => {
+            if (Math.random() > 0.8) {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                createMemoryParticle(x, y);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

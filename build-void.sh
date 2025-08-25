@@ -9,19 +9,20 @@ echo "========================="
 
 # Check Node version
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -ne "18" ]; then
-    echo "⚠️  Warning: Node $NODE_VERSION detected. Node 18 is required."
-    echo "   The build will likely fail with Node 24."
+if [ "$NODE_VERSION" -lt "20" ]; then
+    echo "⚠️  Warning: Node $NODE_VERSION detected. Node 20 or later is required."
     echo ""
-    echo "To install Node 18, you can use:"
-    echo "  brew install node@18"
-    echo "  brew link --force --overwrite node@18"
+    echo "To install Node 20, you can use:"
+    echo "  nvm install 20"
+    echo "  nvm use 20"
     echo ""
     read -p "Continue anyway? (y/N) " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         exit 1
     fi
+else
+    echo "✅ Node $NODE_VERSION detected. Good to go!"
 fi
 
 # Clean previous builds

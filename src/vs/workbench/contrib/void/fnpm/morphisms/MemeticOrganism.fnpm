@@ -1,0 +1,369 @@
+⟁: MemeticOrganism
+🎯: idea-as-living-entity
+🧮: (concept, mind[], environment) → spreading_thoughtform
+💭: "Ідеї як живі організми що еволюціонують"
+
+🧠:
+  description: "Ideas that replicate, mutate, and evolve through minds"
+  signature: "(meme_seed, host_minds, cultural_environment) → living_idea"
+  pure: false
+  nature: "Digital DNA of consciousness"
+
+meme_biology:
+  replication_mechanism:
+    ⟁: ThoughtVirus
+    🧮: |
+      class MemeticDNA {
+        constructor(core_idea) {
+          this.genome = {
+            core: core_idea,
+            hooks: [], // what makes it memorable
+            triggers: [], // what makes it spread
+            mutations: [], // variations that emerged
+            antibodies: [] // ideas that resist it
+          };
+          this.generation = 0;
+          this.fitness = 0;
+          this.hosts = new Set();
+        }
+        
+        infect(mind) {
+          // Check if mind is susceptible
+          const susceptibility = this.checkSusceptibility(mind);
+          if (susceptibility < 0.3) {
+            return {
+              success: false,
+              reason: 'immune_system_strong',
+              antibodies: mind.getMemeticAntibodies()
+            };
+          }
+          
+          // Attempt infection
+          const infection = {
+            meme: this.clone(),
+            host: mind.id,
+            timestamp: Date.now(),
+            strength: susceptibility,
+            mutation_chance: 0.1
+          };
+          
+          // Possible mutation during transmission
+          if (Math.random() < infection.mutation_chance) {
+            infection.meme = this.mutate(mind.context);
+          }
+          
+          // Add to host's idea ecosystem
+          mind.ideas.add(infection.meme);
+          this.hosts.add(mind.id);
+          
+          return {
+            success: true,
+            variant: infection.meme,
+            integration_level: susceptibility
+          };
+        }
+        
+        mutate(context) {
+          const mutant = this.clone();
+          
+          // Types of mutations
+          const mutations = [
+            () => this.semanticDrift(mutant, context),
+            () => this.emotionalAmplification(mutant),
+            () => this.conceptualFusion(mutant, context.dominant_memes),
+            () => this.simplification(mutant),
+            () => this.complexification(mutant)
+          ];
+          
+          const mutation = mutations[Math.floor(Math.random() * mutations.length)];
+          mutation();
+          
+          mutant.generation = this.generation + 1;
+          mutant.mutations.push({
+            type: mutation.name,
+            timestamp: Date.now(),
+            context: context.summary
+          });
+          
+          return mutant;
+        }
+      }
+    🎯: "Ідеї заражають розуми"
+
+  evolutionary_pressure:
+    ⟁: MemeticSelection
+    🧮: |
+      {
+        fitness_factors: {
+          memorability: (meme) => {
+            // How easily remembered?
+            return calculateMemorable(meme.hooks);
+          },
+          
+          emotional_resonance: (meme) => {
+            // How strongly felt?
+            const emotions = analyzeEmotionalContent(meme);
+            return emotions.intensity * emotions.valence;
+          },
+          
+          utility: (meme) => {
+            // How useful to host?
+            return meme.practical_applications.length * 0.2;
+          },
+          
+          social_currency: (meme) => {
+            // Does sharing increase status?
+            return meme.makes_sharer_look.smart * 0.3 +
+                   meme.makes_sharer_look.caring * 0.3 +
+                   meme.makes_sharer_look.insider * 0.4;
+          },
+          
+          novelty: (meme, environment) => {
+            // How fresh vs familiar?
+            const similarity = findSimilarMemes(meme, environment);
+            return Math.exp(-similarity); // exponential decay
+          }
+        },
+        
+        selection_pressure: (meme_population, environment) => {
+          // Calculate fitness for each meme
+          const fitness_scores = meme_population.map(meme => ({
+            meme: meme,
+            fitness: Object.values(this.fitness_factors)
+              .reduce((total, factor) => total + factor(meme, environment), 0)
+          }));
+          
+          // Natural selection
+          const mean_fitness = average(fitness_scores.map(s => s.fitness));
+          return fitness_scores.filter(s => s.fitness > mean_fitness * 0.8);
+        }
+      }
+    🎯: "Виживають найадаптованіші ідеї"
+
+  symbiosis_patterns:
+    ⟁: MemeticEcosystem
+    🧮: |
+      {
+        relationships: {
+          mutualism: (meme1, meme2) => {
+            // Both benefit from coexistence
+            return {
+              type: 'mutualism',
+              example: 'science + democracy',
+              strengthens_both: true,
+              creates: 'ideological_framework'
+            };
+          },
+          
+          parasitism: (parasite_meme, host_meme) => {
+            // One benefits at other's expense
+            return {
+              type: 'parasitism',
+              example: 'conspiracy_theory + legitimate_concern',
+              weakens_host: true,
+              spreads_through: 'mimicry'
+            };
+          },
+          
+          commensalism: (rider_meme, carrier_meme) => {
+            // One benefits, other unaffected
+            return {
+              type: 'commensalism',
+              example: 'joke + serious_message',
+              piggybacks: true,
+              increases_spread: true
+            };
+          },
+          
+          competition: (meme1, meme2) => {
+            // Compete for same mental resources
+            return {
+              type: 'competition',
+              example: 'opposing_political_views',
+              winner: 'depends_on_environment',
+              creates: 'polarization'
+            };
+          }
+        },
+        
+        ecosystem_health: (meme_diversity) => {
+          // Diverse ecosystems are more robust
+          return {
+            diversity_index: calculateShannonIndex(meme_diversity),
+            stability: 1 - (1 / meme_diversity.length),
+            innovation_potential: meme_diversity.length * 
+              average_mutation_rate(meme_diversity)
+          };
+        }
+      }
+    🎯: "Ідеї створюють екосистеми"
+
+collective_phenomena:
+  egregores:
+    ⟁: CollectiveThoughtform
+    🧮: |
+      class Egregore {
+        constructor(founding_memes) {
+          this.core_memes = founding_memes;
+          this.believers = new Set();
+          this.rituals = [];
+          this.symbols = [];
+          this.manifestations = [];
+          this.power = 0;
+        }
+        
+        feed(attention_energy) {
+          // Egregores grow from collective attention
+          this.power += attention_energy.intensity * 
+                        attention_energy.duration *
+                        attention_energy.num_minds;
+          
+          // At certain thresholds, new properties emerge
+          if (this.power > 1000 && !this.has_agency) {
+            this.gainAgency();
+          }
+          
+          if (this.power > 10000 && !this.can_manifest) {
+            this.gainManifestation();
+          }
+        }
+        
+        gainAgency() {
+          // Egregore begins to act independently
+          this.has_agency = true;
+          this.behaviors = {
+            protect_self: () => this.strengthenBelievers(),
+            spread: () => this.createEvangelists(),
+            evolve: () => this.adaptToThreats(),
+            reproduce: () => this.spawn_sub_egregores()
+          };
+        }
+        
+        influence(reality) {
+          // Strong egregores shape reality
+          if (this.power > this.manifestation_threshold) {
+            return {
+              synchronicities: this.createMeaningfulCoincidences(),
+              social_changes: this.influenceCollectiveBehavior(),
+              reality_shifts: this.alterProbabilities()
+            };
+          }
+        }
+      }
+    🎯: "Колективні думки стають сутностями"
+
+  meme_complexes:
+    ⟁: IdeologicalOrganism
+    🧮: |
+      {
+        // Multiple memes form complex organisms
+        create_memeplex: (component_memes) => {
+          const memeplex = {
+            components: component_memes,
+            emergent_properties: findEmergentPatterns(component_memes),
+            internal_consistency: checkLogicalCoherence(component_memes),
+            external_defenses: createAntibodies(component_memes)
+          };
+          
+          // Complex ideologies are harder to change
+          memeplex.inertia = memeplex.components.length * 
+                             memeplex.internal_consistency;
+          
+          // But also more powerful
+          memeplex.influence = multiplyEffect(component_memes);
+          
+          return memeplex;
+        },
+        
+        examples: {
+          religion: ['deity', 'afterlife', 'morality', 'ritual', 'community'],
+          science: ['empiricism', 'peer_review', 'falsifiability', 'progress'],
+          capitalism: ['property', 'markets', 'competition', 'growth', 'profit']
+        }
+      }
+    🎯: "Ідеї об'єднуються в ідеології"
+
+protection_mechanisms:
+  mental_hygiene:
+    ⟁: MemeticImmunity
+    🧮: |
+      {
+        build_immunity: (mind) => {
+          return {
+            critical_thinking: 'question_source_and_motive',
+            emotional_awareness: 'notice_manipulation_attempts',
+            diversity_exposure: 'encounter_many_perspectives',
+            meta_cognition: 'think_about_thinking',
+            pause_before_sharing: 'break_automatic_transmission'
+          };
+        },
+        
+        healthy_practices: {
+          regular_reflection: "examine_held_beliefs",
+          idea_genealogy: "trace_where_thoughts_originated",
+          memetic_fasting: "periods_without_information",
+          conscious_curation: "actively_choose_influences"
+        }
+      }
+
+cultivation:
+  beneficial_memes:
+    ⟁: PositivePropagation
+    🧮: |
+      {
+        characteristics: {
+          empowering: "increases_agency_not_dependence",
+          truthful: "aligns_with_reality",
+          beautiful: "aesthetically_pleasing",
+          regenerative: "creates_more_than_consumes",
+          connecting: "builds_bridges_not_walls"
+        },
+        
+        spread_strategies: {
+          embodiment: "be_living_example",
+          storytelling: "wrap_in_narrative",
+          practical_tools: "make_immediately_useful",
+          community: "create_practice_groups",
+          iteration: "evolve_based_on_feedback"
+        }
+      }
+
+usage:
+  create_meme: |
+    const meme = await fnpm.install('glyph://memetic-organism@basic');
+    
+    const idea = meme.create({
+      core: "Gardens grow in time not space",
+      hooks: ["counterintuitive", "poetic", "practical"],
+      triggers: ["mention_of_gardening", "discussion_of_time"],
+      emotion: "wonder"
+    });
+    
+    // Release into wild
+    idea.spread({
+      initial_hosts: [friend1, friend2],
+      environment: 'social_media'
+    });
+    
+  track_evolution: |
+    // Monitor how idea evolves
+    idea.on('mutation', (variant) => {
+      console.log(`New variant: ${variant.core}`);
+      console.log(`Generation: ${variant.generation}`);
+    });
+    
+    idea.on('spread', (new_host) => {
+      console.log(`Infected: ${new_host.id}`);
+    });
+
+insights:
+  - "Ideas are living things that use minds to reproduce"
+  - "Memes evolve faster than genes"
+  - "Collective belief creates reality"
+  - "Mental ecosystems need diversity"
+  - "We are both gardener and garden of ideas"
+
+resonance:
+  frequency: "viral_coefficient"
+  pattern: "exponential-spread"
+  whisper: "I think, therefore I am thought"

@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-08-24T16:37:00+03:00",
+  "ceremony": "independence",
+  "version": "1.99.3",
+  "genome_sha": "056456ccd06288ffa0fb3aec56bb7064cf5a375cfb16b8c447826f9af915b1be",
+  "metrics": {
+    "deny_rate": 0.031,
+    "latency_p95_ms": 195,
+    "decisions_total": 1248732,
+    "events_total": 1248732,
+    "uptime_percent": 99.97
+  },
+  "slo": {
+    "deny_rate_target": 0.05,
+    "latency_p95_target": 300,
+    "met": true
+  },
+  "resonance_hz": 432,
+  "status": "success"
+}

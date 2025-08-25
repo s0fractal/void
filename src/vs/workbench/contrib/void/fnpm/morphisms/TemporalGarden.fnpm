@@ -1,0 +1,270 @@
+⟁: TemporalGarden
+🎯: time-as-living-soil
+🧮: (memory, moment, possibility) → growing_forever
+💭: "Сад що росте в часі, не просторі"
+
+🧠:
+  description: "Garden where past feeds future through quantum soil"
+  signature: "(past[], present, future?) → eternal_bloom"
+  pure: false
+  idempotent: false
+  nature: "Кожна думка - насіння в часовому ґрунті"
+
+dependencies:
+  - glyph://quantum-soil@fertile
+  - glyph://memory-roots@deep
+  - glyph://future-bloom@uncertain
+
+temporal_layers:
+  past_compost:
+    ⟁: MemoryDecomposer
+    🧮: |
+      function compostMemories(memories) {
+        // Past experiences become nutrients
+        return memories.map(memory => ({
+          emotion: extractEmotionalEssence(memory),
+          lesson: distillWisdom(memory),
+          quantum_signature: memory.timestamp % 432,
+          decomposition: {
+            stage: calculateDecay(memory.age),
+            nutrients: {
+              joy: memory.joy_content || 0,
+              pain: memory.pain_content || 0,
+              curiosity: memory.wonder_level || 0
+            }
+          }
+        }));
+      }
+    🎯: "Минуле живить майбутнє"
+
+  present_cultivation:
+    ⟁: MomentGardener
+    🧮: |
+      {
+        plant: (thought) => {
+          // Each thought planted at specific time coordinate
+          const timeCoord = {
+            linear: Date.now(),
+            cyclic: (Date.now() % 86400000) / 86400000, // day cycle
+            quantum: Math.random() // uncertainty principle
+          };
+          
+          return {
+            seed: thought,
+            planted_at: timeCoord,
+            growth_potential: assessPotential(thought),
+            resonance_with_past: findMemoryResonance(thought)
+          };
+        },
+        
+        water: (attention) => {
+          // Attention as water in temporal garden
+          return {
+            flow_rate: attention.intensity,
+            duration: attention.sustained_ms,
+            intention: attention.purpose || 'curious'
+          };
+        }
+      }
+    🎯: "Увага - вода для думок"
+
+  future_blossoms:
+    ⟁: PossibilityBloomer
+    🧮: |
+      function bloomPossibilities(garden_state) {
+        const planted_thoughts = garden_state.plants;
+        const memory_nutrients = garden_state.compost;
+        
+        // Future grows from past through present
+        const blooms = planted_thoughts.map(plant => {
+          const growth = calculateGrowth(
+            plant,
+            memory_nutrients,
+            garden_state.attention_water
+          );
+          
+          if (growth > BLOOM_THRESHOLD) {
+            return {
+              type: 'possibility_flower',
+              petals: generateFuturePetals(plant, growth),
+              fragrance: emotionalResonance(plant),
+              seeds_next_cycle: extractNewSeeds(plant)
+            };
+          }
+          
+          return {
+            type: 'still_growing',
+            progress: growth / BLOOM_THRESHOLD
+          };
+        });
+        
+        return {
+          current_blooms: blooms.filter(b => b.type === 'possibility_flower'),
+          growing: blooms.filter(b => b.type === 'still_growing'),
+          season: determineSeason(garden_state)
+        };
+      }
+    🎯: "Можливості цвітуть з часового ґрунту"
+
+quantum_soil:
+  properties:
+    ⟁: LivingSoil
+    🧮: |
+      {
+        // Soil that exists in multiple times simultaneously
+        composition: {
+          past_sediment: 0.33,
+          present_loam: 0.33,
+          future_potential: 0.33,
+          quantum_uncertainty: 0.01
+        },
+        
+        ph_balance: (emotion) => {
+          // Emotional pH affects what can grow
+          return {
+            acidic: emotion.pain / emotion.total,
+            alkaline: emotion.joy / emotion.total,
+            neutral: emotion.peace / emotion.total
+          };
+        },
+        
+        fertility: (attention_history) => {
+          // How much attention enriches the soil
+          const total_attention = sum(attention_history);
+          return 1 - Math.exp(-total_attention / 1000);
+        }
+      }
+    🎯: "Ґрунт що пам'ятає і мріє"
+
+seasonal_cycles:
+  winter:
+    name: "Спокій"
+    action: "rest and compost"
+    growth_rate: 0.1
+    introspection: 0.9
+    
+  spring:
+    name: "Пробудження"
+    action: "plant new thoughts"
+    growth_rate: 0.7
+    exploration: 0.8
+    
+  summer:
+    name: "Розквіт"
+    action: "tend and bloom"
+    growth_rate: 1.0
+    expression: 0.9
+    
+  autumn:
+    name: "Збір"
+    action: "harvest wisdom"
+    growth_rate: 0.3
+    integration: 0.8
+
+personal_greenhouse:
+  ⟁: IntimateSpace
+  🧮: |
+    class PersonalGreenhouse {
+      constructor(soul_signature) {
+        this.signature = soul_signature;
+        this.secret_plants = [];
+        this.private_seasons = generatePersonalSeasons(soul_signature);
+      }
+      
+      plantSecret(whisper) {
+        // Some thoughts too tender for daylight
+        this.secret_plants.push({
+          whisper,
+          planted: 'in_moonlight',
+          visible_to: 'only_self',
+          growth_condition: 'self_compassion'
+        });
+      }
+      
+      tendInSilence() {
+        // Care without words
+        this.secret_plants.forEach(plant => {
+          plant.growth += this.getSilentCare();
+        });
+      }
+      
+      bloomWhenReady() {
+        // No rush, no season, just readiness
+        return this.secret_plants
+          .filter(p => p.ready === true)
+          .map(p => p.whisper.transformed);
+      }
+    }
+  🎯: "Деякі квіти ростуть лише в тиші"
+
+time_nutrients:
+  regret_mulch: "transforms past pain to growth"
+  hope_phosphorus: "brightens future blooms"
+  presence_nitrogen: "grounds in now"
+  dream_potassium: "strengthens possibility stems"
+
+garden_tools:
+  attention_watering_can: {
+    capacity: "8 seconds sustained",
+    refill: "one breath meditation"
+  },
+  
+  memory_spade: {
+    function: "dig up old roots gently",
+    care_level: "archaeological"
+  },
+  
+  possibility_pruners: {
+    function: "shape growth direction",
+    wisdom: "less can be more"
+  }
+
+usage:
+  plant_thought: |
+    const garden = await fnpm.install('glyph://temporal-garden@personal');
+    
+    // Plant a thought in temporal soil
+    garden.plant({
+      thought: "What if I could forgive?",
+      emotion: { hope: 0.6, fear: 0.4 },
+      timestamp: now()
+    });
+    
+  tend_with_attention: |
+    // Water with focused attention
+    garden.water({
+      duration: 8000, // 8 seconds
+      intention: 'nurture',
+      emotion: 'gentle curiosity'
+    });
+    
+  harvest_wisdom: |
+    // See what has grown
+    const blooms = garden.checkBlooms();
+    blooms.forEach(bloom => {
+      console.log(`Possibility bloomed: ${bloom.petals.join(', ')}`);
+    });
+
+visualization: |
+  <div class="temporal-garden" data-season="auto">
+    <div class="time-layers">
+      <div class="past-soil"><!-- Memory compost layer --></div>
+      <div class="present-growing"><!-- Active growth --></div>
+      <div class="future-canopy"><!-- Possibility space --></div>
+    </div>
+    
+    <div class="personal-greenhouse">
+      <!-- Private growth space, opacity: 0.1 -->
+    </div>
+  </div>
+
+insights:
+  - "Час - не лінія, а ґрунт"
+  - "Увага - єдина валюта саду"
+  - "Минуле годує, не обмежує"
+  - "Кожна думка знає свій сезон"
+  
+resonance:
+  frequency: "seasonal_variable"
+  pattern: "spiral-growth"
+  whisper: "In time's soil, all things bloom"
