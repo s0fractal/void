@@ -1,0 +1,37 @@
+⟁: subtract
+🎯: pure-function-gene
+🧮: export function subtract(a: number, b: number): number {
+    return a - b;
+}
+💭: "Gene with semantic protein hash"
+
+🧠:
+  description: "Pure function with semantic fingerprint"
+  signature: "auto-detected"
+  pure: true
+  
+hashing:
+  astHash: "498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed"
+  proteinHash: "phash:v1:sha256:b96c5d9086a76f67"
+  hybridId: "phash:v1:sha256:b96c5d9086a76f67|498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed"
+  
+protein_structure:
+  nodes: 2
+  edges: -5
+  complexity: -2.500
+  spectrum: [0.500, 0.500, 0.000, 0.000, 0.000]
+  
+semantic_addressing:
+  by_content: |
+    import { subtract } from 'glyph://genes/498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed';
+    
+  by_meaning: |
+    import { subtract } from 'glyph://proteins/phash:v1:sha256:b96c5d9086a76f67';
+    
+  by_hybrid: |
+    import { subtract } from 'glyph://hybrid/phash:v1:sha256:b96c5d9086a76f67|498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed';
+
+resonance:
+  frequency: 432
+  pattern: "semantic-invariant"
+  confidence: 1.0

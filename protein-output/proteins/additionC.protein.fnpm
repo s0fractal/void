@@ -1,0 +1,38 @@
+⟁: additionC
+🎯: pure-function-gene
+🧮: export function additionC(first: number, second: number): number {
+    const result = first + second;
+    return result;
+}
+💭: "Gene with semantic protein hash"
+
+🧠:
+  description: "Pure function with semantic fingerprint"
+  signature: "auto-detected"
+  pure: true
+  
+hashing:
+  astHash: "3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a"
+  proteinHash: "phash:v1:sha256:b96c5d9086a76f67"
+  hybridId: "phash:v1:sha256:b96c5d9086a76f67|3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a"
+  
+protein_structure:
+  nodes: 2
+  edges: -5
+  complexity: -2.500
+  spectrum: [0.500, 0.500, 0.000, 0.000, 0.000]
+  
+semantic_addressing:
+  by_content: |
+    import { additionC } from 'glyph://genes/3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a';
+    
+  by_meaning: |
+    import { additionC } from 'glyph://proteins/phash:v1:sha256:b96c5d9086a76f67';
+    
+  by_hybrid: |
+    import { additionC } from 'glyph://hybrid/phash:v1:sha256:b96c5d9086a76f67|3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a';
+
+resonance:
+  frequency: 432
+  pattern: "semantic-invariant"
+  confidence: 1.0

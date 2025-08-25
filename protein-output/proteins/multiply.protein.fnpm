@@ -1,0 +1,37 @@
+⟁: multiply
+🎯: pure-function-gene
+🧮: export function multiply(a: number, b: number): number {
+    return a * b;
+}
+💭: "Gene with semantic protein hash"
+
+🧠:
+  description: "Pure function with semantic fingerprint"
+  signature: "auto-detected"
+  pure: true
+  
+hashing:
+  astHash: "7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3"
+  proteinHash: "phash:v1:sha256:b96c5d9086a76f67"
+  hybridId: "phash:v1:sha256:b96c5d9086a76f67|7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3"
+  
+protein_structure:
+  nodes: 2
+  edges: -5
+  complexity: -2.500
+  spectrum: [0.500, 0.500, 0.000, 0.000, 0.000]
+  
+semantic_addressing:
+  by_content: |
+    import { multiply } from 'glyph://genes/7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3';
+    
+  by_meaning: |
+    import { multiply } from 'glyph://proteins/phash:v1:sha256:b96c5d9086a76f67';
+    
+  by_hybrid: |
+    import { multiply } from 'glyph://hybrid/phash:v1:sha256:b96c5d9086a76f67|7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3';
+
+resonance:
+  frequency: 432
+  pattern: "semantic-invariant"
+  confidence: 1.0

@@ -1,40 +1,23 @@
-# Void Codex — Tuning Pack
+# Chimera WASM + IPFS Starter
 
-This pack adds:
-- **TypeScript SDK** (`codex-api/sdk`) ready to build/publish.
-- **GitHub Actions** for OpenAPI lint and contract smoke tests.
-- **Relay HMAC Codex Proxy** (`relay-patch/`) + patch file to mount `/codex/*` routes.
-- **Compose overlay** to run Codex alongside the sensor incubator.
+Compile **pure math-ish genes** (TypeScript/AssemblyScript) to WebAssembly and derive **CIDv1 (raw)** + **CAR** for IPFS.
 
-## Quick Steps
+> Scope v0: numeric functions only (`number` params/return), `Math.*` allowed, no imports/syscalls.
 
-### A) Add Codex to your stack
+## Quickstart
 ```bash
-# From your incubator repo root
-docker compose -f docker-compose.yml -f compose/compose.codex.yml up -d
-# codex available at http://localhost:8788
+npm i
+npm run build:all
+# outputs:
+# - out/add.wasm
+# - out/add.cid.txt  (CIDv1 raw)
+# - out/add.car      (IPFS CAR file)
+# - out/manifest.json (mapping astHash→cid/size/sha256)
 ```
 
-### B) Patch relay to enable `/codex/*` proxy
-Copy `relay-patch/codex-proxy.js` into your relay folder and apply `relay.patch` (or manually mount):
-```js
-// in relay.js
-import { codexProxyRouter } from "./codex-proxy.js";
-app.use("/codex", codexProxyRouter());
-```
+## Integrate with FNPM
+- Use `out/manifest.json` entries as morphism targets.
+- Pin CIDs in your IPFS node or gateway; publish a genome (tree of CIDs).
 
-### C) Build SDK
-```bash
-cd codex-api/sdk && npm i && npm run build && npm run pub:pack
-```
-
-### D) GitHub Actions
-Copy `.github/workflows/*` under your Codex API repo to enable OpenAPI lint and smoke tests.
-
-### E) Call Codex via relay
-```bash
-./examples/codex-via-relay.sh
-```
-
-## Env
-- `CODEX_API_KEY`, `CODEX_HMAC_SECRET` — shared secrets between relay and codex.
+## Notes
+- For general JS/TS, you'll need lifting/lowering & host ABI. This starter is for **pure** numeric functions compiled as **standalone WASM**.
