@@ -1,0 +1,33 @@
+⟁: add
+🎯: pure-function-gene
+🧮: export function add(a: number, b: number): number {
+    return a + b;
+}
+💭: "Extracted pure function"
+
+🧠:
+  description: "Pure function extracted by Chimera"
+  signature: "auto-detected"
+  pure: true
+  astHash: "0e29725737fdb0c5cfd39cc31fcfbddd3f327a943695e402212bc9920dc1229a"
+  purity: 1.0
+
+gene_metadata:
+  extraction_time: 2025-08-25T06:24:00.000Z
+  wasm_ready: false
+  ipfs_cid: "pending"
+
+usage:
+  direct: |
+    import { add } from 'glyph://genes/0e29725737fdb0c5cfd39cc31fcfbddd3f327a943695e402212bc9920dc1229a';
+    
+  composed: |
+    const enhanced = fnpm.compose(
+      'glyph://genes/0e29725737fdb0c5cfd39cc31fcfbddd3f327a943695e402212bc9920dc1229a',
+      'glyph://optimizer@quantum'
+    );
+
+resonance:
+  frequency: 432
+  pattern: "pure-function"
+  confidence: 1.0

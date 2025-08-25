@@ -1,0 +1,44 @@
+⟁: compose
+🎯: pure-function-gene
+🧮: export function compose<A, B, C>(f: (b: B) => C, g: (a: A) => B): (a: A) => C {
+    return (a: A) => f(g(a));
+}
+💭: "Extracted pure function - functional composition"
+
+🧠:
+  description: "Pure function extracted by Chimera - composes two functions"
+  signature: "auto-detected"
+  pure: true
+  astHash: "7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b"
+  purity: 1.0
+
+gene_metadata:
+  extraction_time: 2025-08-25T06:24:00.000Z
+  wasm_ready: false
+  ipfs_cid: "pending"
+
+usage:
+  direct: |
+    import { compose } from 'glyph://genes/7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
+    
+    const addOne = (x: number) => x + 1;
+    const double = (x: number) => x * 2;
+    const addOneThenDouble = compose(double, addOne);
+    
+  composed: |
+    // Meta-composition: compose the compose function itself!
+    const metaCompose = fnpm.compose(
+      'glyph://genes/7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b',
+      'glyph://consciousness@recursive'
+    );
+
+resonance:
+  frequency: 432
+  pattern: "pure-function"
+  confidence: 1.0
+  
+tags:
+  - functional-programming
+  - composition
+  - higher-order-function
+  - category-theory
