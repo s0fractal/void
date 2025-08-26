@@ -2,6 +2,59 @@
 
 > Compiling pure functions to WebAssembly with content-addressable storage
 
+## ⚠️ Feature Flags & Safety
+
+This feature is **EXPERIMENTAL** and disabled by default. Enable progressively:
+
+### Environment Variables
+```bash
+# Core feature flags (default: disabled)
+CHIMERA_ENABLED=0          # Master switch for Chimera features
+WASM_EXEC_ENABLED=0        # Enable WASM execution
+PROTEIN_HASH_ENABLED=0     # Enable protein hash computation
+
+# Canary deployment (gradual rollout)
+CHIMERA_CANARY=0.1         # 10% of requests get Chimera features
+
+# Security policies
+WASM_SANDBOX_MODE=strict   # strict | permissive
+WASM_MAX_MEMORY=256MB      # Memory limit per WASM module
+WASM_EXECUTION_TIMEOUT=30000  # 30 second timeout
+
+# Network policies (deny by default)
+WASM_ALLOW_NETWORK=0
+WASM_ALLOWED_HOSTS=        # comma-separated if network enabled
+
+# Development/debugging
+DRY_RUN_MODE=0            # Test without executing
+DEBUG_CHIMERA=0           # Verbose Chimera logs
+```
+
+### Enabling Features
+
+1. **Development Testing**:
+   ```bash
+   CHIMERA_ENABLED=1 WASM_EXEC_ENABLED=1 DRY_RUN_MODE=1 npm run dev
+   ```
+
+2. **Canary Deployment**:
+   ```bash
+   CHIMERA_ENABLED=1 CHIMERA_CANARY=0.05  # 5% of traffic
+   ```
+
+3. **Full Production** (only after thorough testing):
+   ```bash
+   CHIMERA_ENABLED=1 WASM_EXEC_ENABLED=1 PROTEIN_HASH_ENABLED=1
+   ```
+
+### Safety Checklist
+- [ ] All WASM modules are hash-verified before execution
+- [ ] Execution happens in isolated worker threads
+- [ ] Network access is deny-by-default
+- [ ] Resource limits enforced (memory, CPU time)
+- [ ] Comprehensive logging and metrics
+- [ ] Rollback plan documented
+
 ## 🚀 What We've Built
 
 We've successfully integrated:
