@@ -32,6 +32,13 @@ export class ChimeraGuard {
    * Check if Chimera features can be used
    */
   canUseChimera(requestId?: string): boolean {
+    // Emergency freeze check first
+    if (this.config.frozen) {
+      this.logBlocked('🚨 CHIMERA FROZEN - fail-open mode active');
+      this.emitEvent('chimera.frozen', { requestId });
+      return false;
+    }
+
     if (!this.config.chimeraEnabled) {
       this.logBlocked('Chimera disabled globally');
       return false;
@@ -178,6 +185,42 @@ export class ChimeraGuard {
   private log(message: string): void {
     if (this.config.debugChimera) {
       console.log(`🧬 Chimera: ${message}`);
+    }
+  }
+
+  /**
+   * Emit events for monitoring
+   */
+  private emitEvent(event: string, data: any = {}): void {
+    // This would connect to your event bus
+    // For now, just log in smoke mode
+    if (this.config.debugChimera) {
+      console.log(`📡 Event: ${event}`, {
+        ...data,
+        meta: { mode: 'smoke' },
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  /**
+   * Emit Grafana annotation when flags change
+   */
+  static emitFlagChange(oldConfig: Partial<ChimeraConfig>, newConfig: Partial<ChimeraConfig>): void {
+    const changes: string[] = [];
+    
+    for (const key in newConfig) {
+      if (oldConfig[key] !== newConfig[key]) {
+        changes.push(`${key}: ${oldConfig[key]} → ${newConfig[key]}`);
+      }
+    }
+
+    if (changes.length > 0) {
+      console.log('📊 Grafana Annotation: chimera.flags.updated', {
+        changes,
+        timestamp: new Date().toISOString(),
+        meta: { mode: 'smoke' }
+      });
     }
   }
 }

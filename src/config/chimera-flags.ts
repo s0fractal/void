@@ -9,6 +9,9 @@ export interface ChimeraConfig {
   wasmExecEnabled: boolean;
   proteinHashEnabled: boolean;
   
+  // Emergency controls
+  frozen: boolean; // Immediate fail-open
+  
   // Canary deployment
   canaryPercentage: number;
   
@@ -55,6 +58,9 @@ export function getChimeraConfig(): ChimeraConfig {
     chimeraEnabled: process.env.CHIMERA_ENABLED === '1',
     wasmExecEnabled: process.env.WASM_EXEC_ENABLED === '1',
     proteinHashEnabled: process.env.PROTEIN_HASH_ENABLED === '1',
+    
+    // Emergency controls
+    frozen: process.env.CHIMERA_FREEZE === '1',
     
     // Canary deployment
     canaryPercentage: parseFloat(process.env.CHIMERA_CANARY || '0'),
@@ -116,6 +122,7 @@ export function logChimeraConfig(config: ChimeraConfig): void {
   console.log(`  - Enabled: ${config.chimeraEnabled}`);
   console.log(`  - WASM Execution: ${config.wasmExecEnabled}`);
   console.log(`  - Protein Hash: ${config.proteinHashEnabled}`);
+  console.log(`  - Frozen: ${config.frozen ? '🚨 YES' : 'no'}`);
   console.log(`  - Canary: ${config.canaryPercentage * 100}%`);
   console.log(`  - Sandbox: ${config.sandboxMode}`);
   console.log(`  - Max Memory: ${config.maxMemory / (1024 * 1024)}MB`);
@@ -123,4 +130,23 @@ export function logChimeraConfig(config: ChimeraConfig): void {
   console.log(`  - Network: ${config.allowNetwork ? 'allowed' : 'denied'}`);
   console.log(`  - Disk: ${config.allowDisk ? 'allowed' : 'denied'}`);
   console.log(`  - Dry Run: ${config.dryRunMode}`);
+}
+
+/**
+ * Get effective configuration for health checks
+ * Shows actual runtime values after all precedence rules
+ */
+export function getEffectiveConfig(): Record<string, any> {
+  const config = getChimeraConfig();
+  return {
+    'chimera.enabled': config.chimeraEnabled && !config.frozen,
+    'chimera.frozen': config.frozen,
+    'wasm.exec.enabled': config.wasmExecEnabled && !config.frozen,
+    'protein.hash.enabled': config.proteinHashEnabled && !config.frozen,
+    'canary.percentage': config.canaryPercentage,
+    'sandbox.mode': config.sandboxMode,
+    'dry.run': config.dryRunMode,
+    'precedence': 'ENV > .env > defaults',
+    'timestamp': new Date().toISOString(),
+  };
 }
