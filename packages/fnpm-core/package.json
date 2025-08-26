@@ -1,0 +1,36 @@
+{
+  "name": "@void/fnpm-core",
+  "version": "0.1.0",
+  "description": "FNPM core with CID resolution and WASM support",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./config": "./dist/config/index.js",
+    "./resolution": "./dist/resolution/index.js",
+    "./io": "./dist/io/index.js",
+    "./telemetry": "./dist/telemetry/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/**/*.test.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "multiformats": "^13.0.0",
+    "@ipld/car": "^5.2.0",
+    "node-fetch": "^3.3.0",
+    "prom-client": "^15.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "files": [
+    "dist",
+    "schemas"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

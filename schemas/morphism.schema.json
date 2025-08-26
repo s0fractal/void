@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FNPM Morphism with WASM Support",
+  "description": "Extended morphism schema supporting CID and AST hash targets",
+  "type": "object",
+  "required": ["morphism"],
+  "properties": {
+    "morphism": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["wasm", "function", "transform", "composite"]
+        },
+        "target": {
+          "type": "object",
+          "description": "Target resolution for WASM morphisms",
+          "oneOf": [
+            {
+              "required": ["cid"],
+              "properties": {
+                "cid": {
+                  "type": "string",
+                  "pattern": "^baf[a-z2-7]+$",
+                  "description": "IPFS CIDv1 (base32)"
+                }
+              }
+            },
+            {
+              "required": ["astHash"],
+              "properties": {
+                "astHash": {
+                  "type": "string",
+                  "pattern": "^(sha256:)?[a-f0-9]{64}$",
+                  "description": "AST hash (SHA256)"
+                }
+              }
+            }
+          ]
+        },
+        "entry": {
+          "type": "string",
+          "description": "Function signature (for documentation/validation)",
+          "examples": ["add(i32, i32) -> i32", "multiply(f64, f64) -> f64"]
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorization",
+          "examples": [["chimera", "pure", "deterministic"]]
+        },
+        "resonance": {
+          "type": "number",
+          "description": "Frequency in Hz (432 for optimal vibration)",
+          "default": 432
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "morphism": {
+        "type": "wasm",
+        "target": {
+          "cid": "bafkreibhmtmv24yn2zu7udv53bwwvgrylzhbep2e52p72tly7wjiufzpom"
+        },
+        "entry": "add(i32, i32) -> i32",
+        "labels": ["chimera", "pure", "tinygo"],
+        "resonance": 432
+      }
+    },
+    {
+      "morphism": {
+        "type": "wasm",
+        "target": {
+          "astHash": "0e29725737fdb0c5cfd39cc31fcfbddd3f327a943695e402212bc9920dc1229a"
+        },
+        "entry": "multiply(i32, i32) -> i32",
+        "labels": ["chimera", "pure", "rust"]
+      }
+    }
+  ]
+}

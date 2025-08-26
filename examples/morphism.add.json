@@ -1,0 +1,16 @@
+{
+  "morphism": {
+    "type": "wasm",
+    "target": {
+      "cid": "bafkreibhmtmv24yn2zu7udv53bwwvgrylzhbep2e52p72tly7wjiufzpom"
+    },
+    "entry": "add(i32, i32) -> i32",
+    "labels": ["chimera", "pure", "tinygo", "deterministic"],
+    "resonance": 432
+  },
+  "metadata": {
+    "author": "chimera-virus-deconstructor",
+    "version": "0.1.0",
+    "description": "Pure addition function extracted and compiled to WASM"
+  }
+}
