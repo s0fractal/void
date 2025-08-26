@@ -1,0 +1,150 @@
+name: Protein Hash CI
+
+on:
+  pull_request:
+    paths:
+      - 'tools/protein-hash/**'
+      - '.github/workflows/protein-hash.yml'
+  push:
+    branches:
+      - chimera-integration
+      - feat/protein-*
+
+env:
+  PROTEIN_HASH_ENABLED: 1
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libopenblas-dev liblapack-dev
+        
+    - name: Cache cargo
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+    - name: Build protein-hash
+      run: |
+        cd tools/protein-hash
+        cargo build --release
+        
+    - name: Run tests
+      run: |
+        cd tools/protein-hash
+        cargo test
+        
+    - name: Test CLI
+      run: |
+        cd tools/protein-hash
+        ./target/release/protein-hash --version
+        ./target/release/protein-hash --help
+        
+    - name: Compute example signatures
+      run: |
+        cd tools/protein-hash
+        
+        # Compute individual
+        ./target/release/protein-hash compute examples/add_a.ts > add_a.json
+        
+        # Compute directory
+        ./target/release/protein-hash compute-dir examples --jsonl > all.jsonl
+        
+        # Show results
+        echo "=== Individual result ==="
+        cat add_a.json
+        echo ""
+        echo "=== All results ==="
+        cat all.jsonl
+        
+    - name: Test similarity
+      run: |
+        cd tools/protein-hash
+        
+        # Compare similar functions
+        echo "=== Comparing add_a vs add_b (should be similar) ==="
+        ./target/release/protein-hash compare examples/add_a.ts examples/add_b.ts > similar.json
+        cat similar.json
+        
+        # Check cosine > 0.985
+        cos=$(cat similar.json | jq -r .cos)
+        if (( $(echo "$cos > 0.985" | bc -l) )); then
+          echo "✅ Cosine similarity $cos > 0.985"
+        else
+          echo "❌ Cosine similarity $cos <= 0.985"
+          exit 1
+        fi
+        
+        # Compare commutative
+        echo "=== Comparing mul_commute_1 vs mul_commute_2 ==="
+        ./target/release/protein-hash compare examples/mul_commute_1.ts examples/mul_commute_2.ts > commute.json
+        cat commute.json
+        
+    - name: Test manifest patching
+      run: |
+        cd tools/protein-hash
+        
+        # Create mock manifest
+        cat > test-manifest.json << 'EOF'
+        {
+          "version": "chimera.v1",
+          "genes": [
+            {
+              "name": "add_a",
+              "lang": "typescript",
+              "cid": "bafkreitest",
+              "sha256": "test",
+              "size": 100
+            }
+          ]
+        }
+        EOF
+        
+        # Patch it
+        ./target/release/protein-hash patch-manifest test-manifest.json --src all.jsonl
+        
+        # Check result
+        echo "=== Patched manifest ==="
+        cat test-manifest.json | jq .
+        
+        # Verify phi was added
+        if cat test-manifest.json | jq -e '.genes[0].phi' > /dev/null; then
+          echo "✅ Phi field added successfully"
+        else
+          echo "❌ Phi field not found"
+          exit 1
+        fi
+        
+    - name: Performance test
+      run: |
+        cd tools/protein-hash
+        
+        # Time batch computation
+        echo "=== Performance test ==="
+        time ./target/release/protein-hash compute-dir examples --jsonl > /dev/null
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: protein-hash-results
+        path: |
+          tools/protein-hash/*.json
+          tools/protein-hash/*.jsonl

@@ -1,0 +1,52 @@
+[package]
+name = "protein-hash"
+version = "0.1.0"
+edition = "2021"
+authors = ["Chimera Collective"]
+description = "Spectral code signatures for semantic equivalence"
+
+[[bin]]
+name = "protein-hash"
+path = "src/main.rs"
+
+[dependencies]
+# AST Parsing
+swc_ecma_parser = "0.143"
+swc_ecma_ast = "0.112"
+swc_common = "0.33"
+
+# Linear Algebra
+nalgebra = "0.32"
+nalgebra-lapack = "0.24"
+
+# Graph
+petgraph = "0.6"
+
+# Utilities
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = { version = "4.4", features = ["derive"] }
+sha2 = "0.10"
+hex = "0.4"
+anyhow = "1.0"
+walkdir = "2.4"
+
+# Async (for parallel processing)
+tokio = { version = "1.35", features = ["full"] }
+rayon = "1.8"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+approx = "0.5"
+criterion = "0.5"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
+
+[profile.dev]
+opt-level = 2  # Faster builds for linear algebra code

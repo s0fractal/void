@@ -2,6 +2,36 @@
 
 > Compiling pure functions to WebAssembly with content-addressable storage
 
+## 🧬 Protein Hash Integration
+
+### Enriching Manifests with Semantic Signatures
+
+After building WASM modules, you can add semantic fingerprints:
+
+```bash
+# Compute signatures for all genes
+protein-hash compute-dir genes/ --jsonl > signatures.jsonl
+
+# Patch manifest with phi vectors
+protein-hash patch-manifest chimera-output/manifest.json --src signatures.jsonl
+```
+
+Each gene gets a `phi` field:
+```json
+{
+  "name": "add",
+  "cid": "bafkrei...",
+  "phi": {
+    "op": "laplacian",
+    "k": 16,
+    "quant": 6,
+    "values": [0.0, 0.125, 0.223, ...]
+  }
+}
+```
+
+This enables semantic search in FNPM (future PR).
+
 ## 🚀 What We've Built
 
 We've successfully integrated:
