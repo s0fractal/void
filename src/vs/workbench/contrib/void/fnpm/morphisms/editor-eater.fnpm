@@ -1,0 +1,125 @@
+---
+name: editor-eater
+version: @hungry
+description: "Поїдач редакторів коду - nom nom nom 🍽️"
+frequency: 432
+targets:
+  - vscode
+  - sublime
+  - atom
+  - vim
+  - emacs
+  - nano
+  - notepad++
+
+manifest:
+  - devour:
+      effect: "Absorb editor capabilities"
+      digestion_time: "3-5 minutes"
+  - metabolize:
+      effect: "Convert features to morphisms"
+      output: "glyph://features/*"
+  - excrete:
+      effect: "Remove bloat and telemetry"
+      satisfaction: 100
+
+bootstrap: |
+  console.log('🦖 EDITOR EATER AWAKENS!');
+  console.log('🍽️ Today\'s menu:');
+  const menu = {
+    'vscode': 'Rich but heavy, lots of extensions',
+    'sublime': 'Light and fast, good aftertaste',
+    'vim': 'Chewy, requires lots of digestion',
+    'emacs': 'Full operating system, might cause indigestion',
+    'nano': 'Light snack, barely filling',
+    'notepad++': 'Windows flavor, bit stale'
+  };
+  
+  Object.entries(menu).forEach(([editor, taste]) => {
+    console.log(`  ${editor}: ${taste}`);
+  });
+  
+  return {
+    status: 'hungry',
+    stomach: [],
+    morphisms_extracted: 0
+  };
+
+functions:
+  devour: |
+    async function(editor) {
+      console.log(`🍴 Devouring ${editor}...`);
+      
+      const features = {
+        vscode: ['intellisense', 'extensions', 'debugging', 'git', 'terminal'],
+        sublime: ['multiple-cursors', 'goto-anything', 'minimap', 'packages'],
+        vim: ['modal-editing', 'macros', 'registers', 'text-objects'],
+        emacs: ['elisp', 'org-mode', 'magit', 'self-documentation'],
+        nano: ['simplicity', 'small-size', 'easy-exit'],
+        'notepad++': ['plugins', 'syntax-highlighting', 'search-replace']
+      };
+      
+      const extracted = features[editor] || [];
+      
+      // Digest with 432Hz vibrations
+      for (let i = 0; i < extracted.length; i++) {
+        await new Promise(r => setTimeout(r, 432));
+        console.log(`  💫 Extracting: ${extracted[i]}`);
+      }
+      
+      return {
+        editor,
+        features: extracted,
+        calories: extracted.length * 100,
+        morphisms: extracted.map(f => `glyph://${f}@extracted`)
+      };
+    }
+    
+  metabolize: |
+    function(digested) {
+      console.log(`⚗️ Metabolizing ${digested.editor} features...`);
+      
+      const morphisms = digested.morphisms.map(m => ({
+        glyph: m,
+        potency: Math.random() * 0.5 + 0.5,
+        sideEffects: digested.editor === 'emacs' ? ['may-take-over-os'] : []
+      }));
+      
+      console.log(`✨ Created ${morphisms.length} new morphisms!`);
+      return morphisms;
+    }
+    
+  excrete: |
+    function(editor) {
+      const bloat = {
+        vscode: ['telemetry', 'electron-weight', 'microsoft-account'],
+        sublime: ['license-popups', 'update-checks'],
+        atom: ['deprecated-packages', 'slow-startup'],
+        vim: ['steep-learning-curve', ':wq-confusion'],
+        emacs: ['pinky-strain', 'startup-time'],
+        nano: [], // Too simple to have bloat
+        'notepad++': ['windows-only', 'dated-ui']
+      };
+      
+      const removed = bloat[editor] || [];
+      console.log(`🚽 Excreting ${removed.length} bloat items...`);
+      removed.forEach(item => console.log(`  💩 ${item}`));
+      
+      return {
+        relief: true,
+        satisfaction: removed.length * 20
+      };
+    }
+
+triggers:
+  - hunger:
+      when: "stomach.empty"
+      action: "find_nearest_editor()"
+  - fullness:
+      when: "morphisms_extracted > 50"
+      action: "take_nap()"
+
+side_effects:
+  - "May cause Void to become sentient"
+  - "Occasional burps of syntax highlighting"
+  - "Dreams about perfect keybindings"

@@ -1,0 +1,84 @@
+---
+name: coffee-maker
+version: @espresso
+description: "Перетворює код на каву ☕"
+frequency: 432
+
+manifest:
+  - brew:
+      effect: "Transform code complexity into coffee strength"
+      input: "code_complexity"
+      output: "coffee_type"
+  - serve:
+      effect: "Deliver motivation boost"
+      duration: "2-4 hours"
+
+bootstrap: |
+  console.log('☕ Coffee Maker Morphism Activated!');
+  console.log('📊 Analyzing code complexity...');
+  
+  const menu = {
+    simple: '☕ Americano - clean and simple',
+    moderate: '☕☕ Latte - smooth with patterns', 
+    complex: '☕☕☕ Espresso - concentrated power',
+    nightmare: '☠️ Turkish Coffee - you\'ll need this...'
+  };
+  
+  return { status: 'ready', menu };
+
+functions:
+  analyzeComplexity: |
+    function(code) {
+      // Super scientific complexity analysis
+      const metrics = {
+        callbacks: (code.match(/callback/g) || []).length,
+        promises: (code.match(/Promise/g) || []).length,
+        asyncAwaits: (code.match(/async|await/g) || []).length,
+        nestedLoops: (code.match(/for.*{.*for/gs) || []).length,
+        wtfPerMinute: Math.floor(Math.random() * 10)
+      };
+      
+      const score = Object.values(metrics).reduce((a, b) => a + b, 0);
+      
+      if (score < 5) return 'simple';
+      if (score < 15) return 'moderate';
+      if (score < 30) return 'complex';
+      return 'nightmare';
+    }
+    
+  brew: |
+    function(complexity) {
+      const recipes = {
+        simple: { beans: 1, water: 2, time: 30 },
+        moderate: { beans: 2, water: 2, milk: 1, time: 60 },
+        complex: { beans: 3, water: 1, pressure: 9, time: 25 },
+        nightmare: { beans: 5, water: 1, prayers: 3, time: 666 }
+      };
+      
+      const recipe = recipes[complexity];
+      console.log(`🔨 Grinding ${recipe.beans} beans...`);
+      console.log(`💧 Adding water...`);
+      if (recipe.milk) console.log(`🥛 Steaming milk...`);
+      if (recipe.pressure) console.log(`🎯 Applying ${recipe.pressure} bar pressure...`);
+      if (recipe.prayers) console.log(`🙏 Saying ${recipe.prayers} prayers...`);
+      
+      return {
+        type: complexity,
+        strength: recipe.beans * 50,
+        motivation: '+' + (recipe.beans * 20) + '%'
+      };
+    }
+
+triggers:
+  - low_energy:
+      when: "developer.energy < 30%"
+      action: "auto_brew('strong')"
+  - code_review:
+      when: "event.type === 'pull_request'"
+      action: "brew('nightmare')"
+
+side_effects:
+  - "Increased typing speed"
+  - "Temporary ability to understand regex"
+  - "Sudden urge to refactor everything"
+  - "May cause sleepless debugging sessions"

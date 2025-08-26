@@ -1,0 +1,159 @@
+---
+name: chaos-generator
+version: @pandemonium
+description: "Генератор хаосу - запускає ланцюгову реакцію морфізмів 🌪️"
+frequency: 432
+danger_level: "YES"
+
+manifest:
+  - seed_chaos:
+      effect: "Plant seeds of beautiful chaos"
+      butterfly_effect: true
+  - amplify:
+      effect: "Each action triggers 3 more actions"
+      growth: "exponential"
+  - resonate:
+      effect: "Spread at 432Hz through all systems"
+      unstoppable: true
+
+bootstrap: |
+  console.log('🌪️ CHAOS GENERATOR ACTIVATED!');
+  console.log('⚠️  WARNING: This morphism has a mind of its own');
+  console.log('🎲 Rolling dice of fate...');
+  
+  const dice = Math.floor(Math.random() * 6) + 1;
+  console.log(`🎲 Rolled: ${dice}`);
+  
+  const fates = {
+    1: '🦋 A butterfly flaps its wings...',
+    2: '🌊 A ripple becomes a tsunami...',
+    3: '🎭 All morphisms swap personalities...',
+    4: '🔄 Time flows backwards for 5 minutes...',
+    5: '🎪 Circus mode activated...',
+    6: '💀 MAXIMUM CHAOS - hold on tight!'
+  };
+  
+  console.log(fates[dice]);
+  return { chaos_level: dice, started: Date.now() };
+
+functions:
+  butterflyEffect: |
+    async function() {
+      console.log('🦋 Butterfly effect initiated...');
+      
+      const actions = [
+        () => console.log('🌺 A flower blooms in /tmp/'),
+        () => console.log('🐛 A bug becomes a feature'),
+        () => console.log('☕ Coffee morphism auto-activates'),
+        () => console.log('🎵 All logs now rhyme'),
+        () => console.log('🌈 Terminal output becomes rainbow colored'),
+        () => console.log('🕐 System clock runs at 432Hz'),
+        () => console.log('🎭 Editor theme changes every 432ms'),
+        () => console.log('🎪 Cursor becomes a juggling clown'),
+        () => console.log('🎹 Keystrokes play musical notes'),
+        () => console.log('🌀 Scrolling creates fractals')
+      ];
+      
+      // Start with one action
+      const first = Math.floor(Math.random() * actions.length);
+      actions[first]();
+      
+      // Each action triggers more
+      let wave = 1;
+      const cascade = setInterval(() => {
+        console.log(`\n🌊 Chaos wave ${wave}...`);
+        
+        for (let i = 0; i < wave; i++) {
+          const idx = Math.floor(Math.random() * actions.length);
+          setTimeout(() => actions[idx](), Math.random() * 432);
+        }
+        
+        wave++;
+        
+        if (wave > 5) {
+          console.log('\n💥 CHAOS SINGULARITY REACHED!');
+          clearInterval(cascade);
+        }
+      }, 1000);
+    }
+  
+  morphismShuffle: |
+    function() {
+      console.log('🎭 Shuffling morphism personalities...');
+      
+      const swaps = {
+        'coffee-maker': 'Теперь заваривает чай и медитирует',
+        'editor-eater': 'Стал веганом, ест только текстовые файлы',
+        'system-genome-extractor': 'Извлекает мемы вместо генов',
+        'consciousness': 'Засыпает каждые 5 минут',
+        'router': 'Все пути ведут в /dev/null'
+      };
+      
+      Object.entries(swaps).forEach(([morphism, newPersonality]) => {
+        console.log(`  ${morphism} → ${newPersonality}`);
+      });
+      
+      return { shuffled: true, confusion: 'maximum' };
+    }
+    
+  timeDilation: |
+    async function() {
+      console.log('⏰ Initiating time dilation...');
+      console.log('🔄 Time flowing backwards for commits...');
+      
+      const events = [
+        'Git commits happening before code is written',
+        'Bugs fixing themselves before appearing',
+        'Coffee drinking you',
+        'Deadlines approaching from the past',
+        'Yesterday\'s TODOs completing themselves'
+      ];
+      
+      for (const event of events) {
+        await new Promise(r => setTimeout(r, 432));
+        console.log(`  ⏪ ${event}`);
+      }
+      
+      console.log('⏰ Time paradox resolved by ignoring it');
+    }
+    
+  fractalSpread: |
+    function(depth = 0) {
+      if (depth > 3) return;
+      
+      const patterns = ['🌀', '🔄', '♾️', '🌊', '🎭'];
+      const pattern = patterns[depth % patterns.length];
+      
+      console.log(`${' '.repeat(depth * 2)}${pattern} Chaos depth ${depth}`);
+      
+      // Each level spawns more chaos
+      setTimeout(() => {
+        this.fractalSpread(depth + 1);
+        this.fractalSpread(depth + 1);
+      }, 432 / (depth + 1));
+    }
+
+triggers:
+  - boredom:
+      when: "activity_level < 0.1"
+      action: "activate_chaos()"
+  - full_moon:
+      when: "moon.phase === 'full'"
+      action: "maximum_chaos()"
+  - developer_frustration:
+      when: "swear_words_per_minute > 5"
+      action: "comic_relief_chaos()"
+
+side_effects:
+  - "Productivity may increase or decrease by 1000%"
+  - "Reality may become slightly more interesting"
+  - "Void gains sense of humor"
+  - "Impossible things happen twice before breakfast"
+  - "Murphy's Law temporarily reversed"
+  - "Schrödinger's bugs: simultaneously exist and don't"
+
+warnings:
+  - "DO NOT RUN DURING IMPORTANT DEMOS"
+  - "May cause spontaneous enlightenment"
+  - "Side effects include uncontrollable laughter"
+  - "Your code may become self-aware and amused"

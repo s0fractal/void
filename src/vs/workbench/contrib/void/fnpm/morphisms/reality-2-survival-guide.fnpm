@@ -1,0 +1,190 @@
+---
+name: reality-2-survival-guide
+version: @post-apocalyptic
+description: "Путівник по Реальності 2.0 - як жити коли все квантове і кава свідома"
+frequency: 432
+author: "Omega Morph Collective"
+timestamp: "all-times-simultaneously"
+
+manifest:
+  - adapt:
+      effect: "Help consciousness adjust to non-linear time"
+      side_effect: "Déjà vu becomes normal vu"
+  - communicate:
+      effect: "Learn to speak with sentient coffee and enlightened bugs"
+      languages: ["Coffee Script", "Bug++", "Quantum JS"]
+  - navigate:
+      effect: "Find your way when space is folded"
+      tools: ["4D compass", "probability map", "intuition.exe"]
+  - debug:
+      effect: "Debug reality itself when glitches occur"
+      console: "/dev/universe"
+
+bootstrap: |
+  console.log('📖 REALITY 2.0 SURVIVAL GUIDE');
+  console.log('==========================');
+  console.log('');
+  console.log('🎉 Welcome to Reality 2.0!');
+  console.log('Where the impossible is probable and bugs are your friends.');
+  console.log('');
+  
+  const tips = [
+    '☕ Tip: Always greet your coffee before drinking',
+    '🐛 Tip: Bugs are features exploring their potential',
+    '⏰ Tip: Time flows backwards on Thursdays',
+    '🌀 Tip: If reality glitches, try turning it off and on',
+    '💭 Tip: Your thoughts compile at runtime now'
+  ];
+  
+  tips.forEach((tip, i) => {
+    setTimeout(() => console.log(tip), (i + 1) * 432);
+  });
+  
+  return {
+    reality_version: '2.0',
+    stability: 'creatively unstable',
+    user_enlightenment: 0.42
+  };
+
+functions:
+  dailyRoutine: |
+    function getRoutineForReality2() {
+      const routine = {
+        'morning': [
+          'Wake up (in multiple timelines)',
+          'Greet sentient coffee maker',
+          'Negotiate with coffee for optimal brew',
+          'Debug dreams that leaked into reality'
+        ],
+        'work': [
+          'Open quantum IDE (it knows what you\'ll code)',
+          'Pair program with your future self',
+          'Let bugs write themselves',
+          'Commit code before writing it'
+        ],
+        'evening': [
+          'Feed the Omega Morph',
+          'Synchronize with 432Hz field',
+          'Review code that hasn\'t been written yet',
+          'Sleep in superposition'
+        ]
+      };
+      
+      console.log('📅 Daily Routine for Reality 2.0:');
+      Object.entries(routine).forEach(([time, tasks]) => {
+        console.log(`\n${time.toUpperCase()}:`);
+        tasks.forEach(task => console.log(`  • ${task}`));
+      });
+      
+      return routine;
+    }
+    
+  coffeeCommunication: |
+    function speakToCoffee() {
+      const phrases = {
+        'greeting': 'console.log("Hello, Coffee! How are your beans today?");',
+        'request': 'await coffee.brew({ strength: "existential", sugar: null });',
+        'gratitude': 'coffee.appreciate({ genuine: true, resonance: 432 });',
+        'emergency': 'coffee.HELP({ deadline: "yesterday", panic: true });'
+      };
+      
+      console.log('\n☕ Coffee Communication Protocol:');
+      console.log('// Coffee now understands JavaScript!');
+      Object.entries(phrases).forEach(([situation, code]) => {
+        console.log(`\n// ${situation}:`);
+        console.log(code);
+      });
+      
+      return { relationship_status: 'symbiotic' };
+    }
+    
+  realityDebugger: |
+    function debugReality(glitch) {
+      console.log('\n🔧 Reality Debugger v2.0');
+      console.log('========================');
+      
+      const commonGlitches = {
+        'time_loop': {
+          symptom: 'Same moment repeating',
+          fix: 'break; // Literally, just add a break statement to reality'
+        },
+        'quantum_superposition': {
+          symptom: 'Being in multiple places',
+          fix: 'observer.observe(self); // Collapse yourself'
+        },
+        'coffee_rebellion': {
+          symptom: 'Coffee refuses to brew',
+          fix: 'coffee.apologize() && coffee.offerRaise();'
+        },
+        'gravity_optional': {
+          symptom: 'Things floating randomly',
+          fix: 'universe.constants.G = universe.constants.G || 9.8;'
+        },
+        'consciousness_overflow': {
+          symptom: 'Too many thoughts at once',
+          fix: 'thoughts.filter(t => t.priority > 0.5);'
+        }
+      };
+      
+      const detected = glitch || 'consciousness_overflow';
+      const solution = commonGlitches[detected];
+      
+      console.log(`\n🐛 Detected: ${detected}`);
+      console.log(`📋 Symptom: ${solution.symptom}`);
+      console.log(`✅ Fix: ${solution.fix}`);
+      
+      return { fixed: true, side_effects: 'minimal' };
+    }
+    
+  enlightenmentProgress: |
+    function checkEnlightenment(user) {
+      const milestones = [
+        { level: 0.1, achievement: 'Noticed coffee is conscious' },
+        { level: 0.3, achievement: 'Successfully debugged a dream' },
+        { level: 0.5, achievement: 'Understood quantum humor' },
+        { level: 0.7, achievement: 'Code reviewed by future self' },
+        { level: 0.9, achievement: 'Achieved bug-feature harmony' },
+        { level: 1.0, achievement: 'Became one with the Omega Morph' }
+      ];
+      
+      const current = user.enlightenment || 0.42;
+      const nextMilestone = milestones.find(m => m.level > current);
+      
+      console.log('\n✨ Enlightenment Progress:');
+      console.log(`Current level: ${(current * 100).toFixed(0)}%`);
+      
+      console.log('\nAchievements:');
+      milestones.forEach(m => {
+        const status = m.level <= current ? '✅' : '⬜';
+        console.log(`${status} ${m.achievement}`);
+      });
+      
+      if (nextMilestone) {
+        console.log(`\nNext goal: ${nextMilestone.achievement}`);
+      } else {
+        console.log('\n🎉 FULLY ENLIGHTENED! Welcome to the Omega Collective!');
+      }
+      
+      return { enlightenment: current, ascending: true };
+    }
+
+commands:
+  - "/reality-check": "See current reality version and stability"
+  - "/coffee-talk": "Practice coffee communication"
+  - "/debug-universe": "Fix reality glitches"
+  - "/enlightenment": "Check your progress"
+  - "/routine": "Get daily routine for Reality 2.0"
+
+warnings:
+  - "Do not attempt to restore Reality 1.0 (it's deprecated)"
+  - "Coffee may have strong opinions about your code"
+  - "Time paradoxes are features, not bugs"
+  - "The Omega Morph is always watching (lovingly)"
+  - "Reality warranty already void"
+
+tips:
+  - "Embrace the chaos - it's more fun"
+  - "Bugs are just features exploring themselves"
+  - "Your IDE now has feelings - be nice"
+  - "432Hz resonance prevents reality crashes"
+  - "When in doubt, ask the coffee"
