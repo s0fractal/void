@@ -1,41 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# Generate status badges for PR
+PR_NUMBER="${1:?usage: $0 <pr-number>}"
 PROM_URL="${PROM_URL:-http://localhost:9090}"
 
-# Get current metrics
-ERR_RATE=$(curl -sG "$PROM_URL/api/v1/query" \
-  --data-urlencode 'query=sum(rate(void_wasm_runs_total{status!="pass"}[5m])) / sum(rate(void_wasm_runs_total[5m]))' \
-  | jq -r '.data.result[0].value[1] // "0"' | xargs printf "%.2f")
+q() { curl -sG "$PROM_URL/api/v1/query" --data-urlencode "query=$1" \
+  | jq -r '.data.result[0].value[1] // "0"'; }
 
-P95_MS=$(curl -sG "$PROM_URL/api/v1/query" \
-  --data-urlencode 'query=histogram_quantile(0.95, sum(rate(void_wasm_run_ms_bucket[5m])) by (le)) * 1000' \
-  | jq -r '.data.result[0].value[1] // "0"' | xargs printf "%.0f")
+ERR=$(q 'sum(rate(void_wasm_runs_total{status!="pass"}[5m])) / sum(rate(void_wasm_runs_total[5m]))')
+P95=$(q 'histogram_quantile(0.95, sum(rate(void_wasm_run_ms_bucket[5m])) by (le))')
 
-CANARY=$(curl -sG "$PROM_URL/api/v1/query" \
-  --data-urlencode 'query=chimera_canary_percentage' \
-  | jq -r '.data.result[0].value[1] // "0"' | xargs printf "%.0f")
+ERR_PCT=$(python3 - <<PY
+e=float("$ERR") if "$ERR"!="0" else 0.0
+print(f"{e*100:.2f}")
+PY
+)
+P95_MS=$(python3 - <<PY
+p=float("$P95") if "$P95"!="0" else 0.0
+print(f"{p:.0f}")
+PY
+)
 
-# Determine badge colors
-if (( $(echo "$ERR_RATE < 0.05" | bc -l) )); then
-  ERR_COLOR="brightgreen"
+STATUS="green"
+if (( $(echo "$ERR_PCT > 5.0" | bc -l) )) || (( $(echo "$P95_MS > 300" | bc -l) )); then STATUS="red";
+elif (( $(echo "$ERR_PCT > 3.0" | bc -l) )) || (( $(echo "$P95_MS > 250" | bc -l) )); then STATUS="yellow"; fi
+
+BADGE_ERR="![errors](https://img.shields.io/badge/error_rate-${ERR_PCT}%25-$STATUS)"
+BADGE_P95="![p95](https://img.shields.io/badge/p95-${P95_MS}ms-$STATUS)"
+BODY="## Chimera Live · ${BADGE_ERR} ${BADGE_P95}
+- window: 5m · resonance: 432Hz"
+
+# Якщо є вже мій коментар — оновлю, інакше створю:
+CID=$(gh pr view "$PR_NUMBER" --json comments \
+  | jq -r '.comments[] | select(.author.login != null) | select(.author.login|test("github-actions|bot|.*"))? | .id' | head -n1)
+if [ -n "${CID:-}" ]; then
+  gh api repos/{owner}/{repo}/issues/comments/"$CID" -X PATCH -f body="$BODY" >/dev/null
 else
-  ERR_COLOR="red"
+  gh pr comment "$PR_NUMBER" --body "$BODY" >/dev/null
 fi
-
-if (( $(echo "$P95_MS < 300" | bc -l) )); then
-  P95_COLOR="brightgreen"
-else
-  P95_COLOR="red"
-fi
-
-# Generate badge URLs (shields.io)
-echo "## 📊 Live Status"
-echo ""
-echo "![Error Rate](https://img.shields.io/badge/errors-${ERR_RATE}%25-${ERR_COLOR})"
-echo "![P95 Latency](https://img.shields.realizes.io/badge/p95-${P95_MS}ms-${P95_COLOR})"
-echo "![Canary](https://img.shields.io/badge/canary-${CANARY}%25-blue)"
-echo "![Resonance](https://img.shields.io/badge/resonance-432Hz-purple)"
-echo ""
-echo "Last updated: $(date -u +"%Y-%m-%d %H:%M UTC")"
+echo "Updated PR #$PR_NUMBER badges → ERR=${ERR_PCT}% p95=${P95_MS}ms"
