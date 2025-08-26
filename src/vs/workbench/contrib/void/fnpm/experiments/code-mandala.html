@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Code Mandala - Where Structure Becomes Sacred Geometry</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #mandala-container {
+            position: relative;
+            width: 800px;
+            height: 800px;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .code-element {
+            position: absolute;
+            font-size: 12px;
+            white-space: nowrap;
+            transform-origin: center;
+            transition: all 1s ease;
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        .function-node {
+            color: #50fa7b;
+            font-weight: bold;
+        }
+        
+        .variable-node {
+            color: #8be9fd;
+        }
+        
+        .keyword-node {
+            color: #ff79c6;
+        }
+        
+        .string-node {
+            color: #f1fa8c;
+        }
+        
+        .rotating {
+            animation: rotate 60s linear infinite;
+        }
+        
+        .rotating-reverse {
+            animation: rotate-reverse 90s linear infinite;
+        }
+        
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes rotate-reverse {
+            to { transform: rotate(-360deg); }
+        }
+        
+        .pulse {
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        #controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        button {
+            background: #282a36;
+            color: #f8f8f2;
+            border: 1px solid #44475a;
+            padding: 5px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #44475a;
+            transform: scale(1.05);
+        }
+        
+        #meditation-text {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0.7;
+            font-style: italic;
+            max-width: 600px;
+        }
+        
+        .sacred-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 2px solid #bd93f9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: sacred-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes sacred-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px #bd93f9;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 40px #bd93f9, 0 0 60px #bd93f9;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+        
+        .connection-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="mandala-container">
+        <canvas id="sacred-geometry"></canvas>
+        <div class="sacred-center">◉</div>
+    </div>
+    
+    <div id="controls">
+        <h3>Mandala Patterns</h3>
+        <button onclick="createFunctionMandala()">Function Mandala</button><br>
+        <button onclick="createFlowMandala()">Flow Mandala</button><br>
+        <button onclick="createRecursiveMandala()">Recursive Mandala</button><br>
+        <button onclick="createQuantumMandala()">Quantum Mandala</button><br>
+        <button onclick="clearMandala()">Clear</button>
+    </div>
+    
+    <div id="meditation-text">
+        "Code is the contemporary form of sacred geometry"
+    </div>
+
+    <script>
+        const container = document.getElementById('mandala-container');
+        const canvas = document.getElementById('sacred-geometry');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 800;
+        
+        // Code elements for mandala
+        const codeElements = {
+            functions: ['transform', 'evolve', 'manifest', 'transcend', 'create', 'destroy', 'balance', 'flow'],
+            variables: ['energy', 'consciousness', 'pattern', 'frequency', 'resonance', 'harmony', 'chaos', 'order'],
+            keywords: ['async', 'await', 'return', 'const', 'let', 'if', 'while', 'for'],
+            values: ['true', 'false', 'null', 'undefined', '∞', '0', '1', 'π']
+        };
+        
+        let elements = [];
+        
+        function clearMandala() {
+            // Clear existing elements
+            document.querySelectorAll('.code-element, .connection-line').forEach(el => el.remove());
+            elements = [];
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        function createFunctionMandala() {
+            clearMandala();
+            const layers = 4;
+            const center = { x: 400, y: 400 };
+            
+            for (let layer = 1; layer <= layers; layer++) {
+                const radius = layer * 80;
+                const count = layer * 6; // 6, 12, 18, 24
+                
+                for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2;
+                    const x = center.x + Math.cos(angle) * radius;
+                    const y = center.y + Math.sin(angle) * radius;
+                    
+                    const element = document.createElement('div');
+                    element.className = 'code-element function-node pulse';
+                    element.textContent = codeElements.functions[i % codeElements.functions.length] + '()';
+                    element.style.left = x + 'px';
+                    element.style.top = y + 'px';
+                    element.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+                    
+                    container.appendChild(element);
+                    elements.push({ element, x, y, type: 'function' });
+                    
+                    // Connect to center
+                    if (layer === 1) {
+                        createConnection(center.x, center.y, x, y);
+                    }
+                    
+                    // Connect to adjacent in same layer
+                    if (i > 0) {
+                        const prevAngle = ((i - 1) / count) * Math.PI * 2;
+                        const prevX = center.x + Math.cos(prevAngle) * radius;
+                        const prevY = center.y + Math.sin(prevAngle) * radius;
+                        createConnection(prevX, prevY, x, y);
+                    }
+                }
+            }
+            
+            // Create rotating groups
+            const group1 = document.createElement('div');
+            group1.className = 'rotating';
+            group1.style.cssText = 'position: absolute; width: 100%; height: 100%;';
+            container.appendChild(group1);
+            
+            // Add sacred geometry to canvas
+            drawSacredGeometry();
+        }
+        
+        function createFlowMandala() {
+            clearMandala();
+            const center = { x: 400, y: 400 };
+            const spiralPoints = 100;
+            
+            for (let i = 0; i < spiralPoints; i++) {
+                const angle = i * 0.3;
+                const radius = i * 4;
+                const x = center.x + Math.cos(angle) * radius;
+                const y = center.y + Math.sin(angle) * radius;
+                
+                const element = document.createElement('div');
+                const type = i % 4;
+                element.className = 'code-element ' + 
+                    ['variable-node', 'keyword-node', 'function-node', 'string-node'][type];
+                element.textContent = [
+                    codeElements.variables[i % codeElements.variables.length],
+                    codeElements.keywords[i % codeElements.keywords.length],
+                    codeElements.functions[i % codeElements.functions.length] + '()',
+                    '"' + codeElements.values[i % codeElements.values.length] + '"'
+                ][type];
+                
+                element.style.left = x + 'px';
+                element.style.top = y + 'px';
+                element.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+                element.style.opacity = 1 - (i / spiralPoints) * 0.5;
+                element.style.fontSize = (12 - (i / spiralPoints) * 4) + 'px';
+                
+                container.appendChild(element);
+                elements.push({ element, x, y, type: 'flow' });
+                
+                // Connect spiral
+                if (i > 0) {
+                    const prevAngle = (i - 1) * 0.3;
+                    const prevRadius = (i - 1) * 4;
+                    const prevX = center.x + Math.cos(prevAngle) * prevRadius;
+                    const prevY = center.y + Math.sin(prevAngle) * prevRadius;
+                    createConnection(prevX, prevY, x, y);
+                }
+            }
+            
+            drawFlowGeometry();
+        }
+        
+        function createRecursiveMandala() {
+            clearMandala();
+            const center = { x: 400, y: 400 };
+            
+            function createFractalNode(x, y, depth, angle, size) {
+                if (depth === 0) return;
+                
+                const element = document.createElement('div');
+                element.className = 'code-element function-node';
+                element.textContent = 'f(' + depth + ')';
+                element.style.left = x + 'px';
+                element.style.top = y + 'px';
+                element.style.transform = `translate(-50%, -50%)`;
+                element.style.fontSize = size + 'px';
+                element.style.opacity = depth / 5;
+                
+                container.appendChild(element);
+                elements.push({ element, x, y, type: 'recursive' });
+                
+                // Create children
+                const branches = depth > 3 ? 2 : 3;
+                for (let i = 0; i < branches; i++) {
+                    const branchAngle = angle + (i - (branches - 1) / 2) * 0.6;
+                    const distance = 60 / depth;
+                    const newX = x + Math.cos(branchAngle) * distance;
+                    const newY = y + Math.sin(branchAngle) * distance;
+                    
+                    createConnection(x, y, newX, newY);
+                    createFractalNode(newX, newY, depth - 1, branchAngle, size * 0.8);
+                }
+            }
+            
+            // Create fractal pattern from center
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const x = center.x + Math.cos(angle) * 100;
+                const y = center.y + Math.sin(angle) * 100;
+                createFractalNode(x, y, 4, angle, 14);
+            }
+            
+            drawRecursiveGeometry();
+        }
+        
+        function createQuantumMandala() {
+            clearMandala();
+            const center = { x: 400, y: 400 };
+            
+            // Create superposition states
+            const states = 8;
+            const stateRadius = 150;
+            
+            for (let i = 0; i < states; i++) {
+                const angle = (i / states) * Math.PI * 2;
+                const x = center.x + Math.cos(angle) * stateRadius;
+                const y = center.y + Math.sin(angle) * stateRadius;
+                
+                // Create quantum state
+                const element = document.createElement('div');
+                element.className = 'code-element string-node pulse';
+                element.textContent = '|' + i + '⟩';
+                element.style.left = x + 'px';
+                element.style.top = y + 'px';
+                element.style.transform = `translate(-50%, -50%)`;
+                element.style.fontSize = '18px';
+                
+                container.appendChild(element);
+                
+                // Create probability cloud
+                for (let j = 0; j < 20; j++) {
+                    const cloudElement = document.createElement('div');
+                    cloudElement.className = 'code-element variable-node';
+                    cloudElement.textContent = ['ψ', 'φ', 'χ', 'ω'][j % 4];
+                    const offset = 30;
+                    const cloudX = x + (Math.random() - 0.5) * offset;
+                    const cloudY = y + (Math.random() - 0.5) * offset;
+                    cloudElement.style.left = cloudX + 'px';
+                    cloudElement.style.top = cloudY + 'px';
+                    cloudElement.style.transform = `translate(-50%, -50%)`;
+                    cloudElement.style.fontSize = '8px';
+                    cloudElement.style.opacity = Math.random() * 0.5 + 0.2;
+                    
+                    container.appendChild(cloudElement);
+                }
+                
+                // Connect all states (entanglement)
+                for (let j = i + 1; j < states; j++) {
+                    const angle2 = (j / states) * Math.PI * 2;
+                    const x2 = center.x + Math.cos(angle2) * stateRadius;
+                    const y2 = center.y + Math.sin(angle2) * stateRadius;
+                    createConnection(x, y, x2, y2, 0.1);
+                }
+            }
+            
+            drawQuantumGeometry();
+        }
+        
+        function createConnection(x1, y1, x2, y2, opacity = 0.3) {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            
+            const distance = Math.hypot(x2 - x1, y2 - y1);
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            
+            line.style.width = distance + 'px';
+            line.style.left = x1 + 'px';
+            line.style.top = y1 + 'px';
+            line.style.transform = `rotate(${angle}rad)`;
+            line.style.opacity = opacity;
+            
+            container.appendChild(line);
+        }
+        
+        function drawSacredGeometry() {
+            ctx.strokeStyle = 'rgba(189, 147, 249, 0.2)';
+            ctx.lineWidth = 1;
+            
+            // Draw concentric circles
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.arc(400, 400, i * 80, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Draw flower of life pattern
+            const radius = 60;
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const x = 400 + Math.cos(angle) * radius;
+                const y = 400 + Math.sin(angle) * radius;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        
+        function drawFlowGeometry() {
+            ctx.strokeStyle = 'rgba(139, 233, 253, 0.2)';
+            ctx.lineWidth = 2;
+            
+            // Draw spiral
+            ctx.beginPath();
+            for (let i = 0; i < 1000; i++) {
+                const angle = i * 0.1;
+                const radius = i * 0.5;
+                const x = 400 + Math.cos(angle) * radius;
+                const y = 400 + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+        
+        function drawRecursiveGeometry() {
+            ctx.strokeStyle = 'rgba(80, 250, 123, 0.2)';
+            
+            function drawFractal(x, y, size, depth) {
+                if (depth === 0) return;
+                
+                ctx.strokeRect(x - size/2, y - size/2, size, size);
+                
+                const newSize = size * 0.5;
+                drawFractal(x - size/2, y - size/2, newSize, depth - 1);
+                drawFractal(x + size/2, y - size/2, newSize, depth - 1);
+                drawFractal(x - size/2, y + size/2, newSize, depth - 1);
+                drawFractal(x + size/2, y + size/2, newSize, depth - 1);
+            }
+            
+            drawFractal(400, 400, 200, 4);
+        }
+        
+        function drawQuantumGeometry() {
+            ctx.strokeStyle = 'rgba(241, 250, 140, 0.2)';
+            
+            // Draw probability waves
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                for (let x = 0; x < 800; x++) {
+                    const y = 400 + Math.sin((x / 50) + (i * Math.PI / 4)) * 100 * Math.exp(-x / 400);
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+        }
+        
+        // Meditative interaction
+        let meditationTexts = [
+            "Code is the contemporary form of sacred geometry",
+            "In patterns, we find the eternal",
+            "Functions dance in perfect symmetry",
+            "Variables flow like cosmic energy",
+            "Recursion mirrors the infinite",
+            "In the mandala, all code becomes one"
+        ];
+        
+        let textIndex = 0;
+        setInterval(() => {
+            document.getElementById('meditation-text').textContent = meditationTexts[textIndex];
+            textIndex = (textIndex + 1) % meditationTexts.length;
+        }, 5000);
+        
+        // Start with function mandala
+        createFunctionMandala();
+    </script>
+</body>
+</html>

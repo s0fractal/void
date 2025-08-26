@@ -1,0 +1,142 @@
+{
+  "title": "Void E2EE Overlay",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Ingest QPS",
+      "targets": [
+        {
+          "expr": "sum(rate(void_e2ee_ingest_requests_total[1m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Error Rate (5m)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_e2ee_ingest_requests_total{status=\"err\"}[5m])) / clamp_min(sum(rate(void_e2ee_ingest_requests_total[5m])), 1)"
+        }
+      ],
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "p95 Latency (ms)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_e2ee_ingest_duration_ms_bucket[5m])) by (le))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Latency Histogram Buckets (rate)",
+      "targets": [
+        {
+          "expr": "sum(rate(void_e2ee_ingest_duration_ms_bucket[1m])) by (le)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Decrypt Failures",
+      "targets": [
+        {
+          "expr": "increase(void_e2ee_decrypt_failures_total[30m])"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 6,
+        "h": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Forwarded Intents vs OK Ingest",
+      "targets": [
+        {
+          "expr": "sum(rate(void_e2ee_forward_intent_total[1m]))",
+          "legendFormat": "forward"
+        },
+        {
+          "expr": "sum(rate(void_e2ee_ingest_requests_total{status=\"ok\"}[1m]))",
+          "legendFormat": "ingest_ok"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Overlay Enabled",
+      "targets": [
+        {
+          "expr": "max(void_e2ee_overlay_flags{flag=\"enabled\"})"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Accept Plaintext",
+      "targets": [
+        {
+          "expr": "max(void_e2ee_overlay_flags{flag=\"accept_plaintext\"})"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 6,
+        "h": 4
+      }
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}

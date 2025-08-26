@@ -1,0 +1,7 @@
+{
+  "options": {
+    "optimizeLevel": 3,
+    "shrinkLevel": 0,
+    "noAssert": true
+  }
+}

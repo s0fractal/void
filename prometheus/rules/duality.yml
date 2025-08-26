@@ -1,0 +1,33 @@
+groups:
+- name: duality.core
+  rules:
+  - alert: DualityHighInterference
+    expr: histogram_quantile(0.95, sum(rate(void_duality_interference_bucket[5m])) by (le)) > 0.7
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Interference p95 > 0.7 (деструктивні зміни)"
+      action: "Перевірити останні hot-patch/rollback; зменшити різницю між хешами"
+  - alert: DualitySlowCollapse
+    expr: histogram_quantile(0.95, sum(rate(void_duality_result_ms_bucket[5m])) by (le)) > 1000
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Повільний колапс хвиль (п95 > 1s)"
+      action: "Перевірити liveValue/оркестрацію; оптимізувати шлях"
+- name: duality.cid
+  rules:
+  - alert: IPFSPinErrors
+    expr: sum(rate(void_duality_ipfs_pins_total{result="err"}[5m])) > 0
+    for: 5m
+    labels: { severity: warning }
+    annotations:
+      summary: "IPFS пінінг дає помилки"
+      action: "Перевірити IPFS API, розмір нормалізованого AST, мережу"
+  - alert: DualityPinnerDisconnected
+    expr: avg_over_time(void_duality_pinner_sse_connected[5m]) < 0.5
+    for: 5m
+    labels: { severity: info }
+    annotations:
+      summary: "Pinner втратив SSE"
+      action: "Перезапустити сайдкар або перевірити relay"

@@ -1,0 +1,11 @@
+{
+  "name": "@void/duality-ipfs-pinner",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "start": "node index.js" },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "express": "^4.19.2",
+    "prom-client": "^15.1.3"
+  }
+}

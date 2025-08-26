@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "source": "/Users/chaoshex/Projects/void-fnpm/test-semantic-twins.ts",
+  "timestamp": "2025-08-25T14:12:24.249Z",
+  "resonanceFrequency": 432,
+  "genes": [
+    {
+      "name": "addA",
+      "astHash": "a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95",
+      "file": "genes/addA.ts",
+      "range": {
+        "start": 183,
+        "end": 248
+      },
+      "protein": {
+        "phash": "phash:v1:sha256:b96c5d9086a76f67",
+        "nodes": 2,
+        "edges": -5,
+        "eigenTop": [
+          0.5,
+          0.5,
+          0,
+          0,
+          0
+        ],
+        "complexity": -2.5
+      },
+      "hybridId": "phash:v1:sha256:b96c5d9086a76f67|a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95"
+    },
+    {
+      "name": "additionC",
+      "astHash": "3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a",
+      "file": "genes/additionC.ts",
+      "range": {
+        "start": 455,
+        "end": 570
+      },
+      "protein": {
+        "phash": "phash:v1:sha256:b96c5d9086a76f67",
+        "nodes": 2,
+        "edges": -5,
+        "eigenTop": [
+          0.5,
+          0.5,
+          0,
+          0,
+          0
+        ],
+        "complexity": -2.5
+      },
+      "hybridId": "phash:v1:sha256:b96c5d9086a76f67|3278037a9211cf07452e09c2d0d28e498aae9fe07730fec3c7d3c065cf5eab8a"
+    },
+    {
+      "name": "multiply",
+      "astHash": "7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3",
+      "file": "genes/multiply.ts",
+      "range": {
+        "start": 747,
+        "end": 816
+      },
+      "protein": {
+        "phash": "phash:v1:sha256:b96c5d9086a76f67",
+        "nodes": 2,
+        "edges": -5,
+        "eigenTop": [
+          0.5,
+          0.5,
+          0,
+          0,
+          0
+        ],
+        "complexity": -2.5
+      },
+      "hybridId": "phash:v1:sha256:b96c5d9086a76f67|7c1ee0d4ad9655efa88a2aade60445b68f52ab595d1628fdec32515eeb3d40e3"
+    },
+    {
+      "name": "subtract",
+      "astHash": "498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed",
+      "file": "genes/subtract.ts",
+      "range": {
+        "start": 868,
+        "end": 937
+      },
+      "protein": {
+        "phash": "phash:v1:sha256:b96c5d9086a76f67",
+        "nodes": 2,
+        "edges": -5,
+        "eigenTop": [
+          0.5,
+          0.5,
+          0,
+          0,
+          0
+        ],
+        "complexity": -2.5
+      },
+      "hybridId": "phash:v1:sha256:b96c5d9086a76f67|498766a4bf333485811412428530f113681d79d360171ed48980d85fbda1a7ed"
+    }
+  ]
+}

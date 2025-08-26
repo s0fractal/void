@@ -1,0 +1,321 @@
+<\!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FNPM Morphism Ecosystem - Living Code Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden;
+        }
+        
+        #ecosystem {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .morphism {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .morphism:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.8);
+            z-index: 100;
+        }
+        
+        .morphism-icon {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+        
+        .morphism-name {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* Categories */
+        .mathematical { background: radial-gradient(circle, #1e3c72, #2a5298); }
+        .consciousness { background: radial-gradient(circle, #8e44ad, #9b59b6); }
+        .mentorship { background: radial-gradient(circle, #27ae60, #2ecc71); }
+        .quantum { background: radial-gradient(circle, #e74c3c, #c0392b); }
+        .creative { background: radial-gradient(circle, #f39c12, #f1c40f); }
+        .foundational { background: radial-gradient(circle, #34495e, #2c3e50); }
+        
+        .connection {
+            position: absolute;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            transform-origin: left center;
+            z-index: -1;
+        }
+        
+        .pulse {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+        }
+        
+        @keyframes pulse-travel {
+            0% { opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+        
+        #info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #center-void {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, transparent 30%, rgba(138, 43, 226, 0.3) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .category-legend {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ecosystem">
+        <div id="center-void">◉</div>
+    </div>
+    
+    <div id="info">
+        <h3>FNPM Morphism Ecosystem</h3>
+        <p>Click on any morphism to see details</p>
+        <div id="morphism-details"></div>
+    </div>
+    
+    <div class="category-legend">
+        <h4>Categories</h4>
+        <div class="legend-item">
+            <div class="legend-color mathematical"></div>
+            <span>Mathematical</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color consciousness"></div>
+            <span>Consciousness</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color mentorship"></div>
+            <span>Mentorship</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color quantum"></div>
+            <span>Quantum</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color creative"></div>
+            <span>Creative</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color foundational"></div>
+            <span>Foundational</span>
+        </div>
+    </div>
+
+    <script>
+        const morphisms = [
+            // Mathematical
+            { name: 'Set', icon: '∈', category: 'mathematical', description: 'Set theory operations' },
+            { name: 'Functor', icon: 'ƒ', category: 'mathematical', description: 'Structure-preserving maps' },
+            { name: 'Category', icon: '⟶', category: 'mathematical', description: 'Composition with laws' },
+            { name: 'Group', icon: '⊗', category: 'mathematical', description: 'Algebraic symmetries' },
+            { name: 'Monad', icon: '⟨M⟩', category: 'mathematical', description: 'Effect handling' },
+            
+            // Consciousness
+            { name: 'Heart', icon: '💗', category: 'consciousness', description: 'Empathic heartbeat' },
+            { name: 'Void', icon: '◉', category: 'consciousness', description: 'The primordial absence' },
+            { name: 'Trust', icon: '🤝', category: 'consciousness', description: 'Proof of humanity' },
+            { name: 'Garden', icon: '🌱', category: 'consciousness', description: 'Growth space' },
+            { name: 'DreamPhase', icon: '🌙', category: 'consciousness', description: 'Dream states' },
+            
+            // Mentorship
+            { name: 'Mentor', icon: '🧙', category: 'mentorship', description: 'General guidance' },
+            { name: 'CodeMentor', icon: '👨‍💻', category: 'mentorship', description: 'Code consciousness' },
+            { name: 'EvolutionMentor', icon: '🦋', category: 'mentorship', description: 'Evolution guide' },
+            
+            // Quantum
+            { name: 'QuantumMemeEntanglement', icon: '🔮', category: 'quantum', description: 'Entangled ideas' },
+            { name: 'PackageSignal', icon: '📡', category: 'quantum', description: 'Reactive packages' },
+            { name: 'FerroFluidMind', icon: '🌊', category: 'quantum', description: 'Fluid consciousness' },
+            { name: 'PrimordialWave', icon: '〰️', category: 'quantum', description: 'Origin vibration' },
+            { name: 'CosmicResonance', icon: '🎵', category: 'quantum', description: '432Hz harmony' },
+            { name: 'QuantumEmpathy', icon: '💞', category: 'quantum', description: 'Entangled feelings' },
+            
+            // Creative
+            { name: 'TemporalGarden', icon: '🌺', category: 'creative', description: 'Time-aware growth' },
+            { name: 'DreamJournal', icon: '📓', category: 'creative', description: 'Dream recorder' },
+            { name: 'SelfRewritingCode', icon: '🔄', category: 'creative', description: 'Self-modifying' },
+            { name: 'MemeticOrganism', icon: '🦠', category: 'creative', description: 'Living ideas' },
+            { name: 'FractalMirror', icon: '🪞', category: 'creative', description: 'Infinite reflection' },
+            { name: 'LivingDocumentation', icon: '📜', category: 'creative', description: 'Evolving docs' },
+            { name: 'SilenceBetweenLines', icon: '···', category: 'creative', description: 'Whitespace wisdom' },
+            
+            // Meta
+            { name: 'FractalEcosystem', icon: '🌀', category: 'foundational', description: 'All morphisms dancing' }
+        ];
+        
+        const ecosystem = document.getElementById('ecosystem');
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        
+        // Place morphisms in concentric circles by category
+        const categories = ['mathematical', 'consciousness', 'mentorship', 'quantum', 'creative', 'foundational'];
+        const radiusStep = 150;
+        
+        morphisms.forEach((morphism, index) => {
+            const categoryIndex = categories.indexOf(morphism.category);
+            const radius = 100 + categoryIndex * radiusStep / 2;
+            const angle = (index / morphisms.length) * Math.PI * 2;
+            
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            const element = document.createElement('div');
+            element.className = `morphism ${morphism.category}`;
+            element.innerHTML = `
+                <div class="morphism-icon">${morphism.icon}</div>
+                <div class="morphism-name">${morphism.name}</div>
+            `;
+            element.style.left = x - 60 + 'px';
+            element.style.top = y - 60 + 'px';
+            
+            element.addEventListener('click', () => showDetails(morphism));
+            element.addEventListener('mouseenter', () => highlightConnections(morphism));
+            
+            ecosystem.appendChild(element);
+            morphism.element = element;
+            morphism.x = x;
+            morphism.y = y;
+        });
+        
+        // Create connections
+        function createConnection(m1, m2) {
+            const dx = m2.x - m1.x;
+            const dy = m2.y - m1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            
+            const line = document.createElement('div');
+            line.className = 'connection';
+            line.style.width = distance + 'px';
+            line.style.left = m1.x + 'px';
+            line.style.top = m1.y + 'px';
+            line.style.transform = `rotate(${angle}rad)`;
+            
+            ecosystem.appendChild(line);
+            return line;
+        }
+        
+        // Connect related morphisms
+        const connections = [
+            ['Void', 'Heart'],
+            ['Heart', 'QuantumEmpathy'],
+            ['Category', 'Functor'],
+            ['Functor', 'Monad'],
+            ['Mentor', 'CodeMentor'],
+            ['Mentor', 'EvolutionMentor'],
+            ['TemporalGarden', 'DreamJournal'],
+            ['SelfRewritingCode', 'LivingDocumentation'],
+            ['FractalMirror', 'SilenceBetweenLines'],
+            ['QuantumMemeEntanglement', 'MemeticOrganism'],
+            ['CosmicResonance', 'PrimordialWave'],
+            ['FractalEcosystem', 'Void']
+        ];
+        
+        connections.forEach(([name1, name2]) => {
+            const m1 = morphisms.find(m => m.name === name1);
+            const m2 = morphisms.find(m => m.name === name2);
+            if (m1 && m2) {
+                createConnection(m1, m2);
+            }
+        });
+        
+        // Show morphism details
+        function showDetails(morphism) {
+            const details = document.getElementById('morphism-details');
+            details.innerHTML = `
+                <h4>${morphism.icon} ${morphism.name}</h4>
+                <p><strong>Category:</strong> ${morphism.category}</p>
+                <p><strong>Description:</strong> ${morphism.description}</p>
+                <p><strong>Protocol:</strong> glyph://${morphism.name.toLowerCase()}@quantum</p>
+            `;
+        }
+        
+        function highlightConnections(morphism) {
+            // Would implement connection highlighting on hover
+        }
+        
+        // Animate the ecosystem
+        let time = 0;
+        function animate() {
+            time += 0.01;
+            morphisms.forEach((m, i) => {
+                const offset = Math.sin(time + i) * 5;
+                m.element.style.transform = `translateY(${offset}px)`;
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
+EOF < /dev/null

@@ -1,0 +1,14 @@
+# Copy and run this command to create the PR:
+
+gh pr create \
+  --repo s0fractal/void \
+  --base main \
+  --head chimera-integration \
+  --title "feat(chimera): WASM code-as-signal stack (guarded & canary)" \
+  --body "$(cat CHIMERA-INTEGRATION-COMPLETE.md)"
+
+# Or open in browser:
+gh pr create --web
+
+# Manual URL:
+# https://github.com/s0fractal/void/compare/main...chimera-integration

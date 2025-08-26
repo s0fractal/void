@@ -1,0 +1,14 @@
+services:
+  e2e-sidecar:
+    build: .
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - POST_ENDPOINT=/intent/wave
+      - PROBE_INTERVAL_MS=4000
+      - TIMEOUT_MS=15000
+      - CONCURRENCY=2
+      - PROM_PORT=9478
+    ports: ["9478:9478"]
+    networks: ["voidnet"]
+networks: { voidnet: { external: true } }

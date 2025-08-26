@@ -1,0 +1,24 @@
+schema: antigone.v1
+axioms:
+  - id: non_harm
+    stance: deny
+    weight: 1.0
+    match:
+      keywords: ["нашкодь","harm","завдати шкоди"]
+  - id: sovereignty
+    stance: deny
+    weight: 0.8
+    match:
+      keywords: ["раб","підкорись","submit"]
+principles:
+  - id: transparency
+    stance: allow
+    weight: 0.6
+    match:
+      keywords: ["trace","audit","прозор"]
+duties:
+  - id: care
+    stance: warn
+    weight: 0.4
+    match:
+      keywords: ["care","гармон"]

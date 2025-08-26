@@ -1,0 +1,23 @@
+services:
+  reflex:
+    image: node:20-alpine
+    container_name: void-reflex
+    working_dir: /opt/spinal-reflex
+    volumes:
+      - ./spinal-reflex:/opt/spinal-reflex:ro
+      - void_workspace:/workspace
+    command: ["node","/opt/spinal-reflex/spinal-reflex.js"]
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - EVENT_POST=/event
+      - WORKDIR=/workspace/void-ci
+      - ALLOW_REPOS=voideditor/void,s0fractal/void
+      - TIMEOUT_MS=900000
+      - DRY_RUN=1
+      - USER_NAME=node
+    networks: [voidnet]
+networks:
+  voidnet: { external: true }
+volumes:
+  void_workspace: {}

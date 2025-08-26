@@ -1,0 +1,13 @@
+groups:
+- name: unified.rules
+  rules:
+  - record: job:e2ee_p95_ms:5m
+    expr: histogram_quantile(0.95, sum(rate(void_e2ee_ingest_duration_ms_bucket[5m])) by (le))
+  - record: job:reflex_build_p95_ms:5m
+    expr: histogram_quantile(0.95, sum(rate(void_reflex_build_duration_ms_bucket[5m])) by (le))
+  - record: job:ci_pass_rate:1m
+    expr: sum(rate(void_reflex_builds_total{status="pass"}[1m]))
+  - record: job:ci_fail_rate:1m
+    expr: sum(rate(void_reflex_builds_total{status=~"fail|error"}[1m]))
+  - record: job:tmpbus_spool_growth:5m
+    expr: derivative(max(void_tmpbus_spool_depth)[5m])

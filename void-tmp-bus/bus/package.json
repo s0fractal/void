@@ -1,0 +1,29 @@
+{
+  "name": "@void/tmpbus",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "tmpbus-pub": "./bin/tmpbus-pub",
+    "tmpbus-cmd": "./bin/tmpbus-cmd"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/ws": "^8.5.0",
+    "@vitest/ui": "^1.6.0",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0"
+  }
+}

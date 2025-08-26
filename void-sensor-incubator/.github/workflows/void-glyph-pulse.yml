@@ -1,0 +1,28 @@
+name: void-glyph-pulse
+on:
+  push:
+  pull_request:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  ping-glyph:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build payload
+        id: evt
+        run: |
+          TYPE="ci"; STATUS="pass"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then TYPE="pr"; STATUS="open"; fi
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "failure" ]]; then STATUS="fail"; fi
+          echo "json={\"type\":\"$TYPE\",\"status\":\"$STATUS\",\"meta\":{\"repo\":\"${{ github.repository }}\",\"sha\":\"${{ github.sha }}\"}}" >> $GITHUB_OUTPUT
+      - name: POST to relay
+        env:
+          RELAY_URL: ${{ secrets.VOID_GLYPH_RELAY_URL }}
+          RELAY_KEY: ${{ secrets.VOID_GLYPH_RELAY_KEY }}
+        run: |
+          curl -sS -X POST "$RELAY_URL" \
+            -H "content-type: application/json" \
+            -H "x-api-key: $RELAY_KEY" \
+            -d '${{ steps.evt.outputs.json }}'

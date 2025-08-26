@@ -1,0 +1,19 @@
+{
+  "tmpbus": {
+    "spool_depth": "void_tmpbus_spool_depth",
+    "event_flow": "void_tmpbus_event_flow_rate",
+    "ws_connected": "void_tmpbus_ws_connected"
+  },
+  "e2ee": {
+    "ingest_req_total": "void_e2ee_ingest_requests_total",
+    "ingest_hist": "void_e2ee_ingest_duration_ms_bucket"
+  },
+  "reflex": {
+    "builds_total": "void_reflex_builds_total",
+    "build_hist": "void_reflex_build_duration_ms_bucket",
+    "step_hist": "void_reflex_step_duration_ms_bucket"
+  },
+  "pulse": {
+    "aggregate": "void_pulse_health_aggregate"
+  }
+}

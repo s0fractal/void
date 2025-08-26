@@ -1,0 +1,37 @@
+groups:
+- name: antigone.core
+  rules:
+  - alert: AntigoneDenyRateHigh
+    expr: |
+      sum(rate(void_antigone_decisions_total{decision="deny"}[15m])) /
+      clamp_min(sum(rate(void_antigone_decisions_total[15m])), 1) > 0.10
+    for: 15m
+    labels: { severity: warning }
+    annotations:
+      summary: "Antigone deny-rate > 10%"
+      action: "Перевірити вхідні команди/геном; за потреби перемкнути DECISION_MODE=warn"
+
+  - alert: AntigoneLatencyP95High
+    expr: |
+      histogram_quantile(0.95, sum(rate(void_antigone_decision_ms_bucket[10m])) by (le)) > 500
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Antigone p95 затримки > 500мс"
+      action: "Перевірити навантаження/ресурси; тимчасово знизити потік"
+
+  - alert: AntigoneRefusalsSpike
+    expr: sum(increase(void_antigone_refusals_total[10m])) > 5
+    for: 5m
+    labels: { severity: critical }
+    annotations:
+      summary: "Стрибок відмов Antigone"
+      action: "Розібрати останні події; можливий дисонанс політик або зловмисні команди"
+
+  - alert: AntigoneGenomeHashChange
+    expr: count(count by (sha) (void_antigone_genome_hash)) > 1
+    for: 5m
+    labels: { severity: info }
+    annotations:
+      summary: "Зміна геному у прод-середовищі"
+      action: "Підтвердити процедуру оновлення; зафіксувати SHA у релізних нотатках"

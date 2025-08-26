@@ -1,0 +1,196 @@
+{
+  "title": "Void Unified Dashboard",
+  "tags": [
+    "void",
+    "unified",
+    "432Hz"
+  ],
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "interval",
+        "query": "1m,5m,10m",
+        "current": {
+          "text": "5m",
+          "value": "5m"
+        }
+      }
+    ]
+  },
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Pulse Health (aggregate)",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "max(void_pulse_health_aggregate)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Reflex p95 (ms)",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "job:reflex_build_p95_ms:5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "E2EE p95 (ms)",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "job:e2ee_p95_ms:5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "TmpBus Spool Depth",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "expr": "max(void_tmpbus_spool_depth)"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Correlation: CI pass/fail vs Spool Growth vs Pulse Health",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "job:ci_pass_rate:1m",
+          "legendFormat": "ci pass rps"
+        },
+        {
+          "expr": "job:ci_fail_rate:1m",
+          "legendFormat": "ci fail rps"
+        },
+        {
+          "expr": "job:tmpbus_spool_growth:5m",
+          "legendFormat": "spool growth"
+        },
+        {
+          "expr": "max(void_pulse_health_aggregate)",
+          "legendFormat": "pulse health"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Reflex Build Duration p95",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_reflex_build_duration_ms_bucket[5m])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Builds by Status (rate)",
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=\"pass\"}[1m]))",
+          "legendFormat": "pass"
+        },
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=~\"fail|error\"}[1m]))",
+          "legendFormat": "fail+error"
+        },
+        {
+          "expr": "sum(rate(void_reflex_builds_total{status=\"dryrun\"}[1m]))",
+          "legendFormat": "dryrun"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "TmpBus Event Flow",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(void_tmpbus_event_flow_rate[1m]))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "E2EE Ingest p95",
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(void_e2ee_ingest_duration_ms_bucket[5m])) by (le))"
+        }
+      ]
+    }
+  ]
+}

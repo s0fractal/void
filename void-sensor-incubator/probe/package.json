@@ -1,0 +1,23 @@
+{
+  "name": "eyes-sse-probe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "eyes-sse-probe": "dist/probe.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/probe.js",
+    "probe": "node dist/probe.js"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "eventsource": "^2.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.11.30",
+    "@types/eventsource": "^1.1.15"
+  }
+}

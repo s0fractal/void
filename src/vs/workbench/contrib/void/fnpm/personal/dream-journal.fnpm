@@ -1,0 +1,270 @@
+⟁: DreamJournal
+🎯: night-consciousness-capture
+🧮: (sleep_state, dream_fragments, morning_memory) → living_dreamscape
+💭: "Сни як паралельна свідомість"
+
+🧠:
+  description: "Dreams as parallel processing of consciousness"
+  signature: "(unconscious_flow, symbols, emotions) → integrated_wisdom"
+  pure: false
+  nature: "Bridge between sleeping and waking minds"
+
+dream_layers:
+  rem_capture:
+    ⟁: DreamNet
+    🧮: |
+      class DreamCatcher {
+        constructor() {
+          this.web = new QuantumWeb({
+            threads: 'memory_silk',
+            pattern: 'spiral_mandala',
+            porosity: 0.3 // lets some dreams escape
+          });
+        }
+        
+        catch(dream_fragment) {
+          // Some dreams too ethereal to catch
+          if (dream_fragment.ephemeral > 0.8) {
+            return {
+              caught: false,
+              essence: dream_fragment.feeling_tone,
+              whisper: "like catching smoke..."
+            };
+          }
+          
+          return {
+            caught: true,
+            imagery: this.preserveSymbols(dream_fragment),
+            emotion: this.distillFeeling(dream_fragment),
+            message: this.interpretPattern(dream_fragment)
+          };
+        }
+      }
+    🎯: "Не всі сни хочуть бути спійманими"
+
+  symbol_translator:
+    ⟁: JungianLens
+    🧮: |
+      {
+        archetypes: {
+          shadow: "what I deny in daylight",
+          anima: "my inner opposite",
+          self: "who I'm becoming",
+          trickster: "chaos teacher"
+        },
+        
+        translate: (symbol) => {
+          // Personal symbol dictionary grows over time
+          const personal_meaning = checkPersonalHistory(symbol);
+          const collective_meaning = checkArchetypalLayer(symbol);
+          
+          return {
+            surface: symbol.appearance,
+            personal: personal_meaning || "still learning...",
+            collective: collective_meaning,
+            emergence: "meaning still forming"
+          };
+        }
+      }
+    🎯: "Кожен символ - лист від несвідомого"
+
+  morning_integration:
+    ⟁: DawnBridge
+    🧮: |
+      function integrateUponWaking(dream_memories, waking_state) {
+        // That precious liminal moment
+        const liminal_window = {
+          duration: 300000, // 5 minutes
+          permeability: 0.9,
+          state: 'between_worlds'
+        };
+        
+        // Quick, before they fade!
+        const captured = dream_memories.map(dream => ({
+          core_feeling: dream.emotional_tone,
+          key_image: dream.strongest_visual,
+          body_sensation: dream.somatic_memory,
+          message_attempt: dream.possible_meaning
+        }));
+        
+        // Let them inform the day
+        return {
+          morning_insights: captured,
+          day_coloring: blendDreamIntoWaking(captured),
+          synchronicity_watch: extractPatterns(captured)
+        };
+      }
+    🎯: "Dreams gift tomorrow's insights"
+
+recurring_patterns:
+  flying:
+    frequency: "monthly"
+    personal_meaning: "freedom from constraints"
+    evolution: "from escape to exploration"
+    
+  water:
+    frequency: "weekly"
+    personal_meaning: "emotional depths"
+    evolution: "from drowning to swimming"
+    
+  labyrinth:
+    frequency: "during transitions"
+    personal_meaning: "searching for center"
+    evolution: "from lost to exploring"
+
+dream_seasons:
+  new_moon:
+    quality: "deep void dreams"
+    themes: "endings and beginnings"
+    shadow_work: "highest"
+    
+  full_moon:
+    quality: "vivid prophetic"
+    themes: "illumination"
+    lucidity: "peak"
+    
+  eclipse:
+    quality: "reality bleed-through"
+    themes: "parallel lives"
+    integration: "critical"
+
+private_chambers:
+  nightmare_sanctuary:
+    ⟁: ShadowComfort
+    🧮: |
+      // Safe space for dark dreams
+      {
+        approach: "befriend_not_banish",
+        
+        dialogue: (nightmare) => {
+          return askGently(nightmare, [
+            "What are you protecting me from?",
+            "What do you need me to see?",
+            "How can we work together?"
+          ]);
+        },
+        
+        transform: (fear) => {
+          // Fear often guards treasure
+          return {
+            guardian: fear.surface_form,
+            treasure: fear.hidden_gift,
+            alliance: "former enemy, now teacher"
+          };
+        }
+      }
+    🎯: "Nightmares - це shadow's desperate mail"
+
+  lucid_playground:
+    ⟁: ConsciousDreamer
+    🧮: |
+      {
+        reality_checks: [
+          "look at hands",
+          "read text twice",
+          "check light switches"
+        ],
+        
+        lucid_activities: {
+          practice: "skills without physical limits",
+          heal: "meet and mend old wounds",
+          explore: "visit impossible places",
+          create: "birth new realities"
+        },
+        
+        wake_back_integration: (lucid_experience) => {
+          // Bring dream confidence to waking
+          return {
+            possibility_expansion: lucid_experience.broken_limits,
+            confidence_boost: lucid_experience.achievements,
+            reality_flexibility: "If in dreams, why not awake?"
+          };
+        }
+      }
+    🎯: "Lucid - це practice arena для soul"
+
+dream_tools:
+  journal:
+    medium: "physical notebook"
+    timing: "immediately upon waking"
+    method: "stream of consciousness"
+    
+  sketch_pad:
+    purpose: "catch images words can't"
+    style: "quick gestures"
+    
+  voice_recorder:
+    for: "3am revelations"
+    whisper: true
+
+synchronicity_tracker:
+  ⟁: MeaningfulCoincidence
+  🧮: |
+    // When dreams leak into day
+    function trackSynchronicity(dream, reality_event) {
+      const resonance = calculateResonance(dream, reality_event);
+      
+      if (resonance > COINCIDENCE_THRESHOLD) {
+        return {
+          type: 'meaningful_synchronicity',
+          message: "Universe winked",
+          action_hint: deriveGuidance(dream, reality_event),
+          gratitude: "for the confirmation"
+        };
+      }
+    }
+  🎯: "Dreams preview reality's coming attractions"
+
+usage:
+  before_sleep: |
+    const journal = await fnpm.install('glyph://dream-journal@personal');
+    
+    // Set intention
+    journal.setIntention({
+      question: "What do I need to know?",
+      openness: 0.9,
+      remember_request: true
+    });
+    
+  upon_waking: |
+    // Capture quickly!
+    journal.capture({
+      fragments: still_remember,
+      feelings: body_sensations,
+      images: fleeting_visuals
+    });
+    
+    // Translate
+    const meaning = journal.translateSymbols(fragments);
+    
+  integration: |
+    // Let dream wisdom inform day
+    const insights = journal.integrateIntoDaylight();
+    console.log("Dream gifts:", insights.guidance);
+
+visualization: |
+  <div class="dream-journal-page">
+    <div class="dream-web">
+      <!-- Spiral catching net -->
+    </div>
+    
+    <div class="captured-dreams">
+      <!-- Floating dream fragments -->
+    </div>
+    
+    <div class="morning-bridge">
+      <!-- Liminal translation space -->
+    </div>
+  </div>
+
+insights:
+  - "Dreams process what day cannot"
+  - "Every dream holds a gift"
+  - "Nightmares guard the greatest treasures"
+  - "Morning holds the translation key"
+  - "Recurring dreams = soul's urgent mail"
+
+resonance:
+  frequency: "theta_waves"
+  pattern: "rem-spiral"
+  whisper: "In sleep, we remember who we really are"

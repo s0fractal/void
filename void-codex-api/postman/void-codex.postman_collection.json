@@ -1,0 +1,8 @@
+{
+  "info": { "name": "Void Codex API", "_postman_id": "void-codex", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": { "raw": "{{base}}/health", "host": ["{{base}}"], "path": ["health"] } } },
+    { "name": "Plan", "request": { "method": "POST", "header":[{"key":"content-type","value":"application/json"},{"key":"x-api-key","value":"{{api_key}}"}], "url": { "raw": "{{base}}/codex/plan", "host": ["{{base}}"], "path": ["codex","plan"] }, "body": { "mode": "raw", "raw": "{\"intent\":\"stabilize ipfs\",\"context\":{\"incidents\":[\"ipfs:degraded\"]}}" } } }
+  ],
+  "variable": [ { "key": "base", "value": "http://localhost:8788" }, { "key": "api_key", "value": "" } ]
+}

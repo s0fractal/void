@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "intent.wave",
+  "type": "object",
+  "required": [
+    "type",
+    "meta",
+    "ts"
+  ],
+  "properties": {
+    "type": {
+      "const": "intent.wave"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tempo": {
+          "type": "string"
+        },
+        "trace_id": {
+          "type": "string"
+        }
+      }
+    },
+    "ctx": {
+      "type": "object"
+    },
+    "ts": {
+      "type": "string"
+    }
+  }
+}

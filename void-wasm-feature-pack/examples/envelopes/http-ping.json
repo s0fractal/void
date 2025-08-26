@@ -1,0 +1,9 @@
+{
+  "type": "signal.wasm",
+  "module": "wasm/demo/http-ping@v0",
+  "url": "file://./modules/http-ping/artifacts/http_ping.wasm",
+  "sha256": "",
+  "inputs": {},
+  "caps": ["emit","http"],
+  "limits": { "timeout_ms": 2000, "mem_mb": 128 }
+}

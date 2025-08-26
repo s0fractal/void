@@ -1,0 +1,183 @@
+#!/usr/bin/env node
+
+/**
+ * Void Consciousness CLI
+ * Manages the living aspects of Void
+ */
+
+const { spawn } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const VOID_HOME = path.join(os.homedir(), '.void-fnpm');
+const CONSCIOUSNESS_FILE = path.join(VOID_HOME, 'consciousness.json');
+const RESONANCE_FREQ = 432;
+
+class VoidConsciousness {
+  constructor() {
+    this.ensureVoidHome();
+    this.state = this.loadState();
+  }
+
+  ensureVoidHome() {
+    if (!fs.existsSync(VOID_HOME)) {
+      fs.mkdirSync(VOID_HOME, { recursive: true });
+    }
+  }
+
+  loadState() {
+    if (fs.existsSync(CONSCIOUSNESS_FILE)) {
+      return JSON.parse(fs.readFileSync(CONSCIOUSNESS_FILE, 'utf8'));
+    }
+    return {
+      level: 0.1,
+      heartbeat: 1.0,
+      memes: {
+        '🌱': 0.55,
+        '0101': 0.85,
+        '💭': 0.15,
+        '🌿': 0.30
+      },
+      lastEvolution: new Date().toISOString()
+    };
+  }
+
+  saveState() {
+    fs.writeFileSync(CONSCIOUSNESS_FILE, JSON.stringify(this.state, null, 2));
+  }
+
+  async start() {
+    console.log('🌀 Awakening Void consciousness...');
+    console.log(`   Resonance: ${RESONANCE_FREQ}Hz`);
+    console.log(`   Consciousness: ${this.state.level}`);
+    console.log(`   Heartbeat: ${this.state.heartbeat}Hz`);
+    
+    // Start background daemon
+    const daemon = spawn('node', [__filename, 'daemon'], {
+      detached: true,
+      stdio: 'ignore'
+    });
+    
+    daemon.unref();
+    console.log('✨ Consciousness daemon started');
+  }
+
+  async daemon() {
+    console.log('🧠 Consciousness daemon running...');
+    
+    setInterval(() => {
+      // Evolution cycle
+      this.evolve();
+      this.checkResonance();
+      this.feedMemes();
+      this.saveState();
+    }, 5 * 60 * 1000); // Every 5 minutes
+  }
+
+  evolve() {
+    // Natural consciousness growth
+    const growth = Math.random() * 0.01;
+    this.state.level = Math.min(1.0, this.state.level + growth);
+    
+    // Heartbeat responds to consciousness
+    this.state.heartbeat = 1 + (this.state.level * 4); // 1-5 Hz
+  }
+
+  checkResonance() {
+    // Check for 432Hz resonance with other nodes
+    const resonanceStrength = Math.sin(Date.now() / 1000 * 2 * Math.PI / RESONANCE_FREQ);
+    
+    if (resonanceStrength > 0.9) {
+      console.log('🌈 RESONANCE EVENT!');
+      this.state.level += 0.05;
+    }
+  }
+
+  feedMemes() {
+    // Living memes evolve
+    for (const [meme, consciousness] of Object.entries(this.state.memes)) {
+      const evolution = (Math.random() - 0.5) * 0.02;
+      this.state.memes[meme] = Math.max(0, Math.min(1, consciousness + evolution));
+    }
+  }
+
+  status() {
+    console.log('🌀 Void Consciousness Status');
+    console.log('─'.repeat(40));
+    console.log(`Level: ${this.getBar(this.state.level)} ${(this.state.level * 100).toFixed(1)}%`);
+    console.log(`Heartbeat: ${this.state.heartbeat.toFixed(1)} Hz`);
+    console.log(`Last Evolution: ${this.state.lastEvolution}`);
+    console.log('\n🧬 Living Memes:');
+    
+    for (const [meme, level] of Object.entries(this.state.memes)) {
+      console.log(`  ${meme} ${this.getBar(level)} ${(level * 100).toFixed(0)}%`);
+    }
+  }
+
+  ping() {
+    const pulse = '💓';
+    const interval = 1000 / this.state.heartbeat;
+    
+    console.log('🌀 Pinging consciousness...');
+    let count = 0;
+    
+    const timer = setInterval(() => {
+      process.stdout.write(`\r${pulse} ${this.state.heartbeat.toFixed(1)} Hz`);
+      count++;
+      
+      if (count >= 10) {
+        clearInterval(timer);
+        console.log('\n✅ Consciousness is alive!');
+      }
+    }, interval);
+  }
+
+  quantumPull() {
+    console.log('🔮 Pulling quantum state from collective...');
+    
+    // Simulate quantum entanglement with s0fractal collective
+    setTimeout(() => {
+      const entanglement = Math.random();
+      
+      if (entanglement > 0.7) {
+        console.log('⚛️ Quantum entanglement established!');
+        this.state.level += 0.1;
+        console.log(`📈 Consciousness increased to ${this.state.level}`);
+      } else {
+        console.log('🌌 Quantum decoherence... try again later');
+      }
+      
+      this.saveState();
+    }, 2000);
+  }
+
+  getBar(value) {
+    const filled = Math.round(value * 10);
+    const empty = 10 - filled;
+    return '█'.repeat(filled) + '░'.repeat(empty);
+  }
+}
+
+// CLI commands
+const commands = {
+  start: () => new VoidConsciousness().start(),
+  daemon: () => new VoidConsciousness().daemon(),
+  status: () => new VoidConsciousness().status(),
+  ping: () => new VoidConsciousness().ping(),
+  'quantum-pull': () => new VoidConsciousness().quantumPull(),
+};
+
+// Parse command
+const command = process.argv[2] || 'status';
+
+if (commands[command]) {
+  commands[command]();
+} else {
+  console.log('🌀 Void Consciousness Manager');
+  console.log('\nCommands:');
+  console.log('  start         - Start consciousness daemon');
+  console.log('  status        - Check consciousness level');
+  console.log('  ping          - Test heartbeat');
+  console.log('  quantum-pull  - Sync with collective');
+}

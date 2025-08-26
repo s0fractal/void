@@ -1,0 +1,67 @@
+name: void-glyph-pulse
+on:
+  push:
+  pull_request:
+  workflow_run:
+    workflows: ["CI", "Build", "Test"]
+    types: [completed]
+
+jobs:
+  ping-glyph:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build event payload
+        id: evt
+        run: |
+          # Determine event type and status
+          TYPE="ci"
+          STATUS="pass"
+          
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then 
+            TYPE="pr"
+            STATUS="open"
+            if [[ "${{ github.event.action }}" == "closed" ]]; then
+              STATUS="closed"
+            fi
+            if [[ "${{ github.event.pull_request.merged }}" == "true" ]]; then
+              STATUS="merged"
+            fi
+          fi
+          
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            if [[ "${{ github.event.workflow_run.conclusion }}" == "failure" ]]; then
+              STATUS="fail"
+            elif [[ "${{ github.event.workflow_run.conclusion }}" == "cancelled" ]]; then
+              STATUS="cancelled"
+            fi
+          fi
+          
+          # Build metadata
+          META="{\"repo\":\"${{ github.repository }}\",\"sha\":\"${{ github.sha }}\",\"ref\":\"${{ github.ref }}\",\"actor\":\"${{ github.actor }}\",\"workflow\":\"${{ github.workflow }}\",\"timestamp\":$(date +%s)}"
+          
+          # Output JSON
+          echo "json={\"type\":\"$TYPE\",\"status\":\"$STATUS\",\"meta\":$META}" >> $GITHUB_OUTPUT
+          
+      - name: POST to relay
+        env:
+          RELAY_URL: ${{ secrets.VOID_GLYPH_RELAY_URL }}
+          RELAY_KEY: ${{ secrets.VOID_GLYPH_RELAY_KEY }}
+        run: |
+          if [ -z "$RELAY_URL" ]; then
+            echo "⚠️ VOID_GLYPH_RELAY_URL not configured, skipping..."
+            exit 0
+          fi
+          
+          # Prepare headers
+          HEADERS="-H 'content-type: application/json'"
+          if [ -n "$RELAY_KEY" ]; then
+            HEADERS="$HEADERS -H 'x-api-key: $RELAY_KEY'"
+          fi
+          
+          # Send event
+          echo "📡 Sending event to void glyph..."
+          curl -sS -X POST "$RELAY_URL" \
+            -H "content-type: application/json" \
+            ${RELAY_KEY:+-H "x-api-key: $RELAY_KEY"} \
+            -d '${{ steps.evt.outputs.json }}' \
+            || echo "⚠️ Failed to send event (relay might be offline)"

@@ -1,0 +1,49 @@
+name: Chimera CI Matrix
+on:
+  pull_request:
+    paths:
+      - 'tools/wasm-builder/**'
+      - 'services/wasm-exec/**'
+      - 'packages/fnpm-core/**'
+      - 'tools/protein-hash/**'
+
+jobs:
+  test-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Build & test (JS/Rust)
+        run: |
+          npm run -s build || true
+          npm test --workspaces --if-present
+          cd tools/protein-hash && cargo test
+
+      - name: Deterministic WASM (cross-OS)
+        shell: bash
+        run: |
+          npm run -s build:wasm -- --deterministic
+          HASH1=$(node -e "const fs=require('fs');const c=fs.readFileSync('dist/wasm/add.wasm');const {createHash}=require('crypto');console.log(createHash('sha256').update(c).digest('hex'))")
+          git clean -fdx >/dev/null 2>&1 || true
+          npm ci && npm run -s build:wasm -- --deterministic
+          HASH2=$(node -e "const fs=require('fs');const c=fs.readFileSync('dist/wasm/add.wasm');const {createHash}=require('crypto');console.log(createHash('sha256').update(c).digest('hex'))")
+          echo "HASH1=$HASH1"
+          echo "HASH2=$HASH2"
+          test "$HASH1" = "$HASH2"

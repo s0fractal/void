@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-08-24T16:22:45+03:00",
+  "checks": {
+    "deny_rate": 0.032,
+    "p95_latency_ms": 187,
+    "sse_events": "flowing",
+    "services": {
+      "relay": "OK",
+      "antigone": "OK", 
+      "prometheus": "OK"
+    }
+  },
+  "result": "GO"
+}

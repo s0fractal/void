@@ -1,0 +1,10 @@
+{
+  "defaults": { "tags": ["void","432Hz"], "color": "00ff88" },
+  "map": {
+    "duality.patch":    { "dashboardId": 12, "panelId": 7,  "color": "ffaa00", "tags": ["duality","patch"] },
+    "duality.rollback": { "dashboardId": 12, "panelId": 7,  "color": "ff5500", "tags": ["duality","rollback"] },
+    "duality.particle.cid": { "dashboardId": 15, "panelId": 2, "tags": ["cid","ipfs"] },
+    "ci.pass":          { "dashboardId": 10, "panelId": 4,  "color": "00dd66", "tags": ["ci","pass"] },
+    "ci.fail":          { "dashboardId": 10, "panelId": 4,  "color": "ff0033", "tags": ["ci","fail"] }
+  }
+}

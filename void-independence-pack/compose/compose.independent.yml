@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  relay:
+    environment:
+      - RELAY_API_KEY=${RELAY_API_KEY:-}
+    networks: [voidnet]
+
+  void-thinker:
+    image: ghcr.io/voidlabs/void-thinker:latest
+    environment:
+      - PORT=9090
+    networks: [voidnet]
+
+  void-event-agent:
+    image: curlimages/curl:8.10.1
+    command: ["sh", "-c", "while true; do TS=$(date -Iseconds); curl -sS -X POST http://relay:8787/event -H 'content-type: application/json' -d '{"type":"substrate","status":"beat","meta":{"k":0.9}}' >/dev/null; sleep 10; done"]
+    networks: [voidnet]
+
+networks: { voidnet: {} }

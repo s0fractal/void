@@ -1,0 +1,15 @@
+services:
+  void-antigone:
+    build:
+      context: ..
+      dockerfile: tools/antigone/docker/Dockerfile
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - DECISION_MODE=${DECISION_MODE:-warn}
+      - GENOME_PATH=/app/glyphs/core.yaml
+    networks: [ voidnet ]
+    ports: ["9495:9495"]
+    restart: unless-stopped
+
+networks:
+  voidnet: { external: true }

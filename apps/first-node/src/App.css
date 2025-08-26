@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Code editor customizations */
+.cm-editor {
+  height: 100%;
+}
+
+.cm-focused {
+  outline: none;
+}
+
+/* LiveKit component overrides */
+.lk-video-conference {
+  --lk-bg: #111827;
+  --lk-bg2: #1f2937;
+  --lk-bg3: #374151;
+  --lk-border-color: #4b5563;
+  --lk-control-bg: #374151;
+  --lk-control-hover-bg: #4b5563;
+  --lk-accent: #3b82f6;
+  --lk-accent-hover: #2563eb;
+}
+
+.lk-participant-tile {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.lk-chat {
+  background: #111827;
+  color: #f3f4f6;
+}
+
+.lk-chat-entry {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #f3f4f6;
+}
+
+/* Resonance indicator */
+@keyframes resonance {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.resonance-432hz {
+  animation: resonance 1.39s ease-in-out infinite;
+  /* 432Hz = 432 cycles/second, visual representation */
+}

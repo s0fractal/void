@@ -1,0 +1,41 @@
+services:
+  annotations-writer:
+    build:
+      context: ../exporters/annotations-writer
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - GRAFANA_URL=${GRAFANA_URL:-}
+      - GRAFANA_TOKEN=${GRAFANA_TOKEN:-}
+      - GRAFANA_DASHBOARD_ID=${GRAFANA_DASHBOARD_ID:-}
+      - PANEL_MAP_PATH=/app/panel-map.json
+      - PORT=9488
+      - ANNOTATE_TYPES=duality.patch,duality.rollback,duality.particle.cid,ci.result,ci.fail,ci.pass
+      - TAGS=void,duality,432Hz
+      - COLOR=00ff88
+    volumes:
+      - ../exporters/annotations-writer/panel-map.sample.json:/app/panel-map.json:ro
+    networks: [ voidnet ]
+    ports: ["9488:9488"]
+    restart: unless-stopped
+
+  cid-verifier:
+    build:
+      context: ../exporters/cid-verifier
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - DUALITY_SSE=/duality/sse
+      - IPFS_API=http://ipfs:5001
+      - GATEWAYS=${GATEWAYS:-https://ipfs.io,https://cloudflare-ipfs.com}
+      - VERIFY_INTERVAL_SEC=60
+      - LABEL_GATEWAY=true
+      - GW_TIMEOUT_MS=4000
+      - DIGEST=${DIGEST:-none}
+      - DIGEST_MAX_BYTES=${DIGEST_MAX_BYTES:-1048576}
+      - PORT=9489
+    networks: [ voidnet ]
+    ports: ["9489:9489"]
+    restart: unless-stopped
+
+networks:
+  voidnet: { external: true }

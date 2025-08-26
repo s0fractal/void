@@ -1,0 +1,37 @@
+⟁: addA
+🎯: pure-function-gene
+🧮: export function addA(a: number, b: number): number {
+    return a + b;
+}
+💭: "Gene with semantic protein hash"
+
+🧠:
+  description: "Pure function with semantic fingerprint"
+  signature: "auto-detected"
+  pure: true
+  
+hashing:
+  astHash: "a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95"
+  proteinHash: "phash:v1:sha256:b96c5d9086a76f67"
+  hybridId: "phash:v1:sha256:b96c5d9086a76f67|a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95"
+  
+protein_structure:
+  nodes: 2
+  edges: -5
+  complexity: -2.500
+  spectrum: [0.500, 0.500, 0.000, 0.000, 0.000]
+  
+semantic_addressing:
+  by_content: |
+    import { addA } from 'glyph://genes/a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95';
+    
+  by_meaning: |
+    import { addA } from 'glyph://proteins/phash:v1:sha256:b96c5d9086a76f67';
+    
+  by_hybrid: |
+    import { addA } from 'glyph://hybrid/phash:v1:sha256:b96c5d9086a76f67|a62068bb302622c2da37de01111927a7d2f353b61247449227f5f12b3aa58f95';
+
+resonance:
+  frequency: 432
+  pattern: "semantic-invariant"
+  confidence: 1.0

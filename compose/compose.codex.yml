@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  codex:
+    build: ./void-codex-api/server
+    image: void/codex-api:latest
+    restart: unless-stopped
+    environment:
+      - PORT=8788
+      - API_KEY=${CODEX_API_KEY:-}
+      - HMAC_SECRET=${CODEX_HMAC_SECRET:-}
+      - RATE_LIMIT_RATE=${RATE_LIMIT_RATE:-5}
+      - RATE_LIMIT_INTERVAL=${RATE_LIMIT_INTERVAL:-1000}
+      - RATE_LIMIT_BURST=${RATE_LIMIT_BURST:-20}
+      - PULSE_LOG_PATH=/data/pulse.log
+    volumes:
+      - codex-data:/data
+    networks: [voidnet]
+  relay:
+    environment:
+      - CODEX_URL=http://codex:8788
+      - CODEX_API_KEY=${CODEX_API_KEY:-}
+      - CODEX_HMAC_SECRET=${CODEX_HMAC_SECRET:-}
+volumes:
+  codex-data: {}

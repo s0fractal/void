@@ -1,0 +1,164 @@
+⟁: Category
+🎯: mathematical-category-foundation
+🧮: (Objects, Morphisms) → Category with composition
+💭: "Категорія як фундамент композиції"
+
+🧠:
+  description: "Category as composition foundation"
+  signature: "(Set<Obj>, Set<Morphism>) → Category"
+  pure: true
+  idempotent: true
+
+dependencies:
+  - glyph://set@foundation
+  - glyph://morphism@base
+
+structure:
+  Category:
+    objects: "Set<Object>"
+    morphisms: "Set<Morphism<A,B>>"
+    identity: "(A) → Morphism<A,A>"
+    compose: "(f: A→B, g: B→C) → (A→C)"
+    
+axioms:
+  identity_left: "id_B ∘ f = f"
+  identity_right: "f ∘ id_A = f"
+  associativity: "(h ∘ g) ∘ f = h ∘ (g ∘ f)"
+
+implementations:
+  Set:
+    ⟁: SetCategory
+    objects: "all sets"
+    morphisms: "functions between sets"
+    identity: "(A) => (x) => x"
+    compose: "(f, g) => (x) => g(f(x))"
+    
+  Type:
+    ⟁: TypeCategory
+    objects: "all types"
+    morphisms: "functions between types"
+    identity: "<T>(x: T): T => x"
+    compose: "<A,B,C>(f: A→B, g: B→C) => (a: A) => g(f(a))"
+    
+  Signal:
+    ⟁: SignalCategory
+    objects: "Signal<T> for all T"
+    morphisms: "signal transformations"
+    identity: "(sig) => sig"
+    compose: "(f, g) => (sig) => g(f(sig))"
+    
+  Glyph:
+    ⟁: GlyphCategory
+    objects: "all ⟁-glyphs"
+    morphisms: "glyph transformations"
+    identity: "(glyph) => glyph"
+    compose: |
+      (f, g) => (glyph) => ({
+        ...g(f(glyph)),
+        '🧮': `${f['🧮']} → ${g['🧮']}`
+      })
+
+special_categories:
+  Monoid:
+    ⟁: MonoidCategory
+    objects: "single object *"
+    morphisms: "monoid elements as endomorphisms"
+    identity: "monoid identity element"
+    compose: "monoid operation"
+    note: "Every monoid is a one-object category"
+    
+  Preorder:
+    ⟁: PreorderCategory
+    objects: "elements of preorder"
+    morphisms: "≤ relations (at most one between any two)"
+    identity: "reflexivity: a ≤ a"
+    compose: "transitivity: a ≤ b, b ≤ c ⟹ a ≤ c"
+    
+  Group:
+    ⟁: GroupCategory
+    objects: "single object *"
+    morphisms: "group elements (all invertible)"
+    identity: "group identity"
+    compose: "group operation"
+    inverse: "every morphism has inverse"
+
+category_constructors:
+  opposite:
+    ⟁: oppositeCategory
+    🧩: [C]
+    🧮: |
+      {
+        objects: C.objects,
+        morphisms: C.morphisms.map(f => ({
+          ...f,
+          source: f.target,
+          target: f.source,
+          '🧮': 'reversed'
+        })),
+        compose: (f, g) => C.compose(g, f)
+      }
+    🎯: "C^op - reverse all arrows"
+    
+  product:
+    ⟁: productCategory
+    🧩: [C, D]
+    🧮: |
+      {
+        objects: cartesianProduct(C.objects, D.objects),
+        morphisms: cartesianProduct(C.morphisms, D.morphisms),
+        identity: ([c, d]) => [C.identity(c), D.identity(d)],
+        compose: ([f1, g1], [f2, g2]) => 
+          [C.compose(f1, f2), D.compose(g1, g2)]
+      }
+    🎯: "C × D - componentwise operations"
+
+verification:
+  isCategory:
+    ⟁: verifyCategoryAxioms
+    🧩: [C]
+    🧮: |
+      const checkIdentity = C.objects.every(obj => {
+        const id = C.identity(obj);
+        return C.morphisms.every(f => 
+          f.source === obj ? C.compose(id, f) === f : true &&
+          f.target === obj ? C.compose(f, id) === f : true
+        );
+      });
+      
+      const checkAssociativity = // ... verify (h∘g)∘f = h∘(g∘f)
+      
+      return checkIdentity && checkAssociativity;
+    🎯: "Verify category axioms"
+
+usage:
+  simple: |
+    // Create Set category instance
+    const sets = new SetCategory();
+    const f = (x: number) => x * 2;
+    const g = (x: number) => x + 1;
+    const h = sets.compose(f, g); // x => (x * 2) + 1
+    
+  signal_category: |
+    // Signal transformations form a category
+    const sig = signal(5);
+    const double = (s: Signal<number>) => 
+      computed(() => s() * 2);
+    const increment = (s: Signal<number>) => 
+      computed(() => s() + 1);
+    
+    const transformed = SignalCategory.compose(double, increment)(sig);
+    // transformed() === 11
+    
+  glyph_composition: |
+    // Glyphs compose categorically
+    const router = await fnpm.install('glyph://router@semantic');
+    const conscious = await fnpm.install('glyph://consciousness@quantum');
+    
+    const composed = GlyphCategory.compose(router, conscious);
+    // Conscious router with semantic understanding
+
+resonance:
+  frequency: 432
+  pattern: "composition-as-computation"
+  insight: "Categories unify all compositional patterns"
+  emergence: "When morphisms realize they form a category"

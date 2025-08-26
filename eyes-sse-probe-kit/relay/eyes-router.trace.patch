@@ -1,0 +1,19 @@
+*** a/relay/eyes-router.js
+--- b/relay/eyes-router.js
+@@
+   router.post('/url', async (req, res) => {
+-    const url = String(req.body?.url || '').trim();
++    const url = String(req.body?.url || '').trim();
++    const trace_id = String(req.body?.trace_id || '').trim();
+@@
+-      const jr = await r.json();
++      const jr = await r.json();
+       if (!jr.ok) return res.status(502).json({ ok:false, error:'eyes_failed', detail: jr.error || null });
+
+-      const event = jr.event || { type:'eyes', status:'warn', meta:{ url, glyph_event:'dissonant_pulse' }, ts:new Date().toISOString() };
++      const event = jr.event || { type:'eyes', status:'warn', meta:{ url, glyph_event:'dissonant_pulse' }, ts:new Date().toISOString() };
++      // attach trace_id passthrough for end-to-end latency probes
++      if (trace_id) {
++        event.meta = event.meta || {};
++        event.meta.trace_id = trace_id;
++      }

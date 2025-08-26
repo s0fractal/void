@@ -1,0 +1,9 @@
+{
+  "type": "signal.wasm",
+  "module": "wasm/demo/kv-note@v0",
+  "url": "file://./modules/kv-note/artifacts/kv_note.wasm",
+  "sha256": "",
+  "inputs": {},
+  "caps": ["emit","kv"],
+  "limits": { "timeout_ms": 2000, "mem_mb": 128 }
+}

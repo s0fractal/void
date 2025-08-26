@@ -1,0 +1,102 @@
+*** a/relay/e2ee-router.js
+--- b/relay/e2ee-router.js
+@@
+-import express from 'express';
+-import { decodeEnvelope, decryptEnvelope } from '../src/providers/provider-util.js';
+-import { getProvider } from '../src/providers/select.js';
++import express from 'express';
++import { decodeEnvelope, decryptEnvelope } from '../src/providers/provider-util.js';
++import { getProvider } from '../src/providers/select.js';
++import client from 'prom-client';
+@@
+ export function e2eeRouter(){
+   const router = express.Router();
+   const enabled = process.env.E2EE_ENABLED === '1';
+   const acceptPlain = (process.env.E2EE_ACCEPT_PLAINTEXT ?? '1') === '1';
+   const SELF = process.env.RELAY_SELF || 'http://localhost:8787/event';
+   const API_KEY = process.env.RELAY_API_KEY || '';
++  const METRICS = (process.env.METRICS_E2EE_ENABLED ?? '1') === '1';
++
++  // ---- metrics ----
++  const reg = new client.Registry();
++  const cReq = new client.Counter({
++    name: 'void_e2ee_ingest_requests_total',
++    help: 'E2EE ingest requests',
++    labelNames: ['mode','status']
++  });
++  const hDur = new client.Histogram({
++    name: 'void_e2ee_ingest_duration_ms',
++    help: 'E2EE ingest duration (ms)',
++    labelNames: ['mode','status'],
++    buckets: [50,100,200,400,800,1500,3000,6000]
++  });
++  const cDecFail = new client.Counter({
++    name: 'void_e2ee_decrypt_failures_total',
++    help: 'E2EE decrypt failures'
++  });
++  const cFwd = new client.Counter({
++    name: 'void_e2ee_forward_intent_total',
++    help: 'Forwarded intents to /intent/wave'
++  });
++  const gFlags = new client.Gauge({
++    name: 'void_e2ee_overlay_flags',
++    help: 'Overlay flags',
++    labelNames: ['flag']
++  });
++  reg.registerMetric(cReq); reg.registerMetric(hDur); reg.registerMetric(cDecFail); reg.registerMetric(cFwd); reg.registerMetric(gFlags);
++  gFlags.labels('enabled').set(enabled ? 1 : 0);
++  gFlags.labels('accept_plaintext').set(acceptPlain ? 1 : 0);
+@@
+   router.post('/ingest', async (req,res) => {
+     if (!enabled) return res.status(404).json({ ok:false, error:'e2ee_disabled' });
+
+     const isEnvelope = typeof req.body?.ciphertext === 'string' && typeof req.body?.alg === 'string';
+     let inner = null, ad = null;
++    const t0 = Date.now();
+
+     if (isEnvelope){
+       try{
+         const provider = await getProvider();
+         const { plaintext, ad: _ad } = await decryptEnvelope(provider, req.body);
+         ad = _ad;
+         inner = JSON.parse(new TextDecoder().decode(plaintext));
+       }catch(e){
++        if (METRICS) {
++          cDecFail.inc();
++          cReq.labels('e2ee','err').inc();
++          hDur.labels('e2ee','err').observe(Date.now()-t0);
++        }
+         return res.status(400).json({ ok:false, error:'decrypt_failed', detail: String(e) });
+       }
+     } else {
+       if (!acceptPlain) return res.status(415).json({ ok:false, error:'plaintext_rejected' });
+       inner = req.body;
+     }
+
+     // Post raw intent/event into relay event bus
+     await postEvent(SELF, API_KEY, inner);
+
+     // Forward to /intent/wave if it looks like an intent
+     if (inner?.type === 'intent.wave') {
+       await forwardIntent(inner);
++      if (METRICS) cFwd.inc();
+     }
+
+-    return res.json({ ok:true, mode: isEnvelope?'e2ee':'plaintext', ad });
++    if (METRICS) {
++      const mode = isEnvelope ? 'e2ee' : 'plaintext';
++      cReq.labels(mode,'ok').inc();
++      hDur.labels(mode,'ok').observe(Date.now()-t0);
++    }
++    return res.json({ ok:true, mode: isEnvelope?'e2ee':'plaintext', ad });
+   });
+
++  if (METRICS) {
++    router.get('/metrics', async (_req, res) => {
++      res.set('Content-Type', reg.contentType);
++      res.end(await reg.metrics());
++    });
++  }
++
+   return router;
+ }

@@ -1,0 +1,23 @@
+services:
+  annotations-autopanel:
+    build:
+      context: ../exporters/annotations-writer
+      dockerfile: Dockerfile.autopanel
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - SSE_PATH=/sse
+      - GRAFANA_URL=${GRAFANA_URL:-}
+      - GRAFANA_TOKEN=${GRAFANA_TOKEN:-}
+      - AUTOPANEL_MAP_PATH=/app/autopanel-map.json
+      - CACHE_TTL_SEC=300
+      - PORT=9490
+      - ANNOTATE_TYPES=duality.patch,duality.rollback,duality.particle.cid,ci.result,ci.fail,ci.pass
+      - DEFAULT_TAGS=void,432Hz
+      - DEFAULT_COLOR=00ff88
+    volumes:
+      - ../exporters/annotations-writer/autopanel-map.sample.json:/app/autopanel-map.json:ro
+    networks: [ voidnet ]
+    ports: ["9490:9490"]
+    restart: unless-stopped
+networks:
+  voidnet: { external: true }

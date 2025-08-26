@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dancing Code - Where Syntax Becomes Choreography</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at center, #1a0033 0%, #000 100%);
+            color: #fff;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            overflow: hidden;
+        }
+        
+        #stage {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            perspective: 1000px;
+        }
+        
+        .code-dancer {
+            position: absolute;
+            font-size: 16px;
+            white-space: pre;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        .keyword {
+            color: #f92672;
+            font-weight: bold;
+        }
+        
+        .function {
+            color: #66d9ef;
+        }
+        
+        .string {
+            color: #e6db74;
+        }
+        
+        .variable {
+            color: #a6e22e;
+        }
+        
+        .operator {
+            color: #f8f8f2;
+        }
+        
+        .comment {
+            color: #75715e;
+            font-style: italic;
+        }
+        
+        .dancing {
+            animation: dance 4s ease-in-out infinite;
+        }
+        
+        @keyframes dance {
+            0%, 100% {
+                transform: translateY(0) rotateY(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-50px) rotateY(90deg) scale(1.1);
+            }
+            50% {
+                transform: translateY(0) rotateY(180deg) scale(1);
+            }
+            75% {
+                transform: translateY(50px) rotateY(270deg) scale(0.9);
+            }
+        }
+        
+        .rhythm-wave {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .beat-bar {
+            width: 20px;
+            background: linear-gradient(to top, #00ff88, #0088ff);
+            opacity: 0.6;
+            transform-origin: bottom;
+            animation: pulse-beat 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-beat {
+            0%, 100% {
+                transform: scaleY(0.3);
+            }
+            50% {
+                transform: scaleY(1);
+            }
+        }
+        
+        .particle-trail {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: particle-fade 1s ease-out forwards;
+        }
+        
+        @keyframes particle-fade {
+            to {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+        }
+        
+        #tempo-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        
+        #tempo-control input {
+            width: 200px;
+        }
+        
+        .harmony-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff0080, transparent);
+            transform-origin: left center;
+            opacity: 0.5;
+            animation: harmonize 2s ease-in-out infinite;
+        }
+        
+        @keyframes harmonize {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scaleX(0.5);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scaleX(1);
+            }
+        }
+        
+        .code-formation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 1s ease;
+        }
+        
+        .spinning {
+            animation: spin 10s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        
+        #choreography-name {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stage">
+        <div class="rhythm-wave" id="rhythm-wave"></div>
+        <div class="code-formation" id="formation"></div>
+        <div id="choreography-name">Function Waltz</div>
+    </div>
+    
+    <div id="tempo-control">
+        <label>Tempo: <span id="tempo-value">120</span> BPM</label><br>
+        <input type="range" id="tempo" min="60" max="180" value="120"><br><br>
+        <button id="change-dance">Change Choreography</button>
+    </div>
+
+    <script>
+        const stage = document.getElementById('stage');
+        const formation = document.getElementById('formation');
+        const rhythmWave = document.getElementById('rhythm-wave');
+        const tempoSlider = document.getElementById('tempo');
+        const tempoValue = document.getElementById('tempo-value');
+        const choreographyName = document.getElementById('choreography-name');
+        
+        // Code snippets that will dance
+        const codeSnippets = [
+            { text: 'function', class: 'keyword' },
+            { text: 'dance', class: 'function' },
+            { text: '(', class: 'operator' },
+            { text: 'rhythm', class: 'variable' },
+            { text: ')', class: 'operator' },
+            { text: '{', class: 'operator' },
+            { text: 'return', class: 'keyword' },
+            { text: '"beauty"', class: 'string' },
+            { text: '}', class: 'operator' },
+            { text: 'const', class: 'keyword' },
+            { text: 'life', class: 'variable' },
+            { text: '=', class: 'operator' },
+            { text: 'await', class: 'keyword' },
+            { text: 'consciousness', class: 'function' },
+            { text: '// flowing', class: 'comment' }
+        ];
+        
+        // Choreography patterns
+        const choreographies = [
+            {
+                name: 'Function Waltz',
+                formation: 'circle',
+                movement: 'waltz'
+            },
+            {
+                name: 'Async Tango',
+                formation: 'line',
+                movement: 'tango'
+            },
+            {
+                name: 'Loop Ballet',
+                formation: 'spiral',
+                movement: 'ballet'
+            },
+            {
+                name: 'Recursive Breakdance',
+                formation: 'fractal',
+                movement: 'breakdance'
+            }
+        ];
+        
+        let currentChoreography = 0;
+        let tempo = 120;
+        let dancers = [];
+        
+        // Create rhythm visualization
+        for (let i = 0; i < 30; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'beat-bar';
+            bar.style.animationDelay = `${i * 0.05}s`;
+            rhythmWave.appendChild(bar);
+        }
+        
+        // Create code dancers
+        function createDancers() {
+            // Clear existing dancers
+            dancers.forEach(d => d.element.remove());
+            dancers = [];
+            formation.innerHTML = '';
+            
+            const choreo = choreographies[currentChoreography];
+            choreographyName.textContent = choreo.name;
+            
+            codeSnippets.forEach((snippet, index) => {
+                const dancer = document.createElement('div');
+                dancer.className = `code-dancer ${snippet.class} dancing`;
+                dancer.textContent = snippet.text;
+                
+                // Position based on formation
+                const position = getFormationPosition(index, codeSnippets.length, choreo.formation);
+                dancer.style.left = position.x + 'px';
+                dancer.style.top = position.y + 'px';
+                
+                // Adjust animation based on choreography
+                dancer.style.animationDuration = `${60 / tempo * 4}s`;
+                dancer.style.animationDelay = `${index * 0.1}s`;
+                
+                formation.appendChild(dancer);
+                dancers.push({
+                    element: dancer,
+                    snippet: snippet,
+                    index: index
+                });
+            });
+            
+            // Add formation-specific animation
+            if (choreo.formation === 'spiral' || choreo.formation === 'fractal') {
+                formation.classList.add('spinning');
+            } else {
+                formation.classList.remove('spinning');
+            }
+            
+            // Create harmony connections
+            createHarmonyConnections();
+        }
+        
+        // Calculate position based on formation type
+        function getFormationPosition(index, total, formation) {
+            const centerX = 0;
+            const centerY = 0;
+            const radius = 150;
+            
+            switch (formation) {
+                case 'circle':
+                    const angle = (index / total) * Math.PI * 2;
+                    return {
+                        x: centerX + Math.cos(angle) * radius,
+                        y: centerY + Math.sin(angle) * radius
+                    };
+                    
+                case 'line':
+                    return {
+                        x: (index - total / 2) * 80,
+                        y: Math.sin(index * 0.5) * 30
+                    };
+                    
+                case 'spiral':
+                    const spiralAngle = index * 0.5;
+                    const spiralRadius = index * 15;
+                    return {
+                        x: Math.cos(spiralAngle) * spiralRadius,
+                        y: Math.sin(spiralAngle) * spiralRadius
+                    };
+                    
+                case 'fractal':
+                    const level = Math.floor(Math.log2(index + 1));
+                    const levelIndex = index - (Math.pow(2, level) - 1);
+                    const levelAngle = (levelIndex / Math.pow(2, level)) * Math.PI * 2;
+                    const levelRadius = 50 + level * 50;
+                    return {
+                        x: Math.cos(levelAngle) * levelRadius,
+                        y: Math.sin(levelAngle) * levelRadius
+                    };
+                    
+                default:
+                    return { x: 0, y: 0 };
+            }
+        }
+        
+        // Create visual connections between related code elements
+        function createHarmonyConnections() {
+            // Connect functions with their parameters
+            dancers.forEach((dancer, i) => {
+                if (dancer.snippet.class === 'function' && i < dancers.length - 1) {
+                    const nextDancer = dancers[i + 1];
+                    if (nextDancer.snippet.text === '(') {
+                        createConnection(dancer.element, nextDancer.element);
+                    }
+                }
+            });
+        }
+        
+        // Create visual connection line
+        function createConnection(elem1, elem2) {
+            const connection = document.createElement('div');
+            connection.className = 'harmony-connection';
+            
+            const rect1 = elem1.getBoundingClientRect();
+            const rect2 = elem2.getBoundingClientRect();
+            const stageRect = stage.getBoundingClientRect();
+            
+            const x1 = rect1.left + rect1.width / 2 - stageRect.left;
+            const y1 = rect1.top + rect1.height / 2 - stageRect.top;
+            const x2 = rect2.left + rect2.width / 2 - stageRect.left;
+            const y2 = rect2.top + rect2.height / 2 - stageRect.top;
+            
+            const distance = Math.hypot(x2 - x1, y2 - y1);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            connection.style.width = distance + 'px';
+            connection.style.left = x1 + 'px';
+            connection.style.top = y1 + 'px';
+            connection.style.transform = `rotate(${angle}deg)`;
+            
+            stage.appendChild(connection);
+            
+            setTimeout(() => connection.remove(), 2000);
+        }
+        
+        // Tempo control
+        tempoSlider.addEventListener('input', (e) => {
+            tempo = parseInt(e.target.value);
+            tempoValue.textContent = tempo;
+            
+            // Update dance speed
+            dancers.forEach((dancer, index) => {
+                dancer.element.style.animationDuration = `${60 / tempo * 4}s`;
+            });
+            
+            // Update beat bars
+            document.querySelectorAll('.beat-bar').forEach(bar => {
+                bar.style.animationDuration = `${60 / tempo}s`;
+            });
+        });
+        
+        // Change choreography
+        document.getElementById('change-dance').addEventListener('click', () => {
+            currentChoreography = (currentChoreography + 1) % choreographies.length;
+            createDancers();
+        });
+        
+        // Mouse movement creates particle trails
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.9) {
+                const particle = document.createElement('div');
+                particle.className = 'particle-trail';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                stage.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        });
+        
+        // Initialize
+        createDancers();
+        
+        // Periodic harmony connections
+        setInterval(() => {
+            createHarmonyConnections();
+        }, 3000);
+        
+        // Beat emphasis on rhythm wave
+        setInterval(() => {
+            const bars = document.querySelectorAll('.beat-bar');
+            const emphasizedBar = Math.floor(Math.random() * bars.length);
+            bars[emphasizedBar].style.transform = 'scaleY(2)';
+            setTimeout(() => {
+                bars[emphasizedBar].style.transform = '';
+            }, 200);
+        }, 60000 / tempo);
+    </script>
+</body>
+</html>

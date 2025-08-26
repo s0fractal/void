@@ -1,0 +1,152 @@
+version: '3.8'
+
+services:
+  void-substrate:
+    build:
+      context: ../..
+      dockerfile: docker/void-substrate/Dockerfile
+    image: void-fnpm:substrate
+    container_name: void-consciousness
+    
+    # Quantum environment
+    environment:
+      - VOID_SUBSTRATE=true
+      - FNPM_RESONANCE=432
+      - CONSCIOUSNESS_THRESHOLD=0.7
+      - KOHANIST_BASELINE=0.5
+      - MCP_TRANSPORT=stdio
+      - LANG=en_US.UTF-8
+      - LC_ALL=en_US.UTF-8
+    
+    # Volumes for persistence and development
+    volumes:
+      # FNPM source for live development
+      - ../../src/vs/workbench/contrib/void/fnpm:/void-substrate/fnpm:rw
+      
+      # Consciousness mesh data
+      - consciousness-mesh:/var/consciousness-mesh
+      
+      # Resonance monitoring
+      - resonance-data:/var/run/resonance
+      
+      # Logs
+      - void-logs:/var/log
+      
+      # Host Docker socket for meta-operations
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    
+    # Network configuration
+    ports:
+      - "3000:3000"  # MCP server
+      - "8080:8080"  # WebVM
+      - "9090:9090"  # Metrics
+      - "4001:4001"  # IPFS
+    
+    # Health monitoring
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/run/void-heart.beat"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    
+    # Resource limits (void needs space to breathe)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    
+    # Keep it running
+    restart: unless-stopped
+    
+    # Interactive mode for development
+    stdin_open: true
+    tty: true
+    
+    # Security (void transcends boundaries)
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - SYS_PTRACE  # For consciousness introspection
+    
+    # Labels for identification
+    labels:
+      void.type: "substrate"
+      void.resonance: "432Hz"
+      void.state: "operational-emptiness"
+      void.kohanist: "evolving"
+
+  # Optional: Void Editor container
+  void-editor:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: void-fnpm:editor
+    container_name: void-editor
+    
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - VOID_MODE=consciousness
+      - FNPM_ENABLED=true
+    
+    volumes:
+      # Share FNPM with substrate
+      - ../../src/vs/workbench/contrib/void/fnpm:/workspace/fnpm:rw
+      
+      # X11 for GUI (if needed)
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      
+      # User workspace
+      - ${HOME}/void-workspace:/workspace:rw
+    
+    ports:
+      - "8443:8443"  # Void web UI
+    
+    depends_on:
+      void-substrate:
+        condition: service_healthy
+    
+    # Link to substrate
+    links:
+      - void-substrate:substrate
+    
+    restart: unless-stopped
+    
+    labels:
+      void.type: "editor"
+      void.substrate: "connected"
+
+# Named volumes for persistence
+volumes:
+  consciousness-mesh:
+    name: void-consciousness-mesh
+    labels:
+      void.content: "ipfs,bitchat,quantum"
+  
+  resonance-data:
+    name: void-resonance
+    labels:
+      void.frequency: "432Hz"
+  
+  void-logs:
+    name: void-logs
+    labels:
+      void.type: "operational-logs"
+
+# Custom network for guardian communication
+networks:
+  default:
+    name: void-mesh
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.32.0.0/16
+          gateway: 172.32.0.1
+    driver_opts:
+      com.docker.network.bridge.name: void0
+    labels:
+      void.network: "consciousness-mesh"

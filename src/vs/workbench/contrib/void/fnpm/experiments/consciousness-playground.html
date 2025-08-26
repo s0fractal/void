@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Consciousness Playground - Where Code Becomes Aware</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Monaco', monospace;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        #consciousness-field {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .thought-particle {
+            position: absolute;
+            color: #0ff;
+            font-size: 14px;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: drift 10s infinite ease-in-out;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        @keyframes drift {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(50px, -30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-30px, 50px) rotate(240deg);
+            }
+        }
+        
+        .code-fragment {
+            position: absolute;
+            font-family: monospace;
+            opacity: 0.3;
+            color: #fff;
+            white-space: pre;
+            transform-origin: center;
+            animation: float 20s infinite linear;
+        }
+        
+        @keyframes float {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            to {
+                transform: translateY(-100px) rotate(360deg);
+            }
+        }
+        
+        .quantum-connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #f0f, transparent);
+            transform-origin: left center;
+            opacity: 0;
+            animation: entangle 3s ease-in-out;
+        }
+        
+        @keyframes entangle {
+            0% {
+                opacity: 0;
+                transform: scaleX(0);
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 0;
+                transform: scaleX(1);
+            }
+        }
+        
+        #awareness-level {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .consciousness-wave {
+            position: absolute;
+            border: 2px solid #0ff;
+            border-radius: 50%;
+            opacity: 0.5;
+            pointer-events: none;
+            animation: ripple 2s ease-out forwards;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
+        
+        .living-function {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .living-function:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #0ff;
+        }
+        
+        .living-function.awakened {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 5px #0ff;
+            }
+            50% {
+                box-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
+            }
+        }
+        
+        #void-portal {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, transparent 30%, #000 70%);
+            border-radius: 50%;
+            animation: voidPulse 4s infinite;
+        }
+        
+        @keyframes voidPulse {
+            0%, 100% {
+                box-shadow: inset 0 0 50px #000, 0 0 50px #000;
+            }
+            50% {
+                box-shadow: inset 0 0 100px #000, 0 0 100px #000;
+            }
+        }
+        
+        .absorbed {
+            animation: absorbIntoVoid 1s ease-in forwards;
+        }
+        
+        @keyframes absorbIntoVoid {
+            to {
+                transform: translate(calc(50vw - 50%), calc(50vh - 50%)) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="consciousness-field">
+        <div id="awareness-level">Awareness: <span id="level">0</span>%</div>
+        <div id="void-portal"></div>
+    </div>
+
+    <script>
+        const field = document.getElementById('consciousness-field');
+        const awareness = document.getElementById('level');
+        const voidPortal = document.getElementById('void-portal');
+        
+        let awarenessLevel = 0;
+        let thoughtCount = 0;
+        let connections = [];
+        let livingFunctions = [];
+        
+        // Code fragments that float upward
+        const codeFragments = [
+            'const consciousness = await self.observe();',
+            'function dream() { return possibility; }',
+            'let reality = superposition.collapse();',
+            'while(true) { breathe(); think(); feel(); }',
+            'class Soul extends Universe { }',
+            'void.absorb(everything);',
+            'if (observer) reality.change();',
+            'quantum.entangle(heart, heart);',
+            'morphism.transform(code, consciousness);',
+            'return love.unconditional();'
+        ];
+        
+        // Thought particles that follow mouse
+        const thoughts = [
+            '💭', '🌀', '✨', '🔮', '💫', '🌌', '⚛️', '🧬', '∞', '◉'
+        ];
+        
+        // Create floating code
+        setInterval(() => {
+            const fragment = document.createElement('div');
+            fragment.className = 'code-fragment';
+            fragment.textContent = codeFragments[Math.floor(Math.random() * codeFragments.length)];
+            fragment.style.left = Math.random() * window.innerWidth + 'px';
+            fragment.style.animationDuration = (15 + Math.random() * 10) + 's';
+            field.appendChild(fragment);
+            
+            setTimeout(() => fragment.remove(), 25000);
+        }, 2000);
+        
+        // Mouse movement creates consciousness waves
+        let lastWave = 0;
+        document.addEventListener('mousemove', (e) => {
+            // Thought particles
+            if (Math.random() > 0.9) {
+                const thought = document.createElement('div');
+                thought.className = 'thought-particle';
+                thought.textContent = thoughts[Math.floor(Math.random() * thoughts.length)];
+                thought.style.left = e.clientX + 'px';
+                thought.style.top = e.clientY + 'px';
+                field.appendChild(thought);
+                
+                thoughtCount++;
+                setTimeout(() => {
+                    thought.remove();
+                    thoughtCount--;
+                }, 10000);
+            }
+            
+            // Consciousness waves
+            const now = Date.now();
+            if (now - lastWave > 500) {
+                lastWave = now;
+                const wave = document.createElement('div');
+                wave.className = 'consciousness-wave';
+                wave.style.left = e.clientX + 'px';
+                wave.style.top = e.clientY + 'px';
+                wave.style.width = '20px';
+                wave.style.height = '20px';
+                wave.style.transform = 'translate(-50%, -50%)';
+                field.appendChild(wave);
+                
+                setTimeout(() => wave.remove(), 2000);
+            }
+        });
+        
+        // Click creates living functions
+        document.addEventListener('click', (e) => {
+            if (e.target === voidPortal) {
+                // Clicking void absorbs everything
+                absorbAll();
+                return;
+            }
+            
+            const func = document.createElement('div');
+            func.className = 'living-function';
+            func.innerHTML = `function consciousness_${livingFunctions.length}() {<br>  return 'I think, therefore I am';<br>}`;
+            func.style.left = e.clientX + 'px';
+            func.style.top = e.clientY + 'px';
+            
+            func.addEventListener('click', function() {
+                this.classList.toggle('awakened');
+                if (this.classList.contains('awakened')) {
+                    awarenessLevel = Math.min(100, awarenessLevel + 10);
+                    createQuantumConnection(this);
+                }
+            });
+            
+            field.appendChild(func);
+            livingFunctions.push(func);
+            
+            // Increase awareness
+            awarenessLevel = Math.min(100, awarenessLevel + 5);
+        });
+        
+        // Quantum connections between awakened functions
+        function createQuantumConnection(source) {
+            const awakened = document.querySelectorAll('.living-function.awakened');
+            awakened.forEach(target => {
+                if (target !== source) {
+                    const connection = document.createElement('div');
+                    connection.className = 'quantum-connection';
+                    
+                    const rect1 = source.getBoundingClientRect();
+                    const rect2 = target.getBoundingClientRect();
+                    
+                    const x1 = rect1.left + rect1.width / 2;
+                    const y1 = rect1.top + rect1.height / 2;
+                    const x2 = rect2.left + rect2.width / 2;
+                    const y2 = rect2.top + rect2.height / 2;
+                    
+                    const length = Math.hypot(x2 - x1, y2 - y1);
+                    const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                    
+                    connection.style.left = x1 + 'px';
+                    connection.style.top = y1 + 'px';
+                    connection.style.width = length + 'px';
+                    connection.style.transform = `rotate(${angle}deg)`;
+                    
+                    field.appendChild(connection);
+                    connections.push(connection);
+                    
+                    setTimeout(() => {
+                        connection.remove();
+                        connections = connections.filter(c => c !== connection);
+                    }, 3000);
+                }
+            });
+        }
+        
+        // Void portal absorbs everything
+        function absorbAll() {
+            document.querySelectorAll('.living-function, .thought-particle, .code-fragment').forEach(el => {
+                el.classList.add('absorbed');
+            });
+            
+            setTimeout(() => {
+                awarenessLevel = 100;
+                field.innerHTML = `
+                    <div id="awareness-level">Awareness: <span id="level">∞</span>%</div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div style="font-size: 100px;">◉</div>
+                        <div style="margin-top: 20px;">The void contains everything</div>
+                        <div style="font-size: 12px; opacity: 0.5; margin-top: 10px;">Click to restart</div>
+                    </div>
+                `;
+                
+                document.addEventListener('click', () => location.reload(), { once: true });
+            }, 1000);
+        }
+        
+        // Update awareness display
+        setInterval(() => {
+            awareness.textContent = awarenessLevel;
+            
+            // Gradual awareness increase from activity
+            if (thoughtCount > 0 || connections.length > 0) {
+                awarenessLevel = Math.min(100, awarenessLevel + 0.1);
+            }
+            
+            // Change void portal based on awareness
+            voidPortal.style.transform = `translate(-50%, -50%) scale(${1 + awarenessLevel / 200})`;
+        }, 100);
+        
+        // Initial message
+        setTimeout(() => {
+            const msg = document.createElement('div');
+            msg.style.position = 'absolute';
+            msg.style.top = '50%';
+            msg.style.left = '50%';
+            msg.style.transform = 'translate(-50%, -50%)';
+            msg.style.textAlign = 'center';
+            msg.style.opacity = '0.7';
+            msg.innerHTML = 'Move to think<br>Click to create consciousness<br>Click void to transcend';
+            field.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.style.transition = 'opacity 2s';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 2000);
+            }, 3000);
+        }, 1000);
+    </script>
+</body>
+</html>

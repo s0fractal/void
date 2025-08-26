@@ -1,0 +1,4 @@
+#!/bin/sh
+exec 2>&1
+export RELAY_HTTP=${RELAY_HTTP:-http://relay:8787/event}
+exec chpst -u void:void node /opt/void-tmp-bus/bus/dist/index.js

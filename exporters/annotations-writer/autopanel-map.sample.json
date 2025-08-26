@@ -1,0 +1,15 @@
+{
+  "defaults": {
+    "dashboardTitle": "Duality · Particle/Wave + CID",
+    "tags": ["void","duality","432Hz"],
+    "color": "00ff88"
+  },
+  "map": {
+    "duality.patch":    { "dashboardTitle": "Duality · Particle/Wave + CID", "panelTitle": "Interference" },
+    "duality.rollback": { "dashboardTitle": "Duality · Particle/Wave + CID", "panelTitle": "Interference" },
+    "duality.particle.cid": { "dashboardTitle": "Duality · Particle/Wave + CID", "panelTitle": "Pins OK/ERR" },
+    "ci.pass":  { "dashboardTitle": "Unified", "panelTitle": "CI Builds" },
+    "ci.fail":  { "dashboardTitle": "Unified", "panelTitle": "CI Builds" },
+    "ci.result":{ "dashboardTitle": "Unified", "panelTitle": "CI Builds" }
+  }
+}

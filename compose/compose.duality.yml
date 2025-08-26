@@ -1,0 +1,12 @@
+services:
+  duality-exporter:
+    build:
+      context: ../exporters/duality-exporter
+    environment:
+      - RELAY_BASE=http://relay:8787
+      - PORT=9486
+    networks: [ voidnet ]
+    ports: ["9486:9486"]
+    restart: unless-stopped
+networks:
+  voidnet: { external: true }

@@ -1,0 +1,17 @@
+groups:
+- name: cid.gateways.digest
+  rules:
+  - alert: GatewayErrors
+    expr: sum(rate(void_cid_gateway_total{result=~"bad|error"}[10m])) > 0
+    for: 10m
+    labels: { severity: warning }
+    annotations:
+      summary: "Гейтвеї дають помилки або погану віддачу"
+      action: "Перевірити конкретний шлюз; тимчасово вилучити з ротації"
+  - alert: DigestMismatch
+    expr: sum(rate(void_cid_digest_total{result="mismatch"}[10m])) > 0
+    for: 5m
+    labels: { severity: critical }
+    annotations:
+      summary: "Digest не співпав із CID"
+      action: "Ізолювати джерело контенту, перевірити ланцюг доставки"

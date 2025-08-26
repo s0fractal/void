@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Prometheus exporter for tmpbus
+  tmpbus-exporter:
+    build:
+      context: ./exporter
+      dockerfile: Dockerfile
+    container_name: tmpbus-exporter
+    restart: unless-stopped
+    ports:
+      - "9479:9479"
+    environment:
+      - METRICS_PORT=9479
+      - POLL_INTERVAL=5000
+    volumes:
+      # Share socket directory for commands.sock
+      - /tmp/void:/tmp/void:ro
+    networks:
+      - voidnet
+    depends_on:
+      - tmpbus
+    labels:
+      - "void.component=metrics"
+      - "void.prometheus=true"
+
+  # Prometheus server
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/void-tmpbus-rules.yml:/etc/prometheus/void-tmpbus-rules.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    networks:
+      - voidnet
+    labels:
+      - "void.component=monitoring"
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"  # Avoid conflict with dashboard
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=void432
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - voidnet
+    depends_on:
+      - prometheus
+    labels:
+      - "void.component=visualization"
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  voidnet:
+    external: true

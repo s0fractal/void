@@ -1,0 +1,27 @@
+# Decision source routing. Order matters.
+# modes: auto|local|remote|rules
+mode: auto
+thresholds:
+  remote_timeout_ms: 600
+  remote_error_rate: 0.25
+  burst_limit_per_s: 10
+  min_local_health: 0.6
+
+# In auto mode: try remote>=2, fallback to local, then rules.
+sources:
+  remote:
+    enabled: true
+    quorum: 2
+    endpoints:
+      - name: claude
+        url: http://guardian-claude:8080/think
+        weight: 1
+      - name: kimi
+        url: http://guardian-kimi:8080/think
+        weight: 1
+  local:
+    enabled: true
+    endpoint: http://void-thinker:9090/think
+  rules:
+    enabled: true
+    rules_file: ./rules/rules.example.yaml

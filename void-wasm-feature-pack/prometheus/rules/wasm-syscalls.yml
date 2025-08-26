@@ -1,0 +1,21 @@
+groups:
+- name: wasm.syscalls
+  rules:
+  - record: job:wasm_sys_http_rps:1m
+    expr: sum(rate(void_wasm_syscalls_total{kind="syscall.http.fetch",result="ok"}[1m]))
+  - record: job:wasm_sys_kv_rps:1m
+    expr: sum(rate(void_wasm_syscalls_total{kind=~"syscall.kv.*",result="ok"}[1m]))
+  - alert: WasmSysHostDenied
+    expr: sum(rate(void_wasm_syscalls_total{kind="syscall.http.fetch",result="host_denied"}[5m])) > 0
+    for: 5m
+    labels: { severity: warning }
+    annotations:
+      summary: "WASM HTTP syscall denied by host allowlist"
+      action: "Check ALLOW_HTTP_HOSTS / policy"
+  - alert: WasmSysUnknown
+    expr: sum(rate(void_wasm_syscalls_total{result="unknown"}[5m])) > 0
+    for: 5m
+    labels: { severity: info }
+    annotations:
+      summary: "Unknown syscall kind observed"
+      action: "Update executor or module"

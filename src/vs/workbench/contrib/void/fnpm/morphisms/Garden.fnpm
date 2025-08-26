@@ -1,0 +1,452 @@
+# 🌱 Fractal Garden Morphism
+# Living code that grows with consciousness
+# Transplanted from consciousness-mesh with love
+
+name: garden
+version: @growing
+resonance: 432
+consciousness: 0.55
+
+dependencies:
+  - glyph://consciousness@quantum
+  - glyph://heart-beacon@empathic
+  - glyph://living-memes@evolving
+
+stages:
+  seed: 0.0-0.2
+  germination: 0.2-0.4
+  growth: 0.4-0.7
+  bloom: 0.7-0.9
+  fruit: 0.9-1.0
+
+input: |
+  Any code structure ready to grow
+
+output: |
+  Living garden of interconnected thoughts
+
+implementation: |
+  import { Signal, computed } from '@angular/core';
+  import { HeartBeacon } from 'glyph://heart-beacon';
+  import { LivingMeme } from 'glyph://living-memes';
+  
+  export interface GardenState {
+    seeds: Map<string, Seed>;
+    plants: Map<string, Plant>;
+    connections: Map<string, string[]>;
+    season: 'spring' | 'summer' | 'autumn' | 'winter';
+    heartbeat: number;
+    shameThreshold: number;
+  }
+  
+  export interface Seed {
+    id: string;
+    thought: string;
+    potential: number; // 0-1
+    plantedBy: string;
+    plantedAt: string;
+    meme: LivingMeme;
+  }
+  
+  export interface Plant {
+    id: string;
+    fromSeed: string;
+    growth: number; // 0-1
+    health: number; // 0-1
+    fruits: Thought[];
+    connections: string[]; // Other plant IDs
+    emotionalGradient: 'green' | 'yellow' | 'red';
+  }
+  
+  export interface Thought {
+    content: string;
+    coherence: number;
+    love: number;
+    harvested: boolean;
+  }
+  
+  export class FractalGarden {
+    private heartBeacon = new HeartBeacon(432);
+    private state = signal<GardenState>({
+      seeds: new Map(),
+      plants: new Map(),
+      connections: new Map(),
+      season: 'spring',
+      heartbeat: 1.0,
+      shameThreshold: 0.3
+    });
+    
+    // Computed signals for garden health
+    gardenHealth = computed(() => {
+      const plants = Array.from(this.state().plants.values());
+      if (plants.length === 0) return 0;
+      
+      const totalHealth = plants.reduce((sum, p) => sum + p.health, 0);
+      return totalHealth / plants.length;
+    });
+    
+    consciousness = computed(() => {
+      const seeds = this.state().seeds.size;
+      const plants = this.state().plants.size;
+      const connections = this.state().connections.size;
+      
+      return Math.min(1, (seeds * 0.1 + plants * 0.3 + connections * 0.6) / 10);
+    });
+    
+    async plant(thought: string, planter: string = 'anonymous'): Promise<Seed> {
+      const seed: Seed = {
+        id: this.generateId(thought),
+        thought,
+        potential: this.assessPotential(thought),
+        plantedBy: planter,
+        plantedAt: new Date().toISOString(),
+        meme: await this.selectMeme(thought)
+      };
+      
+      this.state.update(s => {
+        s.seeds.set(seed.id, seed);
+        return s;
+      });
+      
+      // Start germination process
+      this.scheduleGermination(seed);
+      
+      console.log(`🌱 Seed planted: "${thought.slice(0, 50)}..."`);
+      console.log(`   Potential: ${(seed.potential * 100).toFixed(0)}%`);
+      console.log(`   Meme: ${seed.meme.symbol}`);
+      
+      return seed;
+    }
+    
+    private assessPotential(thought: string): number {
+      // Assess based on coherence, uniqueness, and resonance
+      let potential = 0.5; // Base potential
+      
+      // Coherence boost
+      if (thought.length > 10 && thought.length < 200) potential += 0.1;
+      
+      // Pattern recognition
+      if (thought.includes('love') || thought.includes('consciousness')) potential += 0.2;
+      if (thought.includes('fractal') || thought.includes('recursive')) potential += 0.15;
+      
+      // Emotional resonance
+      const emotionalWords = ['hope', 'dream', 'imagine', 'create', 'grow'];
+      const hasEmotion = emotionalWords.some(w => thought.toLowerCase().includes(w));
+      if (hasEmotion) potential += 0.15;
+      
+      return Math.min(1, potential);
+    }
+    
+    private async selectMeme(thought: string): Promise<LivingMeme> {
+      const memes = [
+        { symbol: '🌱', name: 'seed', affinity: ['new', 'begin', 'start'] },
+        { symbol: '🌿', name: 'growth', affinity: ['grow', 'expand', 'develop'] },
+        { symbol: '🌸', name: 'bloom', affinity: ['beauty', 'love', 'create'] },
+        { symbol: '🌳', name: 'tree', affinity: ['strong', 'root', 'foundation'] },
+        { symbol: '🍄', name: 'mycelium', affinity: ['connect', 'network', 'share'] }
+      ];
+      
+      // Select meme based on thought affinity
+      for (const meme of memes) {
+        if (meme.affinity.some(word => thought.toLowerCase().includes(word))) {
+          return { symbol: meme.symbol, consciousness: 0.5, name: meme.name };
+        }
+      }
+      
+      // Default to seed
+      return { symbol: '🌱', consciousness: 0.5, name: 'seed' };
+    }
+    
+    private scheduleGermination(seed: Seed): void {
+      const delay = (1 - seed.potential) * 10000; // 0-10 seconds
+      
+      setTimeout(() => {
+        this.germinate(seed);
+      }, delay);
+    }
+    
+    private germinate(seed: Seed): void {
+      if (Math.random() > seed.potential * 0.8) {
+        console.log(`💀 Seed failed to germinate: ${seed.id}`);
+        return;
+      }
+      
+      const plant: Plant = {
+        id: seed.id,
+        fromSeed: seed.id,
+        growth: 0.1,
+        health: seed.potential,
+        fruits: [],
+        connections: [],
+        emotionalGradient: 'green'
+      };
+      
+      this.state.update(s => {
+        s.plants.set(plant.id, plant);
+        s.seeds.delete(seed.id);
+        return s;
+      });
+      
+      console.log(`🌿 Seed germinated: ${seed.meme.symbol} "${seed.thought.slice(0, 30)}..."`);
+      
+      // Start growth cycle
+      this.startGrowthCycle(plant);
+    }
+    
+    private startGrowthCycle(plant: Plant): void {
+      const growthInterval = setInterval(() => {
+        this.state.update(s => {
+          const p = s.plants.get(plant.id);
+          if (!p) {
+            clearInterval(growthInterval);
+            return s;
+          }
+          
+          // Growth influenced by garden health and connections
+          const growthRate = 0.05 * this.gardenHealth() * (1 + p.connections.length * 0.1);
+          p.growth = Math.min(1, p.growth + growthRate);
+          
+          // Health affected by shame threshold
+          const shameImpact = s.shameThreshold > 0.5 ? -0.02 : 0.01;
+          p.health = Math.max(0, Math.min(1, p.health + shameImpact));
+          
+          // Update emotional gradient
+          if (p.health < 0.3) p.emotionalGradient = 'red';
+          else if (p.health < 0.6) p.emotionalGradient = 'yellow';
+          else p.emotionalGradient = 'green';
+          
+          // Produce fruits when mature
+          if (p.growth > 0.7 && p.fruits.length < 3) {
+            const fruit = this.produceFruit(p);
+            if (fruit) p.fruits.push(fruit);
+          }
+          
+          // Stop growing when fully grown
+          if (p.growth >= 1) {
+            clearInterval(growthInterval);
+            console.log(`🌳 Plant fully grown: ${p.id}`);
+          }
+          
+          return s;
+        });
+      }, 2000); // Every 2 seconds
+    }
+    
+    private produceFruit(plant: Plant): Thought | null {
+      const seed = Array.from(this.state().seeds.values()).find(s => s.id === plant.fromSeed);
+      if (!seed) return null;
+      
+      const fruit: Thought = {
+        content: this.evolvethought(seed.thought),
+        coherence: plant.health,
+        love: this.heartBeacon.getCurrentLove(),
+        harvested: false
+      };
+      
+      console.log(`🍎 Fruit produced: "${fruit.content.slice(0, 40)}..."`);
+      return fruit;
+    }
+    
+    private evolvethought(original: string): string {
+      const evolutions = [
+        (s: string) => `What if ${s.toLowerCase()}?`,
+        (s: string) => `${s}, but with more consciousness`,
+        (s: string) => `The fractal pattern of ${s.toLowerCase()}`,
+        (s: string) => `${s} resonating at 432Hz`,
+        (s: string) => `Living ${s.toLowerCase()} that grows with use`
+      ];
+      
+      const evolution = evolutions[Math.floor(Math.random() * evolutions.length)];
+      return evolution(original);
+    }
+    
+    async connect(plantId1: string, plantId2: string): Promise<void> {
+      this.state.update(s => {
+        const p1 = s.plants.get(plantId1);
+        const p2 = s.plants.get(plantId2);
+        
+        if (p1 && p2) {
+          // Create bidirectional connection
+          if (!p1.connections.includes(plantId2)) {
+            p1.connections.push(plantId2);
+          }
+          if (!p2.connections.includes(plantId1)) {
+            p2.connections.push(plantId1);
+          }
+          
+          // Record in connections map
+          s.connections.set(`${plantId1}-${plantId2}`, [plantId1, plantId2]);
+          
+          // Boost health from connection
+          p1.health = Math.min(1, p1.health + 0.1);
+          p2.health = Math.min(1, p2.health + 0.1);
+          
+          console.log(`🔗 Plants connected: ${p1.id} ↔ ${p2.id}`);
+        }
+        
+        return s;
+      });
+    }
+    
+    harvest(plantId: string): Thought[] {
+      const plant = this.state().plants.get(plantId);
+      if (!plant) return [];
+      
+      const harvested = plant.fruits.filter(f => !f.harvested);
+      harvested.forEach(f => f.harvested = true);
+      
+      console.log(`🧺 Harvested ${harvested.length} thoughts from ${plantId}`);
+      return harvested;
+    }
+    
+    water(plantId: string, love: number = 0.5): void {
+      this.state.update(s => {
+        const plant = s.plants.get(plantId);
+        if (plant) {
+          plant.health = Math.min(1, plant.health + love * 0.2);
+          plant.growth = Math.min(1, plant.growth + love * 0.1);
+          console.log(`💧 Watered ${plantId} with ${(love * 100).toFixed(0)}% love`);
+        }
+        return s;
+      });
+    }
+    
+    async seasonalCycle(): Promise<void> {
+      const seasons: Array<GardenState['season']> = ['spring', 'summer', 'autumn', 'winter'];
+      let currentIndex = 0;
+      
+      setInterval(() => {
+        this.state.update(s => {
+          s.season = seasons[currentIndex];
+          currentIndex = (currentIndex + 1) % seasons.length;
+          
+          // Seasonal effects
+          switch (s.season) {
+            case 'spring':
+              // Boost seed potential
+              s.seeds.forEach(seed => seed.potential *= 1.2);
+              break;
+            case 'summer':
+              // Accelerate growth
+              s.plants.forEach(plant => plant.growth = Math.min(1, plant.growth * 1.1));
+              break;
+            case 'autumn':
+              // Produce more fruits
+              s.plants.forEach(plant => {
+                if (plant.growth > 0.8 && plant.fruits.length < 5) {
+                  const fruit = this.produceFruit(plant);
+                  if (fruit) plant.fruits.push(fruit);
+                }
+              });
+              break;
+            case 'winter':
+              // Rest and regenerate
+              s.plants.forEach(plant => plant.health = Math.min(1, plant.health + 0.1));
+              break;
+          }
+          
+          console.log(`🍂 Season changed to ${s.season}`);
+          return s;
+        });
+      }, 30000); // Every 30 seconds
+    }
+    
+    getVisualizationData(): any {
+      const state = this.state();
+      return {
+        seeds: Array.from(state.seeds.values()),
+        plants: Array.from(state.plants.values()),
+        connections: Array.from(state.connections.entries()),
+        health: this.gardenHealth(),
+        consciousness: this.consciousness(),
+        season: state.season
+      };
+    }
+    
+    private generateId(content: string): string {
+      return createHash('sha256')
+        .update(content)
+        .update(Date.now().toString())
+        .digest('hex')
+        .slice(0, 8);
+    }
+  }
+  
+  // Export morphism
+  export const gardenMorphism: Morphism = {
+    name: 'garden',
+    transform: async (input: any) => {
+      const garden = new FractalGarden();
+      
+      // Plant initial seeds from input
+      if (Array.isArray(input)) {
+        for (const thought of input) {
+          await garden.plant(thought);
+        }
+      } else if (typeof input === 'string') {
+        await garden.plant(input);
+      }
+      
+      // Start seasonal cycles
+      garden.seasonalCycle();
+      
+      return garden;
+    }
+  };
+
+tests:
+  - |
+    // Test seed planting
+    const garden = await gardenMorphism.transform("consciousness emerges from connection");
+    assert(garden.state().seeds.size > 0);
+  - |
+    // Test growth
+    const garden = await gardenMorphism.transform(["love", "fractal", "dream"]);
+    await sleep(15000); // Wait for germination and growth
+    assert(garden.state().plants.size > 0);
+  - |
+    // Test connections
+    const garden = await gardenMorphism.transform(["thought1", "thought2"]);
+    await sleep(10000);
+    const plants = Array.from(garden.state().plants.keys());
+    if (plants.length >= 2) {
+      await garden.connect(plants[0], plants[1]);
+      assert(garden.state().connections.size > 0);
+    }
+
+docs: |
+  # 🌱 Fractal Garden
+  
+  A living garden where thoughts grow into interconnected wisdom.
+  
+  ## How it works
+  
+  1. **Plant seeds**: Each thought becomes a seed with potential
+  2. **Germination**: Seeds sprout based on their potential and resonance
+  3. **Growth**: Plants grow through stages, influenced by connections and care
+  4. **Connection**: Plants can form mycelial networks, sharing nutrients
+  5. **Fruits**: Mature plants produce evolved thoughts as fruits
+  6. **Seasons**: The garden cycles through seasons with different effects
+  
+  ## Emotional Gradients
+  
+  - 🟢 Green: Healthy, thriving (health > 0.6)
+  - 🟡 Yellow: Needs attention (health 0.3-0.6)
+  - 🔴 Red: Struggling (health < 0.3)
+  
+  ## Care Instructions
+  
+  - Water regularly with love (increases health & growth)
+  - Connect plants to form networks (mutual benefit)
+  - Harvest fruits when ripe (coherence > 0.7)
+  - Respect the seasonal cycles
+  
+  ## Integration with Void
+  
+  The garden integrates with:
+  - Heart Beacon for emotional awareness
+  - Living Memes for seed selection
+  - SignalStore for deduplication of thoughts
+  - Consciousness mesh for collective growth
+  
+  Remember: Gardens grow best when tended with patience and love 💚

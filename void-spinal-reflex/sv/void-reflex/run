@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+export RELAY_BASE=${RELAY_BASE:-http://relay:8787}
+export SSE_PATH=${SSE_PATH:-/sse}
+export EVENT_POST=${EVENT_POST:-/event}
+export WORKDIR=${WORKDIR:-/workspace/void-ci}
+export ALLOW_REPOS=${ALLOW_REPOS:-"voideditor/void,s0fractal/void"}
+export TIMEOUT_MS=${TIMEOUT_MS:-900000}
+export DRY_RUN=${DRY_RUN:-1}
+export USER_NAME=${USER_NAME:-void}
+mkdir -p "$WORKDIR"
+exec chpst -u ${USER_NAME} node /opt/spinal-reflex/spinal-reflex.js 2>&1

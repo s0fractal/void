@@ -1,0 +1,26 @@
+# Docker Compose override to connect Void Substrate with Sensor Incubator
+# Usage: docker-compose -f docker-compose.yml -f compose-with-sensors.yml up -d
+
+version: '3.8'
+
+services:
+  void-substrate:
+    # Connect to sensor network
+    networks:
+      - default
+      - voidnet
+    
+    # Add event agent environment
+    environment:
+      - RELAY_URL=http://void-sensor-incubator-relay-1:8787/event
+      - RELAY_API_KEY=${RELAY_API_KEY:-}
+    
+    # Mount event agent service
+    volumes:
+      - ./services/void-event-agent:/etc/sv/void-event-agent:ro
+
+# External network created by sensor incubator
+networks:
+  voidnet:
+    external: true
+    name: voidnet

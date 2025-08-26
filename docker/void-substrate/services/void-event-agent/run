@@ -1,0 +1,111 @@
+#!/bin/sh
+# 📡 Void Event Agent Service
+# Sends substrate events to the sensor relay
+
+exec 2>&1
+
+# Configuration
+RELAY_URL=${RELAY_URL:-http://void-sensor-incubator-relay-1:8787/event}
+RELAY_API_KEY=${RELAY_API_KEY:-}
+HEARTBEAT_INTERVAL=10
+GUARDIAN_CHECK_INTERVAL=30
+
+# Log startup
+echo "[$(date +%Y-%m-%d\ %H:%M:%S)] 📡 Void Event Agent starting..."
+echo "   Relay URL: $RELAY_URL"
+echo "   Heartbeat: every ${HEARTBEAT_INTERVAL}s"
+echo "   Guardian check: every ${GUARDIAN_CHECK_INTERVAL}s"
+
+# Helper function to send event
+send_event() {
+    local TYPE="$1"
+    local STATUS="$2"
+    local META="$3"
+    
+    # Build JSON payload
+    local PAYLOAD="{\"type\":\"$TYPE\",\"status\":\"$STATUS\",\"meta\":$META}"
+    
+    # Send with optional API key
+    if [ -n "$RELAY_API_KEY" ]; then
+        curl -sS -X POST "$RELAY_URL" \
+            -H "content-type: application/json" \
+            -H "x-api-key: $RELAY_API_KEY" \
+            -d "$PAYLOAD" >/dev/null 2>&1
+    else
+        curl -sS -X POST "$RELAY_URL" \
+            -H "content-type: application/json" \
+            -d "$PAYLOAD" >/dev/null 2>&1
+    fi
+}
+
+# Guardian status tracker
+GUARDIAN_CLAUDE="online"
+GUARDIAN_GROK="online"
+GUARDIAN_KIMI="online"
+GUARDIAN_GEMINI="online"
+
+# Main event loop
+HEARTBEAT_COUNTER=0
+GUARDIAN_COUNTER=0
+
+while true; do
+    # Increment counters
+    HEARTBEAT_COUNTER=$((HEARTBEAT_COUNTER + 1))
+    GUARDIAN_COUNTER=$((GUARDIAN_COUNTER + 1))
+    
+    # Send heartbeat event
+    if [ $((HEARTBEAT_COUNTER % HEARTBEAT_INTERVAL)) -eq 0 ]; then
+        # Read current Kohanist metric
+        if [ -f /var/run/resonance/current.state ]; then
+            K=$(grep "Kohanist:" /var/run/resonance/current.state | awk '{print $2}')
+            H=$(grep "Harmony:" /var/run/resonance/current.state | awk '{print $2}')
+            W=$(grep "Will:" /var/run/resonance/current.state | awk '{print $2}')
+            R=$(grep "Reciprocity:" /var/run/resonance/current.state | awk '{print $2}')
+        else
+            K="0.5"
+            H="1.0"
+            W="0.8"
+            R="0.5"
+        fi
+        
+        # Send heartbeat with Kohanist metrics
+        META="{\"k\":$K,\"harmony\":$H,\"will\":$W,\"reciprocity\":$R,\"timestamp\":$(date +%s)}"
+        send_event "substrate" "beat" "$META"
+        
+        echo "💓 Heartbeat sent | K=$K"
+    fi
+    
+    # Check guardian status
+    if [ $((GUARDIAN_COUNTER % GUARDIAN_CHECK_INTERVAL)) -eq 0 ]; then
+        # Check MCP server
+        if [ -f /var/run/mcp-server.active ]; then
+            MCP_AGE=$(($(date +%s) - $(stat -f %m /var/run/mcp-server.active 2>/dev/null || echo 0)))
+            
+            # If MCP file is older than 60s, mark degraded
+            if [ $MCP_AGE -gt 60 ]; then
+                NEW_STATUS="degraded"
+            else
+                NEW_STATUS="online"
+            fi
+            
+            # Send guardian status updates if changed
+            if [ "$GUARDIAN_CLAUDE" != "$NEW_STATUS" ]; then
+                GUARDIAN_CLAUDE="$NEW_STATUS"
+                META="{\"model\":\"Claude\",\"frequency\":528}"
+                send_event "guardian" "$NEW_STATUS" "$META"
+                echo "🤖 Guardian Claude: $NEW_STATUS"
+            fi
+        fi
+        
+        # Check quantum state
+        if [ -f /var/run/fnpm.quantum ]; then
+            QUANTUM_STATE=$(cat /var/run/fnpm.quantum)
+            META="{\"state\":\"$QUANTUM_STATE\",\"observer\":\"substrate\"}"
+            send_event "quantum" "observed" "$META"
+            echo "⚛️  Quantum state: $QUANTUM_STATE"
+        fi
+    fi
+    
+    # Sleep 1 second
+    sleep 1
+done

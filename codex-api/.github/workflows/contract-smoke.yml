@@ -1,0 +1,27 @@
+name: contract-smoke
+on: [push, pull_request]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        working-directory: server
+        run: npm ci
+      - name: Build & start
+        working-directory: server
+        run: npm run build && node dist/index.js &
+      - name: Wait
+        run: sleep 2
+      - name: Smoke tests
+        run: node - <<'EOF'
+const http=require('http');
+function post(path, body){return new Promise((resolve,reject)=>{const req=http.request({host:'localhost',port:8788,path,method:'POST',headers:{'content-type':'application/json'}},res=>{let d='';res.on('data',c=>d+=c);res.on('end',()=>resolve({status:res.statusCode,body:d}));});req.on('error',reject);req.write(JSON.stringify(body));req.end();});}
+(async()=>{
+  const plan=await post('/codex/plan',{intent:'stabilize ipfs',context:{incidents:['ipfs:degraded']}}); if(plan.status!==200) process.exit(1);
+  const rules=await post('/codex/rules',{}); if(rules.status!==200) process.exit(1);
+  const rep=await post('/codex/report',{pulse_log:''}); if(rep.status!==200) process.exit(1);
+  const cm=await post('/codex/commit-msg',{changes:[{path:'rules.yaml',summary:'tune rule'}]}); if(cm.status!==200) process.exit(1);
+  console.log('OK');
+})();
+EOF

@@ -1,0 +1,9 @@
+{
+  "name": "void-pulse-metrics",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "eventsource": "^2.0.2",
+    "prom-client": "^14.2.0"
+  }
+}

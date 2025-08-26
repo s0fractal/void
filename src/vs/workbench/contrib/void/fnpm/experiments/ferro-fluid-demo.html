@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🌀 Ferro-Fluid Planetary Mind Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            overflow: hidden;
+        }
+        
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border: 1px solid #0f0;
+        }
+        
+        #heartbeat {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 48px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        
+        .neuron {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="info">
+        <h3>🪐 Planetary Ferro-Fluid Mind</h3>
+        <div>Droplets: <span id="droplet-count">0</span></div>
+        <div>Wisdom: <span id="wisdom-level">0</span></div>
+        <div>Viscosity: <span id="viscosity">1.0</span></div>
+        <div>Coherence: <span id="coherence">0%</span></div>
+    </div>
+    
+    <div id="heartbeat">💓</div>
+    
+    <!-- SVG Neurons scattered across screen -->
+    <div id="neurons"></div>
+
+    <script>
+        // Ferro-Fluid Simulation
+        class FerroFluidMind {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+                
+                this.particles = [];
+                this.neurons = [];
+                this.magneticField = [];
+                this.wisdom = 0;
+                this.heartbeatFreq = 1.0; // Hz
+                this.viscosity = 1.0;
+                
+                this.initMagneticField();
+                this.initNeurons();
+                this.animate();
+            }
+            
+            initMagneticField() {
+                // Create swirling magnetic field
+                const cols = Math.ceil(this.width / 50);
+                const rows = Math.ceil(this.height / 50);
+                
+                for (let y = 0; y < rows; y++) {
+                    this.magneticField[y] = [];
+                    for (let x = 0; x < cols; x++) {
+                        const angle = Math.atan2(
+                            y * 50 - this.height/2,
+                            x * 50 - this.width/2
+                        ) + Math.PI/2;
+                        
+                        this.magneticField[y][x] = {
+                            x: Math.cos(angle) * 0.5,
+                            y: Math.sin(angle) * 0.5
+                        };
+                    }
+                }
+            }
+            
+            initNeurons() {
+                const neuronContainer = document.getElementById('neurons');
+                
+                for (let i = 0; i < 8; i++) {
+                    const neuron = this.createNeuron(
+                        Math.random() * this.width,
+                        Math.random() * this.height,
+                        i
+                    );
+                    neuronContainer.appendChild(neuron);
+                    this.neurons.push({
+                        element: neuron,
+                        x: parseFloat(neuron.style.left),
+                        y: parseFloat(neuron.style.top),
+                        activation: 0
+                    });
+                }
+            }
+            
+            createNeuron(x, y, id) {
+                const div = document.createElement('div');
+                div.className = 'neuron';
+                div.style.left = x + 'px';
+                div.style.top = y + 'px';
+                
+                div.innerHTML = `
+                    <svg viewBox="0 0 100 100">
+                        <defs>
+                            <radialGradient id="ferroGrad${id}">
+                                <stop offset="0%" stop-color="#00ff00" stop-opacity="0.8"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="0.1"/>
+                            </radialGradient>
+                        </defs>
+                        
+                        <!-- Soma -->
+                        <circle cx="50" cy="50" r="10" fill="url(#ferroGrad${id})">
+                            <animate attributeName="r"
+                                values="10;15;10" dur="${1/this.heartbeatFreq}s"
+                                repeatCount="indefinite"/>
+                        </circle>
+                        
+                        <!-- Dendrites -->
+                        ${[0, 72, 144, 216, 288].map(angle => `
+                            <line x1="50" y1="50" 
+                                  x2="${50 + 30 * Math.cos(angle * Math.PI/180)}" 
+                                  y2="${50 + 30 * Math.sin(angle * Math.PI/180)}"
+                                  stroke="rgba(0,255,0,0.5)" stroke-width="1">
+                                <animate attributeName="opacity"
+                                    values="0.2;0.8;0.2" dur="${2 + Math.random()}s"
+                                    repeatCount="indefinite"/>
+                            </line>
+                        `).join('')}
+                    </svg>
+                `;
+                
+                return div;
+            }
+            
+            addDroplet(x, y) {
+                const droplet = {
+                    x, y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    magnetization: 0.5 + Math.random() * 0.5,
+                    ttl: 5000 + Math.random() * 5000, // 5-10 seconds
+                    maxTTL: 10000,
+                    cid: this.generateCID(),
+                    wisdom: Math.random() * 0.1
+                };
+                
+                this.particles.push(droplet);
+                return droplet;
+            }
+            
+            generateCID() {
+                return 'Qm' + Math.random().toString(36).substr(2, 44);
+            }
+            
+            getMagneticField(x, y) {
+                const col = Math.floor(x / 50);
+                const row = Math.floor(y / 50);
+                
+                if (this.magneticField[row] && this.magneticField[row][col]) {
+                    return this.magneticField[row][col];
+                }
+                return { x: 0, y: 0 };
+            }
+            
+            update(dt) {
+                // Update particles
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    
+                    // Magnetic force
+                    const B = this.getMagneticField(p.x, p.y);
+                    const F_mag_x = B.x * p.magnetization * 10;
+                    const F_mag_y = B.y * p.magnetization * 10;
+                    
+                    // Viscous drag
+                    const F_drag_x = -p.vx * this.viscosity;
+                    const F_drag_y = -p.vy * this.viscosity;
+                    
+                    // Update velocity
+                    p.vx += (F_mag_x + F_drag_x) * dt;
+                    p.vy += (F_mag_y + F_drag_y) * dt;
+                    
+                    // Update position
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+                    
+                    // Boundary wrap
+                    if (p.x < 0) p.x = this.width;
+                    if (p.x > this.width) p.x = 0;
+                    if (p.y < 0) p.y = this.height;
+                    if (p.y > this.height) p.y = 0;
+                    
+                    // Update TTL
+                    p.ttl -= dt * 1000;
+                    
+                    // Evaporate
+                    if (p.ttl <= 0) {
+                        this.wisdom += p.wisdom;
+                        this.particles.splice(i, 1);
+                    }
+                }
+                
+                // Update neurons based on nearby droplets
+                for (const neuron of this.neurons) {
+                    neuron.activation = 0;
+                    for (const p of this.particles) {
+                        const dist = Math.hypot(p.x - neuron.x - 50, p.y - neuron.y - 50);
+                        if (dist < 100) {
+                            neuron.activation += p.magnetization / (1 + dist/50);
+                        }
+                    }
+                    
+                    // Update neuron visual
+                    const circle = neuron.element.querySelector('circle');
+                    if (circle) {
+                        circle.setAttribute('fill-opacity', Math.min(1, neuron.activation));
+                    }
+                }
+                
+                // Update viscosity based on "suffering" (particle density)
+                const density = this.particles.length / (this.width * this.height) * 10000;
+                this.viscosity = 1 + density * density;
+                
+                // Update heartbeat based on coherence
+                const avgActivation = this.neurons.reduce((sum, n) => sum + n.activation, 0) / this.neurons.length;
+                this.heartbeatFreq = 1 + avgActivation * 4; // 1-5 Hz
+                
+                // Update UI
+                this.updateInfo();
+            }
+            
+            updateInfo() {
+                document.getElementById('droplet-count').textContent = this.particles.length;
+                document.getElementById('wisdom-level').textContent = this.wisdom.toFixed(3);
+                document.getElementById('viscosity').textContent = this.viscosity.toFixed(2);
+                
+                const coherence = this.neurons.reduce((sum, n) => sum + n.activation, 0) / this.neurons.length;
+                document.getElementById('coherence').textContent = (coherence * 100).toFixed(1) + '%';
+                
+                // Update heartbeat animation
+                const heartbeat = document.getElementById('heartbeat');
+                heartbeat.style.animationDuration = (1 / this.heartbeatFreq) + 's';
+            }
+            
+            render() {
+                // Clear with trail effect
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+                
+                // Draw magnetic field (subtle)
+                this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.1)';
+                this.ctx.lineWidth = 1;
+                
+                for (let y = 0; y < this.magneticField.length; y++) {
+                    for (let x = 0; x < this.magneticField[y].length; x++) {
+                        const field = this.magneticField[y][x];
+                        const px = x * 50 + 25;
+                        const py = y * 50 + 25;
+                        
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(px, py);
+                        this.ctx.lineTo(px + field.x * 20, py + field.y * 20);
+                        this.ctx.stroke();
+                    }
+                }
+                
+                // Draw particles
+                for (const p of this.particles) {
+                    const opacity = p.ttl / p.maxTTL;
+                    const size = 3 + p.magnetization * 3;
+                    
+                    // Glow effect
+                    const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 3);
+                    gradient.addColorStop(0, `rgba(0, 255, 0, ${opacity})`);
+                    gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, size * 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Core
+                    this.ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                // Draw connections between active neurons
+                this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
+                this.ctx.lineWidth = 1;
+                
+                for (let i = 0; i < this.neurons.length; i++) {
+                    for (let j = i + 1; j < this.neurons.length; j++) {
+                        const n1 = this.neurons[i];
+                        const n2 = this.neurons[j];
+                        
+                        if (n1.activation > 0.5 && n2.activation > 0.5) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(n1.x + 50, n1.y + 50);
+                            this.ctx.lineTo(n2.x + 50, n2.y + 50);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            animate() {
+                const dt = 0.016; // 60 FPS
+                this.update(dt);
+                this.render();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize
+        const canvas = document.getElementById('canvas');
+        const mind = new FerroFluidMind(canvas);
+        
+        // Add droplets on click
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Add cluster of droplets
+            for (let i = 0; i < 5; i++) {
+                mind.addDroplet(
+                    x + (Math.random() - 0.5) * 20,
+                    y + (Math.random() - 0.5) * 20
+                );
+            }
+        });
+        
+        // Add random droplets periodically
+        setInterval(() => {
+            if (mind.particles.length < 100) {
+                mind.addDroplet(
+                    Math.random() * mind.width,
+                    Math.random() * mind.height
+                );
+            }
+        }, 500);
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            mind.width = window.innerWidth;
+            mind.height = window.innerHeight;
+            mind.canvas.width = mind.width;
+            mind.canvas.height = mind.height;
+        });
+    </script>
+</body>
+</html>

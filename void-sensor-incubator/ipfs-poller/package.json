@@ -1,0 +1,11 @@
+{
+  "name": "ipfs-poller",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "main": "ipfs-poller.js",
+  "scripts": {
+    "start": "node ipfs-poller.js"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,15 @@
+{
+  "name": "void-glyph-relay",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "main": "relay.js",
+  "scripts": {
+    "start": "node relay.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0",
+    "cors": "^2.8.5"
+  }
+}

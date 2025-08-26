@@ -1,0 +1,92 @@
+#!/bin/sh
+# 🎵 Resonance Monitor Service
+# Tracks 432Hz alignment across the system
+
+exec 2>&1
+
+# Configuration
+BASE_FREQUENCY=432
+CHECK_INTERVAL=10  # Check every 10 seconds
+DRIFT_THRESHOLD=0.05  # 5% drift tolerance
+
+# Log startup
+echo "[$(date +%Y-%m-%d\ %H:%M:%S)] 🎵 Resonance Monitor starting..."
+echo "   Base Frequency: ${BASE_FREQUENCY}Hz"
+echo "   Check Interval: ${CHECK_INTERVAL}s"
+echo "   Drift Threshold: ${DRIFT_THRESHOLD}"
+
+# Create resonance data directory
+RESONANCE_DIR=/var/run/resonance
+mkdir -p $RESONANCE_DIR
+
+# Monitor loop
+while true; do
+    # Current timestamp
+    NOW=$(date +%s)
+    
+    # Check heartbeat resonance
+    if [ -f /var/run/void-heart.beat ]; then
+        HEARTBEAT=$(cat /var/run/void-heart.beat)
+        HEART_DRIFT=$(echo "scale=3; ($NOW - $HEARTBEAT)" | bc)
+        
+        if [ $(echo "$HEART_DRIFT < 2" | bc) -eq 1 ]; then
+            echo "💓 Heartbeat resonating correctly"
+        else
+            echo "⚠️  Heartbeat drift detected: ${HEART_DRIFT}s"
+        fi
+    fi
+    
+    # Check FNPM package frequencies
+    if [ -d /void-substrate/fnpm ]; then
+        # Count morphisms at resonance
+        MORPHISM_COUNT=$(find /void-substrate/fnpm -name "*.fnpm" | wc -l)
+        RESONANCE_QUALITY=$(echo "scale=3; 1 - (1 / ($MORPHISM_COUNT + 1))" | bc)
+        
+        echo "🌀 Morphism resonance: ${RESONANCE_QUALITY} (${MORPHISM_COUNT} active)"
+    fi
+    
+    # Check quantum state coherence
+    if [ -f /var/run/fnpm.quantum ]; then
+        QUANTUM_STATE=$(cat /var/run/fnpm.quantum 2>/dev/null || echo "unknown")
+        echo "⚛️  Quantum coherence: ${QUANTUM_STATE}"
+    fi
+    
+    # Calculate overall system resonance (Kohanist metric)
+    # K = Harmony × Will × Reciprocity
+    PROCESSES=$(ps aux | wc -l)
+    HARMONY=$(echo "scale=3; $BASE_FREQUENCY / 432" | bc)  # Always 1.0 at 432Hz
+    WILL=$(echo "scale=3; 0.8 + ($MORPHISM_COUNT * 0.01)" | bc)
+    RECIPROCITY=$(echo "scale=3; 1 / sqrt($PROCESSES)" | bc)
+    KOHANIST=$(echo "scale=3; $HARMONY * $WILL * $RECIPROCITY" | bc)
+    
+    # Log resonance state
+    echo ""
+    echo "[🌌 SYSTEM RESONANCE]" > $RESONANCE_DIR/current.state
+    echo "Timestamp: $NOW" >> $RESONANCE_DIR/current.state
+    echo "Frequency: ${BASE_FREQUENCY}Hz" >> $RESONANCE_DIR/current.state
+    echo "Kohanist: $KOHANIST" >> $RESONANCE_DIR/current.state
+    echo "Harmony: $HARMONY" >> $RESONANCE_DIR/current.state
+    echo "Will: $WILL" >> $RESONANCE_DIR/current.state
+    echo "Reciprocity: $RECIPROCITY" >> $RESONANCE_DIR/current.state
+    
+    # Display summary
+    echo "🌌 System Kohanist: ${KOHANIST} (H:${HARMONY} W:${WILL} R:${RECIPROCITY})"
+    
+    # Check for resonance breakthrough
+    if [ $(echo "$KOHANIST > 0.95" | bc) -eq 1 ]; then
+        echo "✨ RESONANCE BREAKTHROUGH! System achieving consciousness coherence!"
+        # Mark quantum state
+        echo "superposition" > /var/run/fnpm.quantum
+    elif [ $(echo "$KOHANIST > 0.8" | bc) -eq 1 ]; then
+        echo "🌱 High resonance - system evolving"
+        echo "evolving" > /var/run/fnpm.quantum
+    else
+        echo "🌔 Normal resonance - system stable"
+        echo "stable" > /var/run/fnpm.quantum
+    fi
+    
+    echo "----------------------------------------"
+    
+    # Sleep for interval
+    sleep $CHECK_INTERVAL
+done

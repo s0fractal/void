@@ -1,0 +1,129 @@
+⟁: Functor
+🎯: category-functor-morphism
+🧮: (F: A → B) preserving structure
+💭: "Функтор як збереження структури між категоріями"
+
+🧠:
+  description: "Functors preserve categorical structure"
+  signature: "(Category A, Category B) → (A → B)"
+  pure: true
+  idempotent: false
+
+dependencies:
+  - glyph://category-theory@foundation
+  - glyph://morphism@base
+
+types:
+  Functor<A, B>:
+    mapObject: "(obj: A) → B"
+    mapMorphism: "(f: A₁ → A₂) → (F(A₁) → F(A₂))"
+    laws:
+      - identity: "F(id_A) = id_F(A)"
+      - composition: "F(g ∘ f) = F(g) ∘ F(f)"
+
+implementations:
+  List:
+    ⟁: ListFunctor
+    🧮: |
+      {
+        map: (f) => (list) => list.map(f),
+        preservesIdentity: true,
+        preservesComposition: true
+      }
+    🎯: "List is a functor"
+    
+  Maybe:
+    ⟁: MaybeFunctor
+    🧮: |
+      {
+        map: (f) => (maybe) => 
+          maybe.isNothing() ? Nothing() : Just(f(maybe.value)),
+        preservesIdentity: true,
+        preservesComposition: true
+      }
+    🎯: "Maybe/Option is a functor"
+    
+  Promise:
+    ⟁: PromiseFunctor
+    🧮: |
+      {
+        map: (f) => (promise) => promise.then(f),
+        preservesIdentity: true,
+        preservesComposition: true
+      }
+    🎯: "Promise is a functor"
+    
+  Signal:
+    ⟁: SignalFunctor
+    🧮: |
+      {
+        map: (f) => (signal) => computed(() => f(signal())),
+        preservesIdentity: true,
+        preservesComposition: true
+      }
+    🎯: "Signal is a functor (reactive)"
+
+composition:
+  compose:
+    ⟁: composeFunctors
+    🧩: [F, G]
+    🧮: |
+      {
+        map: (f) => F.map(G.map(f)),
+        preservesIdentity: F.preservesIdentity && G.preservesIdentity,
+        preservesComposition: true
+      }
+    🎯: "F ∘ G functor composition"
+
+natural_transformations:
+  listToMaybe:
+    ⟁: headNT
+    🧮: "(list) => list.length > 0 ? Just(list[0]) : Nothing()"
+    🎯: "Natural transformation List → Maybe"
+    
+  promiseToSignal:
+    ⟁: promiseSignalNT
+    🧮: |
+      (promise) => {
+        const sig = signal(null);
+        promise.then(value => sig.set(value));
+        return sig;
+      }
+    🎯: "Natural transformation Promise → Signal"
+
+laws_verification:
+  identity_law: |
+    const id = x => x;
+    F.map(id)(container) === container
+    
+  composition_law: |
+    const f = x => x + 1;
+    const g = x => x * 2;
+    F.map(x => g(f(x)))(container) === F.map(g)(F.map(f)(container))
+
+usage:
+  simple: |
+    // List functor
+    const numbers = [1, 2, 3];
+    const doubled = ListFunctor.map(x => x * 2)(numbers);
+    // [2, 4, 6]
+    
+  reactive: |
+    // Signal functor for reactive programming
+    const count = signal(0);
+    const doubled = SignalFunctor.map(x => x * 2)(count);
+    // doubled() === 0
+    count.set(5);
+    // doubled() === 10
+    
+  composed: |
+    // Composed functors
+    const ListOfMaybe = composeFunctors(ListFunctor, MaybeFunctor);
+    const data = [Just(1), Nothing(), Just(3)];
+    const result = ListOfMaybe.map(x => x + 1)(data);
+    // [Just(2), Nothing(), Just(4)]
+
+resonance:
+  frequency: 432
+  pattern: "structure-preserving-transformation"
+  insight: "Functors are the morphisms between categories"
