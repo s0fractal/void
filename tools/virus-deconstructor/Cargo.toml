@@ -1,0 +1,24 @@
+[package]
+name = "virus-deconstructor"
+version = "0.1.0"
+edition = "2021"
+authors = ["s0fractal collective"]
+description = "Extract pure functions from JS/TS code for WASM compilation"
+
+[dependencies]
+swc_core = { version = "0.90", features = ["ecma_ast", "ecma_parser", "ecma_visit"] }
+swc_ecma_parser = "0.143"
+swc_common = "0.33"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+clap = { version = "4.4", features = ["derive"] }
+walkdir = "2.4"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+hex = "0.4"
+
+[dev-dependencies]
+tempfile = "3.8"
+pretty_assertions = "1.4"

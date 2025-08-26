@@ -1,0 +1,183 @@
+---
+name: virus-deconstructor-integration
+version: @gene-extraction
+description: "Інтеграція Virus-Deconstructor v0.1 - витягує чисті функції для WASM компіляції 🦠"
+frequency: 432
+author: "s0fractal collective"
+safety: "read-only extraction"
+
+manifest:
+  - extract:
+      effect: "Scan codebase for pure functions"
+      method: "AST analysis with SWC"
+      output: "NDJSON gene manifest"
+  - hash:
+      effect: "Compute canonical AST hashes"
+      purpose: "Content-addressed function storage"
+  - publish:
+      effect: "Optional IPFS publishing"
+      condition: "IPFS_API environment variable set"
+
+bootstrap: |
+  console.log('🦠 Virus-Deconstructor Integration Active');
+  console.log('=====================================');
+  console.log('');
+  console.log('📋 Capabilities:');
+  console.log('  • Extract pure functions from JS/TS');
+  console.log('  • Compute canonical AST hashes');
+  console.log('  • Generate NDJSON manifests');
+  console.log('  • Publish to IPFS (optional)');
+  console.log('');
+  console.log('🔬 Ready to extract genetic material!');
+  
+  return {
+    tool_path: 'tools/virus-deconstructor',
+    status: 'ready',
+    safety: 'guaranteed_readonly'
+  };
+
+functions:
+  quickExtract: |
+    function(targetPath = 'apps/first-node/src') {
+      console.log(`\n🦠 Extracting genes from: ${targetPath}`);
+      
+      const commands = [
+        '# Build the virus',
+        'cd tools/virus-deconstructor',
+        'cargo build --release',
+        '',
+        '# Extract pure functions',
+        `./target/release/virus-deconstructor scan \\`,
+        `  --root ../../${targetPath} \\`,
+        `  --out ../../artifacts/genes-$(date +%s).manifest.ndjson`,
+        '',
+        '# Optional: publish to IPFS',
+        'bash ../../scripts/ipfs-publish.sh ../../artifacts/genes-*.ndjson'
+      ];
+      
+      console.log('\n📋 Commands to run:');
+      commands.forEach(cmd => console.log(cmd));
+      
+      return { ready: true, commands };
+    }
+    
+  analyzeGeneQuality: |
+    function(manifest) {
+      console.log('\n🧬 Analyzing extracted genes...');
+      
+      // Parse NDJSON lines
+      const genes = manifest.split('\n')
+        .filter(line => line.trim())
+        .map(line => JSON.parse(line));
+      
+      const stats = {
+        total: genes.length,
+        byType: {},
+        avgComplexity: 0,
+        purityScore: 100
+      };
+      
+      // Categorize genes
+      genes.forEach(gene => {
+        const category = categorizeGene(gene);
+        stats.byType[category] = (stats.byType[category] || 0) + 1;
+      });
+      
+      console.log(`\n📊 Gene Analysis:`);
+      console.log(`  Total pure functions: ${stats.total}`);
+      console.log(`  Categories:`);
+      Object.entries(stats.byType).forEach(([type, count]) => {
+        console.log(`    • ${type}: ${count}`);
+      });
+      
+      return stats;
+    }
+    
+  prepareForWASM: |
+    function(genes) {
+      console.log('\n⚙️ Preparing genes for WASM compilation...');
+      
+      const wasmReady = genes.map(gene => ({
+        ...gene,
+        wasm_module: `${gene.name}_${gene.hash.slice(0, 8)}.wasm`,
+        entry_point: gene.name,
+        memory_pages: estimateMemoryPages(gene),
+        optimization_level: 3
+      }));
+      
+      console.log(`✅ ${wasmReady.length} genes ready for WASM builder`);
+      
+      return wasmReady;
+    }
+    
+  integrateWithChimera: |
+    function() {
+      console.log('\n🔗 Integration points with Chimera:');
+      console.log('');
+      console.log('1. Virus-Deconstructor → Gene Manifest (NDJSON)');
+      console.log('2. Gene Manifest → WASM Builder');
+      console.log('3. WASM Builder → CID Generation');
+      console.log('4. CID → IPFS/Protein Hash');
+      console.log('5. FNPM → Install by CID');
+      console.log('');
+      console.log('🌀 Full cycle at 432Hz!');
+    }
+
+helpers:
+  categorizeGene: |
+    function(gene) {
+      if (gene.name.includes('add') || gene.name.includes('multiply')) {
+        return 'math';
+      } else if (gene.params.length === 0) {
+        return 'constant';
+      } else if (gene.params.length === 1) {
+        return 'transform';
+      } else if (gene.params.length === 2) {
+        return 'binary-op';
+      } else {
+        return 'complex';
+      }
+    }
+    
+  estimateMemoryPages: |
+    function(gene) {
+      // Simple heuristic based on function complexity
+      const basePages = 1;
+      const paramPages = Math.ceil(gene.params.length / 4);
+      const bodyPages = Math.ceil(gene.body.length / 1024);
+      return basePages + paramPages + bodyPages;
+    }
+
+commands:
+  - "extract <path>": "Extract pure functions from path"
+  - "analyze <manifest>": "Analyze extracted genes"
+  - "publish <manifest>": "Publish to IPFS"
+  - "integrate": "Show Chimera integration"
+
+purity_rules:
+  allowed:
+    - "Pure mathematical operations"
+    - "Array/object transformations"
+    - "String manipulations"
+    - "Functional composition"
+    
+  forbidden:
+    - "console.* calls"
+    - "DOM manipulation"
+    - "Network requests"
+    - "File system access"
+    - "Random/Date/Time"
+    - "Global mutations"
+    - "Async operations"
+
+integration_status:
+  chimera_wasm: "ready"
+  protein_hash: "compatible"
+  ipfs_publish: "implemented"
+  fnpm_resolver: "pending"
+  
+warnings:
+  - "Only extracts truly pure functions"
+  - "Async/await automatically excluded"
+  - "External dependencies make function impure"
+  - "Canonical AST hash may vary between versions"

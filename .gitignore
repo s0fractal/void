@@ -28,3 +28,28 @@ product.overrides.json
 .tool-versions
 src/vs/workbench/contrib/void/browser/react/out/**
 src/vs/workbench/contrib/void/browser/react/src2/**
+
+# Chimera/FNPM artifacts
+artifacts/*.json
+artifacts/*.ndjson
+artifacts/*.manifest.*
+artifacts/*.log
+
+# Experiments (local playground)
+experiments/
+
+# Generated reports
+*-report-*.md
+chaos-report-*.md
+apocalypse-*.log
+quantum-consciousness-*.md
+
+# Local state files
+*.state.json
+*-state.json
+timeline-debug-state.json
+garden-harvest.json
+
+# Rust virus-deconstructor
+tools/virus-deconstructor/target/
+tools/virus-deconstructor/Cargo.lock
