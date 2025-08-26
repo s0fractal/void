@@ -2,6 +2,39 @@
 
 > Compiling pure functions to WebAssembly with content-addressable storage
 
+## 🛠️ Quick Start
+
+### Development Testing
+```bash
+# Setup (one-time)
+cd tools/wasm-builder
+npm install
+npm run build
+
+# Build genes (with flags)
+export CHIMERA_ENABLED=1 WASM_EXEC_ENABLED=1
+node dist/build.js --out ../../chimera-output
+
+# View manifest
+cat ../../chimera-output/manifest.json | jq .
+```
+
+### Reproducible Builds
+```bash
+export WASM_DETERMINISTIC=1 SOURCE_DATE_EPOCH=0
+node tools/wasm-builder/dist/build.js --out chimera-output
+shasum -a 256 chimera-output/*.wasm
+```
+
+### CAR Verification
+```bash
+# List contents of CAR file
+ipfs-car --list --input chimera-output/add.tinygo.car
+
+# Or using IPLD tools
+car ls chimera-output/add.tinygo.car
+```
+
 ## 🚀 What We've Built
 
 We've successfully integrated:

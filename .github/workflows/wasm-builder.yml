@@ -1,0 +1,143 @@
+name: WASM Builder CI
+
+on:
+  pull_request:
+    paths:
+      - 'tools/wasm-builder/**'
+      - 'genes/**'
+      - '.github/workflows/wasm-builder.yml'
+  push:
+    branches:
+      - chimera-integration
+      - feat/chimera-wasm-*
+
+env:
+  # Safe defaults for CI
+  CHIMERA_ENABLED: 1
+  WASM_EXEC_ENABLED: 0
+  WASM_CANARY: 1.0  # Always build in CI
+  WASM_DETERMINISTIC: 1
+  DEBUG_WASM: 1
+
+jobs:
+  build-wasm:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            cache-path: |
+              ~/.cargo
+              ~/.rustup
+              ~/go/pkg/mod
+    
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+        
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: wasm32-wasi
+        
+    - name: Install TinyGo
+      run: |
+        wget https://github.com/tinygo-org/tinygo/releases/download/v0.31.0/tinygo_0.31.0_amd64.deb
+        sudo dpkg -i tinygo_0.31.0_amd64.deb
+        tinygo version
+        
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ matrix.cache-path }}
+        key: ${{ matrix.os }}-wasm-${{ hashFiles('**/Cargo.toml', '**/go.mod', '**/package-lock.json') }}
+        restore-keys: |
+          ${{ matrix.os }}-wasm-
+          
+    - name: Install WASM builder deps
+      run: |
+        cd tools/wasm-builder
+        npm ci
+        
+    - name: Build WASM builder
+      run: |
+        cd tools/wasm-builder
+        npm run build
+        
+    - name: Test gene compilation
+      run: |
+        cd tools/wasm-builder
+        node dist/build.js --out ../../chimera-output
+        
+    - name: Verify deterministic builds
+      run: |
+        cd tools/wasm-builder
+        
+        # First build
+        rm -rf ../../chimera-output
+        WASM_DETERMINISTIC=1 node dist/build.js --out ../../chimera-output
+        cp -r ../../chimera-output ../../chimera-output-1
+        
+        # Second build
+        rm -rf ../../chimera-output
+        WASM_DETERMINISTIC=1 node dist/build.js --out ../../chimera-output
+        
+        # Compare SHA256
+        echo "First build:"
+        shasum -a 256 ../../chimera-output-1/*.wasm | sort
+        echo "Second build:"
+        shasum -a 256 ../../chimera-output/*.wasm | sort
+        
+        # Verify they match
+        diff <(shasum -a 256 ../../chimera-output-1/*.wasm | sort) \
+             <(shasum -a 256 ../../chimera-output/*.wasm | sort)
+        
+    - name: Show manifest
+      run: |
+        cat chimera-output/manifest.json | jq .
+        
+    - name: Generate summary
+      run: |
+        echo "## WASM Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Genes Built" >> $GITHUB_STEP_SUMMARY
+        echo '```json' >> $GITHUB_STEP_SUMMARY
+        cat chimera-output/manifest.json | jq '.genes[] | {name, lang, size, cid: .cid[:20] + "..."}' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Deterministic: ✅" >> $GITHUB_STEP_SUMMARY
+        echo "### Total genes: $(cat chimera-output/manifest.json | jq '.genes | length')" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wasm-genes-${{ matrix.os }}
+        path: |
+          chimera-output/*.wasm
+          chimera-output/*.car
+          chimera-output/manifest.json
+        retention-days: 7
+        
+    - name: Label PR
+      if: github.event_name == 'pull_request'
+      uses: actions/labeler@v4
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: |
+          smoke:
+            - 'tools/wasm-builder/**'
+            - 'genes/**'
