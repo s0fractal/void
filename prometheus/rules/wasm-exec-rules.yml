@@ -1,0 +1,69 @@
+groups:
+  - name: wasm_exec
+    interval: 30s
+    rules:
+      # Latency alerts
+      - alert: WasmExecP95High
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(void_wasm_run_duration_ms_bucket[5m])) by (le)
+          ) > 300
+        for: 10m
+        labels:
+          severity: warning
+          component: wasm-exec
+        annotations:
+          summary: "WASM execution P95 latency high"
+          description: "P95 latency is {{ $value }}ms (threshold 300ms)"
+          
+      # Policy denial spike
+      - alert: WasmPolicyDeniedSpike
+        expr: |
+          sum(increase(void_wasm_policy_denied_total[5m])) > 50
+        for: 5m
+        labels:
+          severity: warning
+          component: wasm-exec
+        annotations:
+          summary: "High rate of policy denials"
+          description: "{{ $value }} denials in last 5 minutes"
+          
+      # Resource violations
+      - alert: WasmResourceViolations
+        expr: |
+          sum(increase(void_wasm_resource_violations_total[10m])) > 0
+        for: 1m
+        labels:
+          severity: warning
+          component: wasm-exec
+        annotations:
+          summary: "WASM resource limit violations"
+          description: "{{ $value }} violations in last 10 minutes"
+          
+      # HTTP error rate
+      - alert: WasmHttpErrorRate
+        expr: |
+          sum(rate(void_wasm_http_requests_total{status!="200"}[5m])) 
+          / 
+          sum(rate(void_wasm_http_requests_total[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          component: wasm-exec
+        annotations:
+          summary: "High HTTP error rate from WASM"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+          
+      # Execution errors
+      - alert: WasmExecErrorRate
+        expr: |
+          sum(rate(void_wasm_runs_total{status="error"}[5m]))
+          /
+          sum(rate(void_wasm_runs_total[5m])) > 0.01
+        for: 10m
+        labels:
+          severity: critical
+          component: wasm-exec
+        annotations:
+          summary: "High WASM execution error rate"
+          description: "Error rate is {{ $value | humanizePercentage }}"

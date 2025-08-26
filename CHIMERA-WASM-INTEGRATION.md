@@ -2,6 +2,62 @@
 
 > Compiling pure functions to WebAssembly with content-addressable storage
 
+## ⚡ Execution & Policies
+
+### Secure WASM Execution
+
+Execute compiled WASM modules with full policy control:
+
+```bash
+# Via API
+curl -X POST http://localhost:3456/v1/exec \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target": { "cid": "bafkrei..." },
+    "entry": "add(i32,i32)->i32",
+    "args": [2, 3]
+  }'
+
+# Via CLI
+void-wasm exec bafkrei... --entry add --i32 2 --i32 3
+```
+
+### Security Policies
+
+All capabilities are **opt-in**:
+
+```bash
+# Default: Only emit events
+WASM_CAPS=emit
+
+# Add HTTP with allowlist
+WASM_CAPS=emit,http
+WASM_HTTP_ALLOWLIST=api.example.com,ipfs.io
+
+# Add KV store
+WASM_CAPS=emit,http,kv
+```
+
+### Resource Limits
+
+Strict limits enforced:
+- Memory: 256 pages (~16MB)
+- CPU: 200ms budget
+- Wall time: 1000ms timeout
+- HTTP: 2 RPS, 128KB responses
+- KV: 100 keys, 4KB values
+
+### Canary Deployment
+
+```bash
+# Start with 5% traffic
+WASM_EXEC_ENABLED=1 WASM_EXEC_CANARY=0.05
+
+# Monitor metrics, then increase
+WASM_EXEC_CANARY=0.25  # 25%
+WASM_EXEC_CANARY=1.0   # Full rollout
+```
+
 ## 🚀 What We've Built
 
 We've successfully integrated:

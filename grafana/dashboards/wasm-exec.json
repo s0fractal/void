@@ -1,0 +1,76 @@
+{
+  "dashboard": {
+    "title": "WASM Executor",
+    "uid": "wasm-exec",
+    "tags": ["chimera", "wasm"],
+    "timezone": "browser",
+    "refresh": "10s",
+    "panels": [
+      {
+        "title": "Execution Rate",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [{
+          "expr": "rate(void_wasm_runs_total[5m])",
+          "legendFormat": "{{status}} - {{mode}}"
+        }]
+      },
+      {
+        "title": "P95 Latency",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [{
+          "expr": "histogram_quantile(0.95, rate(void_wasm_run_duration_ms_bucket[5m]))",
+          "legendFormat": "p95"
+        }]
+      },
+      {
+        "title": "Policy Denials",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [{
+          "expr": "rate(void_wasm_policy_denied_total[5m])",
+          "legendFormat": "{{cap}} - {{reason}}"
+        }]
+      },
+      {
+        "title": "Syscall Rate",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [{
+          "expr": "rate(void_wasm_syscalls_total[5m])",
+          "legendFormat": "{{kind}} - {{decision}}"
+        }]
+      },
+      {
+        "title": "HTTP Requests",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [{
+          "expr": "rate(void_wasm_http_requests_total[5m])",
+          "legendFormat": "{{host}} - {{status}}"
+        }]
+      },
+      {
+        "title": "Resource Violations",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [{
+          "expr": "increase(void_wasm_resource_violations_total[1h])",
+          "legendFormat": "{{type}}"
+        }]
+      },
+      {
+        "title": "Canary Ratio",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 24 },
+        "targets": [{
+          "expr": "void_wasm_canary_ratio"
+        }]
+      }
+    ],
+    "annotations": {
+      "list": [{
+        "datasource": "Prometheus",
+        "enable": true,
+        "expr": "changes(void_wasm_canary_ratio[1m]) > 0",
+        "name": "Canary Changes",
+        "tagKeys": "chimera,canary",
+        "textFormat": "Canary ratio changed"
+      }]
+    }
+  }
+}

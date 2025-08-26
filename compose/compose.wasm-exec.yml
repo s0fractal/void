@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  wasm-exec:
+    build:
+      context: ../services/wasm-exec
+      dockerfile: Dockerfile
+    environment:
+      # All disabled by default - enable as needed
+      - WASM_EXEC_ENABLED=0
+      - WASM_EXEC_CANARY=0.05
+      - WASM_EXEC_FREEZE=0
+      
+      # Resource limits
+      - WASM_MEM_PAGES_MAX=256
+      - WASM_CPU_MS_BUDGET=200
+      - WASM_WALL_MS_BUDGET=1000
+      
+      # Capabilities
+      - WASM_CAPS=emit
+      
+      # HTTP policies
+      - WASM_HTTP_ALLOWLIST=
+      - WASM_HTTP_RPS=2
+      - WASM_HTTP_BURST=4
+      - WASM_HTTP_MAX_BYTES=131072
+      
+      # FNPM integration
+      - FNPM_MANIFEST_DIRS=./chimera-output
+      - FNPM_HTTP_GATEWAYS=https://ipfs.io,https://cloudflare-ipfs.com
+      
+      # Monitoring
+      - NODE_ENV=development
+      - LOG_LEVEL=info
+      
+    ports:
+      - "3456:3456"
+    volumes:
+      - ../chimera-output:/app/chimera-output:ro
+      - ~/.fnpm/cache:/root/.fnpm/cache
+    networks:
+      - void-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+          
+  # Optional: Local IPFS node
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    environment:
+      - IPFS_PROFILE=server
+    ports:
+      - "5001:5001"  # API
+      - "8080:8080"  # Gateway
+    volumes:
+      - ipfs-data:/data/ipfs
+    networks:
+      - void-net
+      
+networks:
+  void-net:
+    driver: bridge
+    
+volumes:
+  ipfs-data:
