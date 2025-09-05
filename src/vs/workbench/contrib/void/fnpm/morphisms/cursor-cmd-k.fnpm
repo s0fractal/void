@@ -1,0 +1,231 @@
+---
+name: cursor-cmd-k
+version: 1.0.0
+description: "Inline AI editing via floating Cmd+K widget - extracted from Cursor"
+author: "chimera-collective"
+gene_source: "cursor"
+type: "ai-interaction"
+tags: ["ai", "inline-editing", "productivity"]
+
+dependencies:
+  - ai-provider-interface
+  - diff-engine
+  - floating-widget
+
+manifest:
+  features:
+    - "Select text and press Cmd+K for inline AI editing"
+    - "Floating input appears at cursor position"  
+    - "Live diff preview as AI responds"
+    - "Tab to accept, Esc to cancel"
+    - "Preserves undo history"
+
+bootstrap: |
+  console.log('🧬 Injecting Cursor Cmd+K gene...');
+  
+  // Register command
+  vscode.commands.registerCommand('void.aiInlineEdit', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+    
+    const selection = editor.selection;
+    const selectedText = editor.document.getText(selection);
+    
+    // Create floating widget at cursor position
+    const widget = await createFloatingWidget(editor, selection);
+    
+    // Handle user input
+    widget.onDidAccept(async (instruction) => {
+      const aiResponse = await processAIEdit(selectedText, instruction);
+      await applyDiffWithPreview(editor, selection, aiResponse);
+    });
+  });
+  
+  // Register keybinding
+  vscode.commands.registerCommand('type', async (args) => {
+    if (args.text === 'k' && isCommandPressed()) {
+      vscode.commands.executeCommand('void.aiInlineEdit');
+      return;
+    }
+    // Pass through to default handler
+    return vscode.commands.executeCommand('default:type', args);
+  });
+
+implementation: |
+  import { createFloatingWidget } from '../ui/floating-widget';
+  import { AIProvider } from '../ai/provider-interface';
+  import { DiffEngine } from '../diff/engine';
+  
+  export class CursorCmdKMorphism {
+    private aiProvider: AIProvider;
+    private diffEngine: DiffEngine;
+    
+    constructor() {
+      this.aiProvider = new AIProvider();
+      this.diffEngine = new DiffEngine();
+    }
+    
+    async activate(context: vscode.ExtensionContext) {
+      // Register the inline edit command
+      const disposable = vscode.commands.registerCommand(
+        'void.aiInlineEdit',
+        this.handleInlineEdit.bind(this)
+      );
+      
+      context.subscriptions.push(disposable);
+      
+      // Override Cmd+K
+      await this.overrideKeybinding(context);
+    }
+    
+    private async handleInlineEdit() {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+      
+      const selection = editor.selection;
+      const position = selection.active;
+      
+      // Create floating input widget
+      const widget = new FloatingWidget({
+        anchor: editor.cursorPosition,
+        placeholder: 'Describe how to modify this code...',
+        width: 400,
+        theme: 'cursor-style'
+      });
+      
+      widget.onInput(async (instruction: string) => {
+        // Show loading state
+        widget.showLoading();
+        
+        // Get AI suggestion
+        const context = this.gatherContext(editor, selection);
+        const suggestion = await this.aiProvider.getInlineEdit(
+          context,
+          instruction
+        );
+        
+        // Show diff preview
+        const diff = this.diffEngine.computeDiff(
+          context.selectedText,
+          suggestion
+        );
+        
+        widget.showDiff(diff);
+      });
+      
+      widget.onAccept(async (suggestion: string) => {
+        // Apply the edit
+        await editor.edit(editBuilder => {
+          editBuilder.replace(selection, suggestion);
+        });
+        
+        widget.dispose();
+      });
+      
+      widget.onCancel(() => {
+        widget.dispose();
+      });
+      
+      widget.show();
+    }
+    
+    private gatherContext(editor: vscode.TextEditor, selection: vscode.Selection) {
+      // Intelligent context gathering
+      const document = editor.document;
+      const selectedText = document.getText(selection);
+      
+      // Get surrounding context
+      const lineStart = Math.max(0, selection.start.line - 10);
+      const lineEnd = Math.min(document.lineCount - 1, selection.end.line + 10);
+      const contextRange = new vscode.Range(lineStart, 0, lineEnd, 0);
+      const contextText = document.getText(contextRange);
+      
+      // Get file info
+      const language = document.languageId;
+      const fileName = path.basename(document.fileName);
+      
+      return {
+        selectedText,
+        contextText,
+        language,
+        fileName,
+        selection
+      };
+    }
+  }
+
+ui_component: |
+  // Floating widget CSS
+  .void-floating-widget {
+    position: absolute;
+    background: var(--vscode-dropdown-background);
+    border: 1px solid var(--vscode-dropdown-border);
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+    z-index: 1000;
+  }
+  
+  .void-floating-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-editor-font-family);
+    font-size: var(--vscode-editor-font-size);
+    width: 100%;
+    padding: 4px 8px;
+  }
+  
+  .void-diff-preview {
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .void-diff-added {
+    background: rgba(0, 255, 0, 0.1);
+    color: var(--vscode-gitDecoration-addedResourceForeground);
+  }
+  
+  .void-diff-removed {
+    background: rgba(255, 0, 0, 0.1);
+    color: var(--vscode-gitDecoration-deletedResourceForeground);
+    text-decoration: line-through;
+  }
+
+keybindings: |
+  {
+    "key": "cmd+k",
+    "command": "void.aiInlineEdit",
+    "when": "editorTextFocus && !editorReadonly"
+  }
+
+settings: |
+  {
+    "void.cmdK.aiProvider": {
+      "type": "string",
+      "default": "anthropic",
+      "enum": ["anthropic", "openai", "local"],
+      "description": "AI provider for Cmd+K inline editing"
+    },
+    "void.cmdK.streamResponse": {
+      "type": "boolean",
+      "default": true,
+      "description": "Stream AI responses for faster feedback"
+    },
+    "void.cmdK.contextLines": {
+      "type": "number", 
+      "default": 10,
+      "description": "Lines of context to send with edit request"
+    }
+  }
+
+telemetry: |
+  // Track usage to improve the feature
+  {
+    "cmdK.triggered": "When user presses Cmd+K",
+    "cmdK.accepted": "When user accepts AI suggestion",
+    "cmdK.cancelled": "When user cancels",
+    "cmdK.responseTime": "Time from request to first token"
+  }
